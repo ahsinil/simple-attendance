@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Secure Attend - User Management</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b8cee",
+                        "primary-dark": "#1a6ec0",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2632",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 24px;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .icon-sm {
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-200">
+    <div class="flex h-screen w-full overflow-hidden">
+        <aside
+            class="hidden md:flex flex-col w-72 bg-surface-light dark:bg-surface-dark border-r border-slate-200 dark:border-slate-800 h-full">
+            <div class="p-6">
+                <div class="flex items-center gap-3">
+                    <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shrink-0 shadow-sm"
+                        data-alt="Secure Attend logo showing a blue shield abstract icon"
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD9TNbnxhTMXzDkimCfzxkfFq0jB0KcAXdJ_6BKMth-a9BqSnuGx5cLnPgsZTiyoYb26hpI2cHu7jtOHFes8wtouKTkNTM0WugSaaVkTKtYeMf9S_YzyEj1W6zcyUUKus9vaHUywXOi2t1yYh2ctsARuljBiKstHjAZobC1g7G6lSJ3_lMY_364MaMPuv593ulsucyUiR4P6fYRa7FIt2-nmzfbgE87RPIXdAqVf2KKwtuQnDeKemJYxcRXqjMdYugldEW6_JTFjvnY");'>
+                    </div>
+                    <div class="flex flex-col">
+                        <h1 class="text-slate-900 dark:text-white text-base font-bold leading-normal">Secure Attend</h1>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Admin Console
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto px-4 py-2">
+                <nav class="flex flex-col gap-1">
+                    <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                        href="#">
+                        <span
+                            class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary">dashboard</span>
+                        <p class="text-sm font-medium leading-normal">Dashboard</p>
+                    </a>
+                    <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary dark:text-primary transition-colors"
+                        href="#">
+                        <span class="material-symbols-outlined icon-fill">group</span>
+                        <p class="text-sm font-bold leading-normal">User Management</p>
+                    </a>
+                    <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                        href="#">
+                        <span
+                            class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary">schedule</span>
+                        <p class="text-sm font-medium leading-normal">Shift Management</p>
+                    </a>
+                    <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                        href="#">
+                        <span
+                            class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary">fact_check</span>
+                        <p class="text-sm font-medium leading-normal">Manual Attendance Approval</p>
+                    </a>
+                    <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                        href="#">
+                        <span
+                            class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary">analytics</span>
+                        <p class="text-sm font-medium leading-normal">Reporting</p>
+                    </a>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+                <button
+                    class="flex items-center gap-3 px-3 py-2 w-full rounded-lg text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="text-sm font-medium">Sign Out</span>
+                </button>
+            </div>
+        </aside>
+        <main class="flex-1 flex flex-col min-w-0 bg-background-light dark:bg-background-dark overflow-hidden">
+            <header
+                class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-surface-dark px-6 py-3 shrink-0 z-10">
+                <div class="flex items-center gap-4">
+                    <button class="md:hidden p-1 text-slate-600 dark:text-slate-300">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                    <div
+                        class="md:hidden size-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">
+                        SA</div>
+                    <h2
+                        class="hidden sm:block text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">
+                        User Management</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <button
+                            class="relative flex size-10 cursor-pointer items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                            <span class="material-symbols-outlined icon-sm">notifications</span>
+                            <span
+                                class="absolute top-2.5 right-2.5 size-2 rounded-full bg-red-500 border-2 border-slate-100 dark:border-slate-800"></span>
+                        </button>
+                        <button
+                            class="flex size-10 cursor-pointer items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                            <span class="material-symbols-outlined icon-sm">help</span>
+                        </button>
+                    </div>
+                    <div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+                    <div class="flex items-center gap-3 cursor-pointer">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-sm font-bold text-slate-900 dark:text-white leading-none">Sarah Jenkins</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Super Admin</p>
+                        </div>
+                        <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-slate-100 dark:border-slate-700 shadow-sm"
+                            data-alt="Profile picture of Sarah Jenkins"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDuaxOM8tQkZxcrFKaWkMkXjd87WEiSjkngqcjsuSnjYK8G8C15fPZ8D9AF7WIVhVjZkbN--eiWcK1V2oiXaAViVrqOyiM-X0hMVqC7G3zvXHm5GQEmGmVdGke1P3-68-8NIUhi8puLjAEG7CjMvKBsgt8nUUrJK00iPeOk6t8oXVO3K3AIuMeaXTuxFQpk-aQgoo02YP2k5yZtCDzXww_B2O9n3ehiioypdv0-reW65OoxblsAmK33kR3hRxGKBxIOpCHmmUWNSyRv");'>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 scroll-smooth">
+                <div class="max-w-7xl mx-auto flex flex-col gap-6">
+                    <div class="flex items-center gap-2 text-sm">
+                        <a class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
+                            href="#">Dashboard</a>
+                        <span class="text-slate-400 dark:text-slate-600">/</span>
+                        <span class="text-slate-900 dark:text-slate-200 font-medium">User Management</span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                        <div class="flex flex-col gap-2">
+                            <h1
+                                class="text-slate-900 dark:text-white text-3xl sm:text-4xl font-black leading-tight tracking-tight">
+                                User Management</h1>
+                            <p class="text-slate-500 dark:text-slate-400 text-base font-normal max-w-2xl">Manage access,
+                                roles, and device registrations for all employees securely.</p>
+                        </div>
+                        <button
+                            class="flex items-center justify-center gap-2 h-11 px-6 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg shadow-sm hover:shadow transition-all duration-200 whitespace-nowrap">
+                            <span class="material-symbols-outlined icon-sm">add</span>
+                            <span>Add New Employee</span>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div
+                            class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-1">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Users</p>
+                            <div class="flex items-end gap-2">
+                                <p class="text-slate-900 dark:text-white text-2xl font-bold leading-none">1,248</p>
+                                <p
+                                    class="text-green-600 dark:text-green-400 text-xs font-bold bg-green-50 dark:bg-green-900/30 px-1.5 py-0.5 rounded flex items-center">
+                                    <span class="material-symbols-outlined" style="font-size: 12px;">arrow_upward</span>
+                                    12%
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-1">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Active Employees</p>
+                            <div class="flex items-end gap-2">
+                                <p class="text-slate-900 dark:text-white text-2xl font-bold leading-none">1,150</p>
+                                <p
+                                    class="text-green-600 dark:text-green-400 text-xs font-bold bg-green-50 dark:bg-green-900/30 px-1.5 py-0.5 rounded flex items-center">
+                                    <span class="material-symbols-outlined" style="font-size: 12px;">arrow_upward</span>
+                                    5%
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-1">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Admins</p>
+                            <div class="flex items-end gap-2">
+                                <p class="text-slate-900 dark:text-white text-2xl font-bold leading-none">12</p>
+                                <p
+                                    class="text-slate-500 dark:text-slate-500 text-xs font-bold bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                                    0%</p>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-1">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Pending Devices</p>
+                            <div class="flex items-end gap-2">
+                                <p class="text-slate-900 dark:text-white text-2xl font-bold leading-none">45</p>
+                                <p
+                                    class="text-amber-600 dark:text-amber-400 text-xs font-bold bg-amber-50 dark:bg-amber-900/30 px-1.5 py-0.5 rounded flex items-center">
+                                    <span class="material-symbols-outlined" style="font-size: 12px;">arrow_upward</span>
+                                    2%
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        class="flex flex-col md:flex-row gap-4 justify-between bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div class="relative flex-1 max-w-md">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <span class="material-symbols-outlined icon-sm">search</span>
+                            </span>
+                            <input
+                                class="w-full h-10 pl-10 pr-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+                                placeholder="Search by name, email or ID..." type="text" />
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <div class="relative min-w-[140px]">
+                                <select
+                                    class="appearance-none w-full h-10 pl-3 pr-10 rounded-lg border border-slate-200 dark:border-slate-700 bg-surface-light dark:bg-surface-dark text-slate-700 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer">
+                                    <option value="">All Roles</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="employee">Employee</option>
+                                    <option value="super_admin">Super Admin</option>
+                                </select>
+                                <span
+                                    class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none text-slate-500">
+                                    <span class="material-symbols-outlined icon-sm">expand_more</span>
+                                </span>
+                            </div>
+                            <div class="relative min-w-[140px]">
+                                <select
+                                    class="appearance-none w-full h-10 pl-3 pr-10 rounded-lg border border-slate-200 dark:border-slate-700 bg-surface-light dark:bg-surface-dark text-slate-700 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer">
+                                    <option value="">Status: All</option>
+                                    <option value="active">Active</option>
+                                    <option value="suspended">Suspended</option>
+                                    <option value="pending">Pending</option>
+                                </select>
+                                <span
+                                    class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none text-slate-500">
+                                    <span class="material-symbols-outlined icon-sm">expand_more</span>
+                                </span>
+                            </div>
+                            <button
+                                class="flex items-center justify-center gap-2 h-10 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold rounded-lg transition-colors">
+                                <span class="material-symbols-outlined icon-sm">filter_list</span>
+                                <span>More</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr
+                                        class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                                        <th class="p-4 w-10">
+                                            <input
+                                                class="size-4 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-primary focus:ring-primary"
+                                                type="checkbox" />
+                                        </th>
+                                        <th
+                                            class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                            User</th>
+                                        <th
+                                            class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                            Role</th>
+                                        <th
+                                            class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                            Device Status</th>
+                                        <th
+                                            class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                            Status</th>
+                                        <th
+                                            class="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">
+                                            Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                        <td class="p-4">
+                                            <input
+                                                class="size-4 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-primary focus:ring-primary"
+                                                type="checkbox" />
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shadow-sm border border-slate-100 dark:border-slate-700"
+                                                    data-alt="Portrait of Michael Chen"
+                                                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBKUGvcZvKUZ0EecZP_Eyu-iamTsukVC3rrySiu0YR4dNpHv4LVUpHSEeOntxmvGTyp_ZkkgCcCq5fww0bdiyUaRnqmEsbc9I1Z-0Fkzdgen-FDvg5hYFmB9yyQLaufQ4F3d71IwvzFzV7SgWJ-KJTLliN9I8y6uPJdAmLHsBAT1ZPLf7GLZ9NIEeYM2ZoLGduiU-7CHX9JCeyWFzWk037iL3BP7XgkMbKKOwsp5feiaEHr3-7b7damtWijst8dKUZYHaDN4oQGSDWG");'>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <span
+                                                        class="text-sm font-bold text-slate-900 dark:text-white">Michael
+                                                        Chen</span>
+                                                    <span
+                                                        class="text-xs text-slate-500 dark:text-slate-400">michael.chen@company.com</span>
+                                                    <span class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">ID:
+                                                        EMP-2023-045</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-800">
+                                                Admin
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex flex-col gap-1">
+                                                <div
+                                                    class="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+                                                    <span class="material-symbols-outlined icon-fill"
+                                                        style="font-size: 16px;">verified_user</span>
+                                                    <span class="text-xs font-bold">Verified</span>
+                                                </div>
+                                                <span class="text-xs text-slate-500 dark:text-slate-400">iPhone 13 Pro
+                                                    (iOS 16)</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-100 dark:border-green-800">
+                                                <span class="size-1.5 rounded-full bg-green-500"></span>
+                                                Active
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <div
+                                                class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400"
+                                                    title="Edit User">
+                                                    <span class="material-symbols-outlined icon-sm">edit</span>
+                                                </button>
+                                                <button
+                                                    class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400"
+                                                    title="View Logs">
+                                                    <span class="material-symbols-outlined icon-sm">history</span>
+                                                </button>
+                                                <button
+                                                    class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400"
+                                                    title="More Actions">
+                                                    <span class="material-symbols-outlined icon-sm">more_vert</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                        <td class="p-4">
+                                            <input
+                                                class="size-4 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-primary focus:ring-primary"
+                                                type="checkbox" />
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shadow-sm border border-slate-100 dark:border-slate-700"
+                                                    data-alt="Portrait of Sarah Jones"
+                                                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2VX_t3TuC7qx3tSot9bln8PQzLm2OoP-5QBpNlK7URXe-xEczVD6BAkrcCLEZmtYiXYNcNlP0CyfjNEsUXEpcwOWWgXuBSza2Eo989XqNh9vaaIaYPZL77MRmsEAfMHZrYMZTIwYonBzXBs9agGhpygGCj34jI93_lwBfidQoOP7_po94Vnc1iJLqEyr-szZv4YCTgSfPY5wpiyQebI4YN_hwtwbir4YW2UVGrUMQa5yjOSrhxi8EmgbbOryOypTAq1fZs5D6sbzW");'>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <span class="text-sm font-bold text-slate-900 dark:text-white">Sarah
+                                                        Jones</span>
+                                                    <span
+                                                        class="text-xs text-slate-500 dark:text-slate-400">sarah.j@company.com</span>
+                                                    <span class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">ID:
+                                                        EMP-2023-112</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                                Employee
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex flex-col gap-1">
+                                                <div
+                                                    class="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+                                                    <span class="material-symbols-outlined icon-fill"
+                                                        style="font-size: 16px;">verified_user</span>
+                                                    <span class="text-xs font-bold">Verified</span>
+                                                </div>
+                                                <span class="text-xs text-slate-500 dark:text-slate-400">Pixel 7
+                                                    (Android 14)</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-100 dark:border-green-800">
+                                                <span class="size-1.5 rounded-full bg-green-500"></span>
+                                                Active
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <div
+                                                class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400">
+                                                    <span class="material-symbols-outlined icon-sm">edit</span>
+                                                </button>
+                                                <button
+                                                    class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400">
+                                                    <span class="material-symbols-outlined icon-sm">history</span>
+                                                </button>
+                                                <button
+                                                    class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400">
+                                                    <span class="material-symbols-outlined icon-sm">more_vert</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                        <td class="p-4">
+                                            <input
+                                                class="size-4 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-primary focus:ring-primary"
+                                                type="checkbox" />
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shadow-sm border border-slate-100 dark:border-slate-700"
+                                                    data-alt="Portrait of James Wilson"
+                                                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCtpMNbh5RujF6rYzd-VC_-LxixTLixcOU3DaOhePJBguBULgihdrXomr3janLHLj5_K5ezpuOrWzDGZPRuL-KuaRV3HRaFb8BrvURKkkt4dCtqOKlC-eFOfFrLf1logz7Rm7Be8_ljDn8i_Dr7lIX531gmaYipRhX9BlyCCb1h3M73BQm5ywZnBNw55bBuzbq_F_PcjU1aoK1Svf4jMommpY6knBZlRlpAxHUVgf_7l6-dLrY0SE2feprkIZGS6NLQDrW7F1FRcDV6");'>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <span class="text-sm font-bold text-slate-900 dark:text-white">James
+                                                        Wilson</span>
+                                                    <span
+                                                        class="text-xs text-slate-500 dark:text-slate-400">james.w@company.com</span>
+                                                    <span class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">ID:
+                                                        EMP-2023-205</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                                Employee
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex flex-col gap-1">
+                                                <div
+                                                    class="flex items-center gap-1.5 text-amber-600 dark:text-amber-500">
+                                                    <span
+                                                        class="material-symbols-outlined icon-sm">phonelink_setup</span>
+                                                    <span class="text-xs font-bold">Registration Pending</span>
+                                                </div>
+                                                <span class="text-xs text-slate-400 dark:text-slate-500">No device
+                                                    linked</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-800">
+                                                <span class="size-1.5 rounded-full bg-amber-500"></span>
+                                                Pending
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <div
+                                                class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    class="px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold">
+                                                    Send Invite
+                                                </button>
+                                                <button
+                                                    class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400">
+                                                    <span class="material-symbols-outlined icon-sm">edit</span>
+                                                </button>
+                                                <button
+                                                    class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400">
+                                                    <span class="material-symbols-outlined icon-sm">more_vert</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                        <td class="p-4">
+                                            <input
+                                                class="size-4 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-primary focus:ring-primary"
+                                                type="checkbox" />
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 shadow-sm border border-slate-100 dark:border-slate-700 grayscale opacity-70"
+                                                    data-alt="Portrait of Elena Rodriguez"
+                                                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCWjE_8Lxm26Ww1sT_XyT98DvYslk4kWYpWNdcacTK97ZS6LiurRAxnXXCFAzQ4sfKX3vHqDHeRhf2CFRxWOFEVH5HE101EuEKjI9YO-gHf88SpmQn_x015wgtaspjv3DkOR7hveJAnonWevAg1gtXgejiFxBdOg5_DKc3cW8FhVMsfMvGq7rI0ZHkHur3rCBeOT6GvNm-WSD2fn6YnHOsqlHuv21Mf72BXXHwTQE33LH5g9rgr0VTXDpcEBw87o22AJbg1tKTB64dH");'>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <span
+                                                        class="text-sm font-bold text-slate-500 dark:text-slate-400">Elena
+                                                        Rodriguez</span>
+                                                    <span
+                                                        class="text-xs text-slate-400 dark:text-slate-500">elena.r@company.com</span>
+                                                    <span class="text-xs text-slate-400 dark:text-slate-600 mt-0.5">ID:
+                                                        EMP-2022-891</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                                                Employee
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex flex-col gap-1">
+                                                <div
+                                                    class="flex items-center gap-1.5 text-slate-400 dark:text-slate-500">
+                                                    <span class="material-symbols-outlined icon-sm">phonelink_off</span>
+                                                    <span class="text-xs font-bold">Unregistered</span>
+                                                </div>
+                                                <span class="text-xs text-slate-400 dark:text-slate-600">Samsung S21
+                                                    (Android 13)</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-100 dark:border-red-800">
+                                                <span class="size-1.5 rounded-full bg-red-500"></span>
+                                                Suspended
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <div
+                                                class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    class="px-3 py-1.5 rounded-lg bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 text-xs font-bold">
+                                                    Reactivate
+                                                </button>
+                                                <button
+                                                    class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400">
+                                                    <span class="material-symbols-outlined icon-sm">edit</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div
+                            class="flex items-center justify-between px-6 py-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-200 dark:border-slate-800">
+                            <p class="text-sm text-slate-500 dark:text-slate-400">
+                                Showing <span class="font-bold text-slate-900 dark:text-white">1-10</span> of <span
+                                    class="font-bold text-slate-900 dark:text-white">1,248</span> users
+                            </p>
+                            <div class="flex gap-2">
+                                <button
+                                    class="flex items-center justify-center size-8 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50">
+                                    <span class="material-symbols-outlined icon-sm">chevron_left</span>
+                                </button>
+                                <button
+                                    class="flex items-center justify-center size-8 rounded bg-primary text-white text-sm font-bold shadow-sm">
+                                    1
+                                </button>
+                                <button
+                                    class="flex items-center justify-center size-8 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium">
+                                    2
+                                </button>
+                                <button
+                                    class="flex items-center justify-center size-8 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium">
+                                    3
+                                </button>
+                                <span class="flex items-center justify-center size-8 text-slate-400">...</span>
+                                <button
+                                    class="flex items-center justify-center size-8 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm font-medium">
+                                    12
+                                </button>
+                                <button
+                                    class="flex items-center justify-center size-8 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700">
+                                    <span class="material-symbols-outlined icon-sm">chevron_right</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-10"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>

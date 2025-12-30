@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Secure Attendance Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b8cee",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+    <div class="min-h-screen flex w-full">
+        <!-- Left Side: Visual/Branding (Hidden on mobile/tablet, visible on desktop) -->
+        <div class="hidden lg:flex w-1/2 relative bg-slate-900 overflow-hidden">
+            <!-- Background Image with Overlay -->
+            <div class="absolute inset-0 bg-cover bg-center opacity-60 mix-blend-overlay"
+                data-alt="Modern bright corporate office hallway with glass walls"
+                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCBFxwccYfgl5Mas2qgLRqVF9klPqv0MYCtI6Va0NmsLDvO-d2CP-8hrKup6bJEef_pKAssIyy7hmodVE-SguOKKNh5DaNhAazmBU9OemWtaY4iIkE15AqJC5fJCE4hg2lgJIagIXLp-4Fwkery4KZqrstayatbD5Uak2oa__DqyVK-FNO8FHlmOQXkAvfGP-Qs2DAkFRItpsgR27Ab-nFSwCblMxnrBYut4yac4UQQgDOfzVgXpUaGTeV_TNwtF9vbi9Rn41DYklxy');">
+            </div>
+            <!-- Gradient Overlay using Primary Color -->
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-primary/90 via-blue-900/90 to-slate-900/95 mix-blend-multiply">
+            </div>
+            <!-- Branding Content -->
+            <div class="relative z-10 flex flex-col justify-between p-16 w-full h-full text-white">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="size-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center p-2 text-white shadow-lg">
+                        <svg class="w-full h-full drop-shadow-sm" fill="none" viewbox="0 0 48 48"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M8.57829 8.57829C5.52816 11.6284 3.451 15.5145 2.60947 19.7452C1.76794 23.9758 2.19984 28.361 3.85056 32.3462C5.50128 36.3314 8.29667 39.7376 11.8832 42.134C15.4698 44.5305 19.6865 45.8096 24 45.8096C28.3135 45.8096 32.5302 44.5305 36.1168 42.134C39.7033 39.7375 42.4987 36.3314 44.1494 32.3462C45.8002 28.361 46.2321 23.9758 45.3905 19.7452C44.549 15.5145 42.4718 11.6284 39.4217 8.57829L24 24L8.57829 8.57829Z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">Secure Attendance</span>
+                </div>
+                <div class="flex flex-col gap-8 max-w-lg">
+                    <h1 class="text-4xl xl:text-5xl font-extrabold leading-tight tracking-tight">
+                        Verify your presence with confidence.
+                    </h1>
+                    <p class="text-blue-100 text-lg leading-relaxed font-medium opacity-90">
+                        Access the workplace securely. Our system ensures accurate time tracking using advanced GPS
+                        validation and dynamic barcode authentication.
+                    </p>
+                    <div class="flex flex-wrap gap-4 mt-2">
+                        <div
+                            class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-full border border-white/20 shadow-sm">
+                            <span class="material-symbols-outlined text-[20px]">location_on</span>
+                            <span class="text-sm font-bold">GPS Verified</span>
+                        </div>
+                        <div
+                            class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-full border border-white/20 shadow-sm">
+                            <span class="material-symbols-outlined text-[20px]">qr_code_scanner</span>
+                            <span class="text-sm font-bold">Dynamic Code</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between items-end border-t border-white/10 pt-8">
+                    <div class="text-sm text-blue-200 font-medium">
+                        © 2024 Enterprise Systems.
+                    </div>
+                    <div class="flex gap-4 text-sm text-blue-200">
+                        <a class="hover:text-white transition-colors" href="#">Privacy Policy</a>
+                        <a class="hover:text-white transition-colors" href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Right Side: Login Form -->
+        <div
+            class="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 sm:p-12 lg:p-24 bg-background-light dark:bg-background-dark transition-colors overflow-y-auto">
+            <div
+                class="w-full max-w-[440px] flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <!-- Mobile Logo Header (Visible only on small screens) -->
+                <div class="lg:hidden flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="size-8 bg-primary rounded-lg flex items-center justify-center p-1.5 text-white shadow-md">
+                            <svg class="w-full h-full" fill="none" viewbox="0 0 48 48"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M8.57829 8.57829C5.52816 11.6284 3.451 15.5145 2.60947 19.7452C1.76794 23.9758 2.19984 28.361 3.85056 32.3462C5.50128 36.3314 8.29667 39.7376 11.8832 42.134C15.4698 44.5305 19.6865 45.8096 24 45.8096C28.3135 45.8096 32.5302 44.5305 36.1168 42.134C39.7033 39.7375 42.4987 36.3314 44.1494 32.3462C45.8002 28.361 46.2321 23.9758 45.3905 19.7452C44.549 15.5145 42.4718 11.6284 39.4217 8.57829L24 24L8.57829 8.57829Z"
+                                    fill="currentColor"></path>
+                            </svg>
+                        </div>
+                        <span class="text-lg font-bold text-slate-900 dark:text-white">Secure Attendance</span>
+                    </div>
+                </div>
+                <!-- Page Heading -->
+                <div class="flex flex-col gap-3">
+                    <h2
+                        class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-[-0.033em] leading-tight">
+                        Employee Portal
+                    </h2>
+                    <p class="text-[#4c739a] dark:text-slate-400 text-base font-normal leading-normal">
+                        Please enter your credentials to verify your presence.
+                    </p>
+                </div>
+                <!-- Login Form -->
+                <form class="flex flex-col gap-6" onsubmit="event.preventDefault()">
+                    <!-- Email Field -->
+                    <label class="flex flex-col gap-2">
+                        <span class="text-[#0d141b] dark:text-slate-200 text-sm font-semibold leading-normal">Email or
+                            Username</span>
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">person</span>
+                            </div>
+                            <input
+                                class="form-input w-full h-14 rounded-lg border border-[#cfdbe7] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#0d141b] dark:text-white placeholder:text-[#4c739a] focus:border-primary focus:ring-0 focus:outline-none dark:focus:border-primary pl-11 px-4 transition-all font-normal text-base shadow-sm"
+                                placeholder="e.g. employee@company.com" type="text" />
+                        </div>
+                    </label>
+                    <!-- Password Field -->
+                    <label class="flex flex-col gap-2">
+                        <span
+                            class="text-[#0d141b] dark:text-slate-200 text-sm font-semibold leading-normal">Password</span>
+                        <div class="relative group flex items-center">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">lock</span>
+                            </div>
+                            <input
+                                class="form-input w-full h-14 rounded-lg border border-[#cfdbe7] dark:border-slate-700 bg-white dark:bg-slate-800 text-[#0d141b] dark:text-white placeholder:text-[#4c739a] focus:border-primary focus:ring-0 focus:outline-none dark:focus:border-primary pl-11 pr-12 transition-all font-normal text-base shadow-sm"
+                                placeholder="Enter your password" type="password" />
+                            <button
+                                class="absolute right-0 top-0 h-full w-12 text-[#4c739a] hover:text-primary transition-colors flex items-center justify-center rounded-r-lg focus:outline-none"
+                                type="button">
+                                <span class="material-symbols-outlined text-[20px]">visibility</span>
+                            </button>
+                        </div>
+                    </label>
+                    <!-- Remember & Forgot Password -->
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input
+                                class="form-checkbox size-4 rounded border-[#cfdbe7] text-primary focus:ring-offset-0 focus:ring-primary bg-slate-50 dark:bg-slate-800 dark:border-slate-600 transition-colors"
+                                type="checkbox" />
+                            <span
+                                class="text-sm font-medium text-[#4c739a] group-hover:text-primary dark:text-slate-400 transition-colors">Remember
+                                me</span>
+                        </label>
+                        <a class="text-sm font-bold text-primary hover:text-blue-600 transition-colors" href="#">Forgot
+                            Password?</a>
+                    </div>
+                    <!-- Submit Button -->
+                    <button
+                        class="w-full h-14 bg-primary hover:bg-blue-600 active:bg-blue-700 text-slate-50 text-base font-bold leading-normal tracking-[0.015em] rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 mt-2 transform active:scale-[0.99]">
+                        <span>Secure Login</span>
+                        <span class="material-symbols-outlined text-[20px] font-bold">arrow_forward</span>
+                    </button>
+                </form>
+                <!-- Security Footer -->
+                <div
+                    class="mt-2 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 flex gap-4 items-start">
+                    <div class="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg text-primary shrink-0">
+                        <span class="material-symbols-outlined text-[24px]">verified_user</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <p class="text-sm font-bold text-slate-900 dark:text-white">Enhanced Security Active</p>
+                        <p class="text-xs text-[#4c739a] dark:text-slate-400 leading-relaxed">
+                            Your login session is protected by Geo-Location verification. Please ensure location
+                            services are enabled on your device.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

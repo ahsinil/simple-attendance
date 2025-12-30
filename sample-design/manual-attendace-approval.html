@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manual Attendance Approval</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2b8cee",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+            },
+            fontFamily: {
+              "display": ["Manrope", "sans-serif"],
+              "body": ["Noto Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#0d141b] dark:text-slate-100 overflow-x-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<aside class="flex w-72 flex-col border-r border-[#e7edf3] bg-white dark:bg-[#1a2632] dark:border-slate-700 hidden lg:flex h-full transition-all">
+<div class="flex h-full flex-col justify-between p-4">
+<div class="flex flex-col gap-4">
+<div class="flex gap-3 items-center px-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shadow-sm" data-alt="Admin portal logo abstract shape" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAOX4NdYg-sMHhT_SDe5XzHMOQkkop9Kqt0_eFPoof6vIY-pRqs8CXZ5wLPd7MMWZd7PzmTzhGUG40v4sc5RVoQQjlKik80FyKbqHkfE0WZluQRHS4uk8PJq7O7z5O8CSPONHRY9iNMTPi64bLzZypzQnpCH3Iske2knrCJuNpE0IzlEUBqCL3YGdskWSlMd8sTwNRVgp2pSjO5G1ajmN1AAz6YGff9xlfxqI2cnBcLzIT45jCyj3lsof18Np4G860fudhrsGzAx4Fd");'></div>
+<div class="flex flex-col">
+<h1 class="text-[#0d141b] dark:text-white text-base font-bold leading-normal">Admin Portal</h1>
+<p class="text-[#4c739a] text-sm font-normal leading-normal">Secure Attendance</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 mt-4">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#4c739a] group-hover:text-primary dark:text-slate-400">dashboard</span>
+<p class="text-[#0d141b] dark:text-slate-200 text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#4c739a] group-hover:text-primary dark:text-slate-400">manage_accounts</span>
+<p class="text-[#0d141b] dark:text-slate-200 text-sm font-medium leading-normal">User Management</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#4c739a] group-hover:text-primary dark:text-slate-400">edit_calendar</span>
+<p class="text-[#0d141b] dark:text-slate-200 text-sm font-medium leading-normal">Shift Management</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 dark:bg-primary/20 transition-colors" href="#">
+<span class="material-symbols-outlined filled text-primary">fact_check</span>
+<p class="text-[#0d141b] dark:text-white text-sm font-bold leading-normal">Manual Attendance Approval</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#4c739a] group-hover:text-primary dark:text-slate-400">analytics</span>
+<p class="text-[#0d141b] dark:text-slate-200 text-sm font-medium leading-normal">Reporting</p>
+</a>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-red-500 hover:text-red-600" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium leading-normal">Log Out</p>
+</a>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e7edf3] dark:border-slate-700 bg-white dark:bg-[#1a2632] px-6 py-3 shrink-0 z-20">
+<div class="flex items-center gap-4 text-[#0d141b] dark:text-white lg:hidden">
+<button class="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Attendance System</h2>
+</div>
+<div class="hidden lg:flex items-center gap-4 text-[#0d141b] dark:text-white">
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Admin Console</h2>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<div class="flex gap-2">
+<button class="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full hover:bg-[#e7edf3] dark:hover:bg-slate-700 text-[#0d141b] dark:text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full hover:bg-[#e7edf3] dark:hover:bg-slate-700 text-[#0d141b] dark:text-white transition-colors">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+</div>
+<div class="w-px h-8 bg-slate-200 dark:bg-slate-700 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-bold text-[#0d141b] dark:text-white leading-tight">Sarah Jenkins</p>
+<p class="text-xs text-[#4c739a] leading-tight">Super Admin</p>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white dark:ring-slate-600 shadow-sm" data-alt="Portrait of Sarah Jenkins, Admin" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJspYjZEecLNmAaWeeAXB-KDOa5_Wy4ZxDuS1dKstHlbQPw-AG-iHA1_AW6xLI0qwMPja-HTIGNatSh2ab1Wg1rH6cY6JKUVotB496XRdjIpiGr4OravvwPOESYtJ297yKPabaz_diq_g3B9AZkZVpN1d6_OIyLE6ht_AOinCN_bQPJanmzfDpZN_LqLhTqI44RV4XEJW257gzO_VJCU_oDVG6XJHkc66aieRfo3miACGAtIaI74fIDoBvtFM7PyULredLBoAU0DN2");'></div>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+<div class="max-w-[1200px] mx-auto flex flex-col gap-6">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+<div class="flex flex-col gap-2">
+<h1 class="text-[#0d141b] dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Manual Attendance Approval</h1>
+<p class="text-[#4c739a] text-base font-normal leading-normal max-w-2xl">Review employee check-in requests validated by GPS and time. Ensure all manual overrides are justified.</p>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center gap-2 rounded-lg bg-white dark:bg-slate-800 border border-[#e7edf3] dark:border-slate-700 px-4 py-2 text-sm font-bold text-[#0d141b] dark:text-white shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+<span class="material-symbols-outlined" style="font-size: 20px;">history</span>
+                                View History
+                            </button>
+<button class="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white shadow-md hover:bg-blue-600 transition-all">
+<span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
+                                Approve All Selected
+                            </button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1a2632] border border-[#e7edf3] dark:border-slate-700 shadow-sm relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-primary" style="font-size: 64px;">pending_actions</span>
+</div>
+<p class="text-[#4c739a] text-sm font-medium uppercase tracking-wider">Pending Requests</p>
+<p class="text-[#0d141b] dark:text-white tracking-tight text-3xl font-bold leading-tight">12</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1a2632] border border-[#e7edf3] dark:border-slate-700 shadow-sm relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-green-600" style="font-size: 64px;">check_circle</span>
+</div>
+<p class="text-[#4c739a] text-sm font-medium uppercase tracking-wider">Approved Today</p>
+<p class="text-[#0d141b] dark:text-white tracking-tight text-3xl font-bold leading-tight">4</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1a2632] border border-[#e7edf3] dark:border-slate-700 shadow-sm relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-red-500" style="font-size: 64px;">cancel</span>
+</div>
+<p class="text-[#4c739a] text-sm font-medium uppercase tracking-wider">Rejected Today</p>
+<p class="text-[#0d141b] dark:text-white tracking-tight text-3xl font-bold leading-tight">1</p>
+</div>
+</div>
+<div class="bg-white dark:bg-[#1a2632] rounded-xl border border-[#e7edf3] dark:border-slate-700 shadow-sm p-4 flex flex-col md:flex-row gap-4 justify-between items-center">
+<div class="relative w-full md:max-w-md">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[#4c739a]">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg bg-[#f6f7f8] dark:bg-slate-800 text-[#0d141b] dark:text-white placeholder-[#4c739a] focus:ring-2 focus:ring-primary text-sm transition-shadow" placeholder="Search by employee name or ID..." type="text"/>
+</div>
+<div class="flex w-full md:w-auto gap-3">
+<div class="relative flex-1 md:flex-none min-w-[160px]">
+<select class="w-full appearance-none bg-[#f6f7f8] dark:bg-slate-800 border-none rounded-lg py-2.5 pl-4 pr-10 text-sm text-[#0d141b] dark:text-white font-medium focus:ring-2 focus:ring-primary cursor-pointer">
+<option>All Departments</option>
+<option>Engineering</option>
+<option>Sales</option>
+<option>Marketing</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#4c739a]">
+<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>
+</div>
+</div>
+<div class="relative flex-1 md:flex-none min-w-[160px]">
+<select class="w-full appearance-none bg-[#f6f7f8] dark:bg-slate-800 border-none rounded-lg py-2.5 pl-4 pr-10 text-sm text-[#0d141b] dark:text-white font-medium focus:ring-2 focus:ring-primary cursor-pointer">
+<option>Sort by: Date</option>
+<option>Sort by: Distance</option>
+<option>Sort by: Name</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#4c739a]">
+<span class="material-symbols-outlined" style="font-size: 20px;">sort</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#1a2632] rounded-xl border border-[#e7edf3] dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#f8fafc] dark:bg-slate-800 border-b border-[#e7edf3] dark:border-slate-700">
+<th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#4c739a]">Employee</th>
+<th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#4c739a]">Time &amp; Date</th>
+<th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#4c739a]">Location Check</th>
+<th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#4c739a] w-1/5">Justification</th>
+<th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#4c739a] w-1/4">Admin Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#e7edf3] dark:divide-slate-700">
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="py-4 px-6 align-top">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Avatar of John Doe" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA3Oq9cPjPXXGFo1oGgCI1EoqZFGKPHEro2Ym7wEm9qnngqL-C91AIpsoyGpO5wVm_D7FBmuUq6sjJpyPM_WqnmuuCtDcI5DCNa6zAD3jveVlGSGPfYMfwv-zyYeVhfjG9KWYdb8oMTlbdsSGMpUXruWL9sMKQ2cVFNuJCQEJtJdAxpUpRDMGnd9Zz4v3FBaYrdVrSZfO9zk5CAuiqCnyoGMhWN28lzKfFdi6ZYODvK_3G_zZDmAeKQg6n9NXqF1mOHT4kIJhdA1L3a");'></div>
+<div>
+<p class="text-sm font-bold text-[#0d141b] dark:text-white">John Doe</p>
+<p class="text-xs text-[#4c739a]">Software Engineer</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="flex flex-col">
+<p class="text-sm font-medium text-[#0d141b] dark:text-white">09:05 AM</p>
+<p class="text-xs text-[#4c739a]">Oct 24, 2023</p>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="flex flex-col gap-1 items-start">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+<span class="material-symbols-outlined" style="font-size: 14px;">my_location</span>
+                                                    45m from HQ
+                                                </span>
+<button class="text-xs text-primary hover:underline flex items-center gap-1 mt-1">
+                                            View on Map
+                                            <span class="material-symbols-outlined" style="font-size: 12px;">open_in_new</span>
+</button>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+<p class="text-sm text-[#0d141b] dark:text-slate-300 italic">"Scanner malfunctioned at the front desk."</p>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="flex flex-col gap-3">
+<input class="w-full text-sm rounded-lg border-[#cfdbe7] dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-primary focus:border-primary px-3 py-2 text-[#0d141b] dark:text-white placeholder:text-slate-400" placeholder="Add optional admin note..." type="text"/>
+<div class="flex gap-2">
+<button class="flex-1 flex items-center justify-center gap-1 rounded-lg bg-primary hover:bg-blue-600 text-white px-3 py-2 text-sm font-bold transition-all shadow-sm">
+<span class="material-symbols-outlined" style="font-size: 18px;">check</span>
+                                                Approve
+                                            </button>
+<button class="flex-1 flex items-center justify-center gap-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:text-red-400 dark:hover:border-red-800 px-3 py-2 text-sm font-bold transition-all">
+<span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+                                                Reject
+                                            </button>
+</div>
+</div>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors bg-red-50/30 dark:bg-red-900/5">
+<td class="py-4 px-6 align-top">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Avatar of Jane Smith" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCFJP-nlmd0U9FZ8s_eZdDTihPsS0mbSle7sDd5BV4EZGUigHG8TMF2YTDl22rugWP6gH69wagFJrh6ub6TSb5mbSmnuvprNztJen9_TN5ic83Z20hhb6g_DwMyKCY0aq75Tzeeb8nwu0ya48pwgGFLuTaSvhVh_53QciLmfnJYdbzOKc6aE4BokaRKZh6STioblj6unMn3TsEcgKz1QGZb1yoaaK58rLZizcwxZX5N0V2zDh4ue7HuoKMxfzG_YljZkqjSe-RU5tGn");'></div>
+<div>
+<p class="text-sm font-bold text-[#0d141b] dark:text-white">Jane Smith</p>
+<p class="text-xs text-[#4c739a]">Product Manager</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="flex flex-col">
+<p class="text-sm font-medium text-[#0d141b] dark:text-white">09:12 AM</p>
+<p class="text-xs text-[#4c739a]">Oct 24, 2023</p>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="flex flex-col gap-1 items-start">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800">
+<span class="material-symbols-outlined" style="font-size: 14px;">warning</span>
+                                                    850m from HQ
+                                                </span>
+<p class="text-xs text-red-600 dark:text-red-400 font-medium mt-1">Geofence Violation</p>
+<button class="text-xs text-primary hover:underline flex items-center gap-1 mt-0.5">
+                                            View on Map
+                                            <span class="material-symbols-outlined" style="font-size: 12px;">open_in_new</span>
+</button>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+<p class="text-sm text-[#0d141b] dark:text-slate-300 italic">"Forgot my badge at home, checking in from parking lot."</p>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="flex flex-col gap-3">
+<input class="w-full text-sm rounded-lg border-red-200 dark:border-red-800 bg-white dark:bg-slate-800 focus:ring-red-500 focus:border-red-500 px-3 py-2 text-[#0d141b] dark:text-white placeholder:text-slate-400" placeholder="Required for rejection..." type="text"/>
+<div class="flex gap-2">
+<button class="flex-1 flex items-center justify-center gap-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 cursor-not-allowed px-3 py-2 text-sm font-bold shadow-none opacity-50">
+<span class="material-symbols-outlined" style="font-size: 18px;">check</span>
+                                                Approve
+                                            </button>
+<button class="flex-1 flex items-center justify-center gap-1 rounded-lg bg-red-500 hover:bg-red-600 text-white border border-transparent px-3 py-2 text-sm font-bold transition-all shadow-sm">
+<span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+                                                Reject
+                                            </button>
+</div>
+</div>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="py-4 px-6 align-top">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Avatar of Mike Brown" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBN3gMmDwv-bjL_Xke70GJpiSfWIEi6nDcASLs1hcp3VrpuRyvE4kW99UCXrv5tSkHj8Nten90vfDzcajI9OtEKr3UbuZ1c9lfbwjO3uDJGXxGb3WVqSMVnmTZQIpK7jRu01mDFDEpIKhTa4lSAxmhtVE7qmFtte2yhkEitLxlvtC0FMwCLPzCmPzikmQ7iv0o-UjHdQvA8_m0oRQ3HPuBqXYM4ZG2VF_XedfXBORzo4ltVJq55REfg7a-_9BVO1e7oox6mzyWrcDwR");'></div>
+<div>
+<p class="text-sm font-bold text-[#0d141b] dark:text-white">Mike Brown</p>
+<p class="text-xs text-[#4c739a]">Sales Director</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="flex flex-col">
+<p class="text-sm font-medium text-[#0d141b] dark:text-white">08:55 AM</p>
+<p class="text-xs text-[#4c739a]">Oct 24, 2023</p>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="flex flex-col gap-1 items-start">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+<span class="material-symbols-outlined" style="font-size: 14px;">explore</span>
+                                                    120m from HQ
+                                                </span>
+<button class="text-xs text-primary hover:underline flex items-center gap-1 mt-1">
+                                            View on Map
+                                            <span class="material-symbols-outlined" style="font-size: 12px;">open_in_new</span>
+</button>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+<p class="text-sm text-[#0d141b] dark:text-slate-300 italic">"GPS signal weak in lobby, please verify with reception."</p>
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="flex flex-col gap-3">
+<input class="w-full text-sm rounded-lg border-[#cfdbe7] dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-primary focus:border-primary px-3 py-2 text-[#0d141b] dark:text-white placeholder:text-slate-400" placeholder="Add optional admin note..." type="text"/>
+<div class="flex gap-2">
+<button class="flex-1 flex items-center justify-center gap-1 rounded-lg bg-primary hover:bg-blue-600 text-white px-3 py-2 text-sm font-bold transition-all shadow-sm">
+<span class="material-symbols-outlined" style="font-size: 18px;">check</span>
+                                                Approve
+                                            </button>
+<button class="flex-1 flex items-center justify-center gap-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:text-red-400 dark:hover:border-red-800 px-3 py-2 text-sm font-bold transition-all">
+<span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+                                                Reject
+                                            </button>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-[#f8fafc] dark:bg-slate-800 border-t border-[#e7edf3] dark:border-slate-700 px-6 py-4 flex items-center justify-between">
+<p class="text-sm text-[#4c739a]">Showing <span class="font-bold text-[#0d141b] dark:text-white">1-3</span> of <span class="font-bold text-[#0d141b] dark:text-white">12</span> pending requests</p>
+<div class="flex gap-2">
+<button class="flex items-center justify-center size-8 rounded-lg border border-[#cfdbe7] dark:border-slate-600 text-[#4c739a] hover:bg-white dark:hover:bg-slate-700 transition-colors disabled:opacity-50">
+<span class="material-symbols-outlined" style="font-size: 18px;">chevron_left</span>
+</button>
+<button class="flex items-center justify-center size-8 rounded-lg bg-white dark:bg-slate-700 border border-[#cfdbe7] dark:border-slate-600 text-[#0d141b] dark:text-white text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors">1</button>
+<button class="flex items-center justify-center size-8 rounded-lg border border-[#cfdbe7] dark:border-slate-600 text-[#4c739a] hover:bg-white dark:hover:bg-slate-700 transition-colors">2</button>
+<button class="flex items-center justify-center size-8 rounded-lg border border-[#cfdbe7] dark:border-slate-600 text-[#4c739a] hover:bg-white dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 18px;">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>
