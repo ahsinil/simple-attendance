@@ -22,6 +22,7 @@ class AttendanceRequest extends Model
         'reason',
         'photo_path',
         'failure_reason',
+        'ip_address',
         'status',
         'admin_note',
         'reviewed_by',

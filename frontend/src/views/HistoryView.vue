@@ -7,11 +7,20 @@ const attendanceStore = useAttendanceStore()
 const startDate = ref('')
 const endDate = ref('')
 
+// Format date to YYYY-MM-DD without UTC conversion
+function formatDateLocal(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 onMounted(() => {
   // Set default date range to current month
   const now = new Date()
-  startDate.value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-  endDate.value = now.toISOString().split('T')[0]
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
+  startDate.value = formatDateLocal(firstDay)
+  endDate.value = formatDateLocal(now)
   
   fetchHistory()
 })
@@ -25,18 +34,19 @@ function fetchHistory() {
 }
 
 function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('en-US', { 
+  const date = new Date(iso)
+  return date.toLocaleDateString('en-GB', { 
     weekday: 'short', 
-    month: 'short', 
-    day: 'numeric' 
+    day: 'numeric',
+    month: 'short'
   })
 }
 
 function formatTime(iso) {
-  return new Date(iso).toLocaleTimeString('en-US', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  })
+  const date = new Date(iso)
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${hours}:${minutes} WIB`
 }
 
 function statusBadgeClass(status) {

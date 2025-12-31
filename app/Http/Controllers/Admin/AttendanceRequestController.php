@@ -7,6 +7,7 @@ use App\Models\AttendanceRequest;
 use App\Services\AttendanceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class AttendanceRequestController extends Controller
 {
@@ -93,12 +94,14 @@ class AttendanceRequestController extends Controller
 
         $request->validate([
             'admin_note' => 'nullable|string|max:500',
+            'adjusted_time' => 'nullable|date',
         ]);
 
         $attendance = $this->attendanceService->approveRequest(
             $attendanceRequest,
             $user,
-            $request->input('admin_note')
+            $request->input('admin_note'),
+            $request->input('adjusted_time') ? Carbon::parse($request->input('adjusted_time')) : null
         );
 
         return response()->json([

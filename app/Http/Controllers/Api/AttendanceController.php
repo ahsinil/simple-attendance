@@ -8,6 +8,7 @@ use App\Models\AttendanceRequest;
 use App\Models\Location;
 use App\Services\AttendanceService;
 use App\Services\DeviceService;
+use App\Services\IpValidationService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,13 +18,16 @@ class AttendanceController extends Controller
 {
     protected AttendanceService $attendanceService;
     protected DeviceService $deviceService;
+    protected IpValidationService $ipValidationService;
 
     public function __construct(
         AttendanceService $attendanceService,
-        DeviceService $deviceService
+        DeviceService $deviceService,
+        IpValidationService $ipValidationService
     ) {
         $this->attendanceService = $attendanceService;
         $this->deviceService = $deviceService;
+        $this->ipValidationService = $ipValidationService;
     }
 
     /**
@@ -40,6 +44,15 @@ class AttendanceController extends Controller
         ]);
 
         $user = $request->user();
+
+        // Validate IP whitelist
+        if (!$this->ipValidationService->isAllowed($request->ip())) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Attendance not allowed from this IP address',
+                'ip_address' => $request->ip(),
+            ], 403);
+        }
 
         // Validate device if device registration is enabled
         $deviceFingerprint = $request->input('device_fingerprint');
@@ -138,6 +151,23 @@ class AttendanceController extends Controller
             ->whereDate('scan_time', '<=', $endDate)
             ->get();
 
+        // Group attendances by date and calculate work minutes for each day
+        $groupedByDate = $attendances->groupBy(fn($a) => $a->scan_time->toDateString());
+        
+        $totalWorkMinutes = 0;
+        foreach ($groupedByDate as $date => $dayAttendances) {
+            $checkIn = $dayAttendances->where('check_type', 'IN')
+                ->sortBy('scan_time')
+                ->first();
+            $checkOut = $dayAttendances->where('check_type', 'OUT')
+                ->sortByDesc('scan_time')
+                ->first();
+            
+            if ($checkIn && $checkOut) {
+                $totalWorkMinutes += $checkOut->scan_time->diffInMinutes($checkIn->scan_time);
+            }
+        }
+
         $summary = [
             'month' => $month,
             'year' => $year,
@@ -148,7 +178,7 @@ class AttendanceController extends Controller
                 ->count(),
             'absent_days' => $attendances->where('status', 'ABSENT')->count(),
             'late_days' => $attendances->where('status', 'LATE')->count(),
-            'total_work_minutes' => $attendances->where('check_type', 'OUT')->sum('work_minutes'),
+            'total_work_minutes' => $totalWorkMinutes,
             'total_overtime_minutes' => $attendances->sum('overtime_min'),
             'total_late_minutes' => $attendances->sum('late_min'),
         ];
@@ -178,6 +208,15 @@ class AttendanceController extends Controller
 
         $user = $request->user();
 
+        // Validate IP whitelist
+        if (!$this->ipValidationService->isAllowed($request->ip())) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Attendance request not allowed from this IP address',
+                'ip_address' => $request->ip(),
+            ], 403);
+        }
+
         // Check if user can make manual requests
         if (!$user->can('attendance.manual-request')) {
             return response()->json([
@@ -202,7 +241,8 @@ class AttendanceController extends Controller
             $request->input('gps_lng') ? (float) $request->input('gps_lng') : null,
             $request->input('gps_accuracy') ? (float) $request->input('gps_accuracy') : null,
             $photoPath,
-            $request->input('failure_reason')
+            $request->input('failure_reason'),
+            $request->ip()
         );
 
         return response()->json([
@@ -252,6 +292,58 @@ class AttendanceController extends Controller
         return response()->json([
             'success' => true,
             'data' => $locations,
+        ]);
+    }
+
+    /**
+     * Get user's schedules.
+     */
+    public function mySchedules(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        
+        $schedules = $user->schedules()
+            ->with('shift')
+            ->orderBy('start_date', 'desc')
+            ->get()
+            ->map(function ($schedule) {
+                $today = Carbon::today();
+                $startDate = Carbon::parse($schedule->start_date);
+                $endDate = $schedule->end_date ? Carbon::parse($schedule->end_date) : null;
+                
+                // Determine schedule status
+                $status = 'upcoming';
+                if ($startDate->lte($today) && (!$endDate || $endDate->gte($today))) {
+                    $status = 'active';
+                } elseif ($endDate && $endDate->lt($today)) {
+                    $status = 'expired';
+                }
+                
+                return [
+                    'id' => $schedule->id,
+                    'shift' => $schedule->shift ? [
+                        'id' => $schedule->shift->id,
+                        'code' => $schedule->shift->code,
+                        'name' => $schedule->shift->name,
+                        'start_time' => $schedule->shift->start_time->format('H:i:s'),
+                        'end_time' => $schedule->shift->end_time->format('H:i:s'),
+                        'late_after_min' => $schedule->shift->late_after_min,
+                    ] : null,
+                    'start_date' => $schedule->start_date->format('Y-m-d'),
+                    'end_date' => $schedule->end_date?->format('Y-m-d'),
+                    'status' => $status,
+                ];
+            });
+
+        // Get current active schedule
+        $activeSchedule = $schedules->firstWhere('status', 'active');
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'active_schedule' => $activeSchedule,
+                'schedules' => $schedules,
+            ],
         ]);
     }
 }

@@ -37,6 +37,9 @@ export const authApi = {
     login: (email, password) => api.post('/login', { email, password }),
     logout: () => api.post('/auth/logout'),
     me: () => api.get('/auth/me'),
+    updateProfile: (data) => api.put('/auth/profile', data),
+    changePassword: (data) => api.put('/auth/password', data),
+    activeDevices: () => api.get('/auth/devices'),
 }
 
 // Attendance API
@@ -47,6 +50,7 @@ export const attendanceApi = {
     monthlySummary: (params) => api.get('/attendance/monthly-summary', { params }),
     manualRequest: (data) => api.post('/attendance/manual-request', data),
     myRequests: (params) => api.get('/attendance/my-requests', { params }),
+    mySchedules: () => api.get('/attendance/my-schedules'),
     locations: () => api.get('/attendance/locations'),
 }
 
@@ -59,6 +63,9 @@ export const barcodeApi = {
 
 // Admin API
 export const adminApi = {
+    // Dashboard
+    getDashboard: () => api.get('/admin/dashboard'),
+
     // Requests
     getRequests: (params) => api.get('/admin/requests', { params }),
     getRequestStats: () => api.get('/admin/requests/stats'),
@@ -85,5 +92,19 @@ export const adminApi = {
     deleteUser: (id) => api.delete(`/admin/users/${id}`),
     assignSchedule: (userId, data) => api.post(`/admin/users/${userId}/schedule`, data),
     getUserSchedules: (userId) => api.get(`/admin/users/${userId}/schedules`),
+
     removeSchedule: (userId, scheduleId) => api.delete(`/admin/users/${userId}/schedules/${scheduleId}`),
+
+    // Settings
+    getSettings: () => api.get('/admin/settings'),
+    updateSettings: (data) => api.post('/admin/settings', data),
+
+    // Reports
+    getReports: (params) => api.get('/admin/reports', { params }),
+    getReportsSummary: (params) => api.get('/admin/reports/summary', { params }),
+    getReportsLocations: () => api.get('/admin/reports/locations'),
+    exportReports: (params) => api.get('/admin/reports/export', {
+        params,
+        responseType: 'blob'
+    }),
 }

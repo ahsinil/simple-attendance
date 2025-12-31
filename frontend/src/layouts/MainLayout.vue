@@ -13,6 +13,8 @@ const navItems = [
   { name: 'Attendance', icon: 'qr_code_scanner', to: '/attendance' },
   { name: 'History', icon: 'history', to: '/history' },
   { name: 'My Requests', icon: 'pending_actions', to: '/requests' },
+  { name: 'My Schedules', icon: 'calendar_month', to: '/schedules' },
+  { name: 'Settings', icon: 'settings', to: '/settings' },
 ]
 
 async function handleLogout() {
@@ -116,11 +118,11 @@ async function handleLogout() {
 
           <div class="flex items-center gap-2">
             <RouterLink 
-              to="/barcode" 
+              to="/attendance" 
               class="p-2 hover:bg-gray-100 dark:hover:bg-dark-border rounded-lg"
-              title="Barcode Display"
+              title="Scan Attendance"
             >
-              <span class="material-symbols-outlined">qr_code</span>
+              <span class="material-symbols-outlined">qr_code_scanner</span>
             </RouterLink>
           </div>
         </div>

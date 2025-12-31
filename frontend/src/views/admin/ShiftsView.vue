@@ -1,6 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { adminApi } from '@/services/api'
+import { useToast } from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
+
+const toast = useToast()
+const { confirmDelete } = useConfirm()
 
 const shifts = ref([])
 const loading = ref(true)
@@ -42,19 +47,22 @@ async function handleSubmit() {
       await adminApi.createShift(form.value)
     }
     showForm.value = false
+    toast.success(editingShift.value ? 'Shift updated successfully' : 'Shift created successfully')
     fetchShifts()
   } catch (error) {
-    alert(error.response?.data?.error || 'Failed to save shift')
+    toast.error(error.response?.data?.message || error.response?.data?.error || 'Failed to save shift')
   }
 }
 
 async function deleteShift(shift) {
-  if (!confirm(`Delete ${shift.name}?`)) return
+  const confirmed = await confirmDelete(shift.name)
+  if (!confirmed) return
   try {
     await adminApi.deleteShift(shift.id)
+    toast.success('Shift deleted successfully')
     fetchShifts()
   } catch (error) {
-    alert(error.response?.data?.error || 'Failed to delete')
+    toast.error(error.response?.data?.message || error.response?.data?.error || 'Failed to delete')
   }
 }
 </script>

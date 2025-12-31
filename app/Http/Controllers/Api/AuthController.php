@@ -114,4 +114,78 @@ class AuthController extends Controller
             ] : null,
         ];
     }
+    /**
+     * Update user profile.
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $user->update([
+            'name' => $request->name,
+            'phone' => $request->phone,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile updated successfully',
+            'data' => $this->formatUser($user),
+        ]);
+    }
+
+    /**
+     * Change user password.
+     */
+    public function changePassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['The provided password does not match your current password.'],
+            ]);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password changed successfully',
+        ]);
+    }
+
+    /**
+     * Get user active devices (tokens).
+     */
+    public function devices(Request $request): JsonResponse
+    {
+        $currentAccessToken = $request->user()->currentAccessToken();
+        
+        $devices = $request->user()->tokens->map(function ($token) use ($currentAccessToken) {
+            return [
+                'id' => $token->id,
+                'name' => $token->name,
+                'last_used_at' => $token->last_used_at ? $token->last_used_at->diffForHumans() : 'Never',
+                'is_current' => $token->id === $currentAccessToken->id,
+                'created_at' => $token->created_at->format('M d, Y'),
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $devices,
+        ]);
+    }
 }

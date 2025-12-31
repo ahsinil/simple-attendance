@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAttendanceStore } from '@/stores/attendance'
 
 const attendanceStore = useAttendanceStore()
@@ -10,19 +10,86 @@ const form = ref({
   check_type: 'IN',
   request_time: '',
   reason: '',
+  photo: null,
 })
+const photoPreview = ref(null)
+const fileInput = ref(null)
 const submitting = ref(false)
 const submitError = ref('')
 const submitSuccess = ref(false)
+const showPhotoModal = ref(false)
+const selectedPhoto = ref('')
+
+// Base URL for photo storage
+const storageUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000'
+
+function getPhotoUrl(path) {
+  if (!path) return null
+  return `${storageUrl}/storage/${path}`
+}
+
+function openPhotoModal(photoPath) {
+  selectedPhoto.value = getPhotoUrl(photoPath)
+  showPhotoModal.value = true
+}
+
+// Format date to local datetime-local input format (YYYY-MM-DDTHH:mm)
+function formatToLocalDatetime(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${year}-${month}-${day}T${hours}:${minutes}`
+}
 
 onMounted(() => {
   attendanceStore.fetchMyRequests()
   attendanceStore.fetchLocations()
   
-  // Set default time to now
+  // Set default time to now (using device's local timezone)
   const now = new Date()
-  form.value.request_time = now.toISOString().slice(0, 16)
+  form.value.request_time = formatToLocalDatetime(now)
 })
+
+function handlePhotoSelect(event) {
+  const file = event.target.files[0]
+  if (file) {
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      submitError.value = 'Photo size must be less than 5MB'
+      return
+    }
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      submitError.value = 'Please select an image file'
+      return
+    }
+    
+    form.value.photo = file
+    
+    // Create preview
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      photoPreview.value = e.target.result
+    }
+    reader.readAsDataURL(file)
+    submitError.value = ''
+  }
+}
+
+function removePhoto() {
+  form.value.photo = null
+  photoPreview.value = null
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
 
 async function handleSubmit() {
   if (!form.value.location_id || !form.value.reason) {
@@ -40,6 +107,9 @@ async function handleSubmit() {
   if (result.success) {
     submitSuccess.value = true
     showForm.value = false
+    // Reset form
+    form.value.photo = null
+    photoPreview.value = null
     attendanceStore.fetchMyRequests()
     setTimeout(() => submitSuccess.value = false, 3000)
   } else {
@@ -57,9 +127,9 @@ function statusBadgeClass(status) {
 }
 
 function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('en-US', { 
-    month: 'short', 
+  return new Date(iso).toLocaleDateString('en-GB', { 
     day: 'numeric',
+    month: 'long', 
     year: 'numeric'
   })
 }
@@ -120,8 +190,43 @@ function formatDate(iso) {
           <textarea 
             v-model="form.reason" 
             class="input min-h-[100px]" 
-            placeholder="Explain why you need this manual attendance..."
+            placeholder="Explain why you need this manual attendance (minimum 10 characters)..."
           />
+        </div>
+
+        <!-- Photo Upload -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Photo (Optional)</label>
+          <input 
+            ref="fileInput"
+            type="file" 
+            accept="image/*"
+            capture="environment"
+            @change="handlePhotoSelect"
+            class="hidden"
+          />
+          
+          <div v-if="photoPreview" class="relative inline-block">
+            <img :src="photoPreview" alt="Preview" class="w-32 h-32 object-cover rounded-lg border border-gray-200 dark:border-dark-border" />
+            <button 
+              type="button"
+              @click="removePhoto"
+              class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+            >
+              <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+          
+          <button 
+            v-else
+            type="button"
+            @click="triggerFileInput"
+            class="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-dark-border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors"
+          >
+            <span class="material-symbols-outlined text-gray-400">add_a_photo</span>
+            <span class="text-gray-600 dark:text-gray-400">Add photo</span>
+          </button>
+          <p class="text-xs text-gray-500 mt-1">Max 5MB. Supports JPG, PNG, etc.</p>
         </div>
 
         <div class="flex gap-3">
@@ -162,6 +267,16 @@ function formatDate(iso) {
               <p v-if="request.admin_note" class="text-sm text-primary mt-1">
                 Note: {{ request.admin_note }}
               </p>
+              
+              <!-- Photo thumbnail -->
+              <div v-if="request.photo_path" class="mt-2">
+                <img 
+                  :src="getPhotoUrl(request.photo_path)" 
+                  alt="Attached photo" 
+                  class="w-12 h-12 object-cover rounded-lg border border-gray-200 dark:border-dark-border cursor-pointer hover:opacity-80"
+                  @click="openPhotoModal(request.photo_path)"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -169,6 +284,23 @@ function formatDate(iso) {
 
       <div v-else class="p-8 text-center text-gray-500">
         No requests yet
+      </div>
+    </div>
+
+    <!-- Photo Modal -->
+    <div v-if="showPhotoModal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" @click="showPhotoModal = false">
+      <div class="relative max-w-4xl max-h-[90vh]" @click.stop>
+        <button 
+          @click="showPhotoModal = false" 
+          class="absolute -top-10 right-0 text-white hover:text-gray-300"
+        >
+          <span class="material-symbols-outlined text-3xl">close</span>
+        </button>
+        <img 
+          :src="selectedPhoto" 
+          alt="Full size photo" 
+          class="max-w-full max-h-[85vh] rounded-lg shadow-2xl"
+        />
       </div>
     </div>
   </div>

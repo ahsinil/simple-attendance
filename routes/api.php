@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BarcodeController;
 use App\Http\Controllers\Admin\AttendanceRequestController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\ShiftController;
 use App\Http\Controllers\Admin\UserController;
@@ -28,6 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth
     Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
+        Route::get('/devices', [AuthController::class, 'devices']);
+        Route::put('/profile', [AuthController::class, 'updateProfile']);
+        Route::put('/password', [AuthController::class, 'changePassword']);
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/logout-all', [AuthController::class, 'logoutAll']);
     });
@@ -40,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/monthly-summary', [AttendanceController::class, 'monthlySummary']);
         Route::post('/manual-request', [AttendanceController::class, 'manualRequest']);
         Route::get('/my-requests', [AttendanceController::class, 'myRequests']);
+        Route::get('/my-schedules', [AttendanceController::class, 'mySchedules']);
         Route::get('/locations', [AttendanceController::class, 'locations']);
     });
 
@@ -58,6 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('admin')->group(function () {
         
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index']);
+
         // Attendance Requests
         Route::prefix('requests')->group(function () {
             Route::get('/', [AttendanceRequestController::class, 'index']);
@@ -79,5 +87,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users/{user}/schedule', [UserController::class, 'assignSchedule']);
         Route::get('/users/{user}/schedules', [UserController::class, 'schedules']);
         Route::delete('/users/{user}/schedules/{schedule}', [UserController::class, 'removeSchedule']);
+
+
+        // Reports
+        Route::get('/reports', [App\Http\Controllers\Admin\ReportController::class, 'index']);
+        Route::get('/reports/summary', [App\Http\Controllers\Admin\ReportController::class, 'summary']);
+        Route::get('/reports/export', [App\Http\Controllers\Admin\ReportController::class, 'export']);
+        Route::get('/reports/locations', [App\Http\Controllers\Admin\ReportController::class, 'locations']);
+
+        // Settings
+        Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index']);
+        Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update']);
     });
 });

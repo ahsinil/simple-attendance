@@ -77,10 +77,31 @@ export const useAttendanceStore = defineStore('attendance', {
             this.loading = true
             this.error = null
             try {
-                const response = await attendanceApi.manualRequest(data)
+                // Use FormData for file uploads
+                const formData = new FormData()
+                formData.append('location_id', data.location_id)
+                formData.append('check_type', data.check_type)
+                formData.append('request_time', data.request_time)
+                formData.append('reason', data.reason)
+
+                if (data.photo) {
+                    formData.append('photo', data.photo)
+                }
+
+                const response = await attendanceApi.manualRequest(formData)
                 return { success: true, data: response.data }
             } catch (error) {
-                this.error = error.response?.data?.error || 'Request failed'
+                // Handle Laravel validation errors (422) or other errors
+                const errorData = error.response?.data
+                if (errorData?.errors) {
+                    // Get first validation error message
+                    const firstError = Object.values(errorData.errors)[0]
+                    this.error = Array.isArray(firstError) ? firstError[0] : firstError
+                } else if (errorData?.message) {
+                    this.error = errorData.message
+                } else {
+                    this.error = errorData?.error || 'Request failed'
+                }
                 return { success: false, error: this.error }
             } finally {
                 this.loading = false

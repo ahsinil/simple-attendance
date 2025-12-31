@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useAttendanceStore } from '@/stores/attendance'
+import { QrcodeStream } from 'vue-qrcode-reader'
 
 const attendanceStore = useAttendanceStore()
 
@@ -10,6 +11,8 @@ const gpsLocation = ref(null)
 const gpsError = ref('')
 const gpsAccuracy = ref(null)
 const result = ref(null)
+const cameraError = ref('')
+const cameraLoading = ref(true)
 
 let watchId = null
 
@@ -54,14 +57,46 @@ function stopGpsTracking() {
   }
 }
 
+// QR Code Scanner handlers
+function onCameraReady() {
+  cameraLoading.value = false
+  cameraError.value = ''
+}
+
+function onCameraError(error) {
+  cameraLoading.value = false
+  if (error.name === 'NotAllowedError') {
+    cameraError.value = 'Camera access denied. Please allow camera permission.'
+  } else if (error.name === 'NotFoundError') {
+    cameraError.value = 'No camera found on this device.'
+  } else if (error.name === 'NotSupportedError') {
+    cameraError.value = 'Camera not supported. Try using HTTPS.'
+  } else if (error.name === 'NotReadableError') {
+    cameraError.value = 'Camera is already in use by another application.'
+  } else if (error.name === 'OverconstrainedError') {
+    cameraError.value = 'Camera constraints not satisfiable.'
+  } else if (error.name === 'StreamApiNotSupportedError') {
+    cameraError.value = 'Stream API not supported in this browser.'
+  } else {
+    cameraError.value = `Camera error: ${error.message}`
+  }
+}
+
+async function onDecode(decodedString) {
+  if (scanning.value) return // Prevent multiple scans
+  
+  scannedCode.value = decodedString
+  await handleScan()
+}
+
 async function handleScan() {
   if (!scannedCode.value) {
-    result.value = { success: false, error: 'Please enter barcode data' }
+    result.value = { success: false, error: 'Please scan or enter barcode data' }
     return
   }
 
   if (!gpsLocation.value) {
-    result.value = { success: false, error: 'GPS location not available' }
+    result.value = { success: false, error: 'GPS location not available. Please enable location services.' }
     return
   }
 
@@ -81,13 +116,6 @@ async function handleScan() {
 
   scanning.value = false
   scannedCode.value = ''
-}
-
-// Simulate barcode scan for demo
-function simulateScan() {
-  // In production, this would be replaced with actual barcode scanning
-  // For now, we'll show how to integrate with a barcode scanner
-  scannedCode.value = 'demo-barcode-' + Date.now()
 }
 </script>
 
@@ -119,16 +147,47 @@ function simulateScan() {
       </div>
     </div>
 
-    <!-- Scan Area -->
+    <!-- QR Scanner -->
     <div class="card p-6">
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
-        Scan Barcode
+        Scan QR Code
       </h3>
 
-      <div class="aspect-square bg-gray-100 dark:bg-dark-bg rounded-lg flex items-center justify-center mb-4">
-        <div class="text-center">
-          <span class="material-symbols-outlined text-6xl text-gray-400">qr_code_scanner</span>
-          <p class="mt-2 text-gray-500">Point camera at barcode</p>
+      <div class="aspect-square bg-gray-100 dark:bg-dark-bg rounded-lg overflow-hidden mb-4 relative">
+        <!-- Camera Loading -->
+        <div v-if="cameraLoading" class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-dark-bg z-10">
+          <div class="text-center">
+            <svg class="animate-spin h-10 w-10 text-primary mx-auto mb-2" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <p class="text-gray-500">Starting camera...</p>
+          </div>
+        </div>
+
+        <!-- Camera Error -->
+        <div v-if="cameraError" class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-dark-bg z-10">
+          <div class="text-center p-4">
+            <span class="material-symbols-outlined text-5xl text-red-400 mb-2">videocam_off</span>
+            <p class="text-red-500 text-sm">{{ cameraError }}</p>
+          </div>
+        </div>
+
+        <!-- QR Code Stream -->
+        <QrcodeStream 
+          @decode="onDecode"
+          @camera-on="onCameraReady"
+          @error="onCameraError"
+          class="w-full h-full"
+        />
+
+        <!-- Scan Overlay -->
+        <div class="absolute inset-0 pointer-events-none">
+          <div class="absolute inset-8 border-2 border-primary rounded-lg"></div>
+          <div class="absolute top-8 left-8 w-6 h-6 border-t-4 border-l-4 border-primary rounded-tl-lg"></div>
+          <div class="absolute top-8 right-8 w-6 h-6 border-t-4 border-r-4 border-primary rounded-tr-lg"></div>
+          <div class="absolute bottom-8 left-8 w-6 h-6 border-b-4 border-l-4 border-primary rounded-bl-lg"></div>
+          <div class="absolute bottom-8 right-8 w-6 h-6 border-b-4 border-r-4 border-primary rounded-br-lg"></div>
         </div>
       </div>
 

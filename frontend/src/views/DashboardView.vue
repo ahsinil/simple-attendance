@@ -26,10 +26,45 @@ const statusColor = computed(() => {
   return 'text-gray-400'
 })
 
+// Get timezone abbreviation for Indonesian timezones
+function getTimezoneAbbr(timezone) {
+  const tzMap = {
+    'Asia/Jakarta': 'WIB',
+    'Asia/Makassar': 'WITA',
+    'Asia/Jayapura': 'WIT',
+    'Asia/Pontianak': 'WIB',
+    'Asia/Ujung_Pandang': 'WITA'
+  }
+  return tzMap[timezone] || 'WIB'
+}
+
 function formatTime(iso) {
   if (!iso) return '-'
-  return new Date(iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+  const date = new Date(iso)
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const tz = getTimezoneAbbr(attendanceStore.todaySummary?.timezone || 'Asia/Jakarta')
+  return `${hours}:${minutes} ${tz}`
 }
+
+// Calculate work duration from check-in and check-out times
+const workDuration = computed(() => {
+  const summary = attendanceStore.todaySummary
+  if (!summary?.check_in_time || !summary?.check_out_time) {
+    return '0h 0m'
+  }
+  
+  const checkIn = new Date(summary.check_in_time)
+  const checkOut = new Date(summary.check_out_time)
+  const diffMs = checkOut - checkIn
+  
+  if (diffMs <= 0) return '0h 0m'
+  
+  const totalMinutes = Math.floor(diffMs / 60000)
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+  return `${hours}h ${minutes}m`
+})
 
 function formatMinutes(min) {
   if (!min) return '0h 0m'
@@ -98,7 +133,7 @@ function formatMinutes(min) {
         <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-dark-border">
           <span class="text-gray-500">Work Duration</span>
           <span class="font-semibold text-gray-900 dark:text-white">
-            {{ formatMinutes(attendanceStore.todaySummary.work_minutes) }}
+            {{ workDuration }}
           </span>
         </div>
 

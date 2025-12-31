@@ -14,6 +14,8 @@ const navItems = [
   { name: 'Users', icon: 'group', to: '/admin/users' },
   { name: 'Shifts', icon: 'schedule', to: '/admin/shifts' },
   { name: 'Locations', icon: 'location_on', to: '/admin/locations' },
+  { name: 'Reports', icon: 'analytics', to: '/admin/reports' },
+  { name: 'Settings', icon: 'settings_applications', to: '/admin/settings' },
 ]
 
 async function handleLogout() {

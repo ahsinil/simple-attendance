@@ -32,6 +32,16 @@ const routes = [
                 name: 'MyRequests',
                 component: () => import('@/views/MyRequestsView.vue'),
             },
+            {
+                path: 'schedules',
+                name: 'MySchedules',
+                component: () => import('@/views/SchedulesView.vue'),
+            },
+            {
+                path: 'settings',
+                name: 'Settings',
+                component: () => import('@/views/SettingsView.vue'),
+            },
         ],
     },
     {
@@ -55,6 +65,11 @@ const routes = [
                 component: () => import('@/views/admin/UsersView.vue'),
             },
             {
+                path: 'settings',
+                name: 'AdminSettings',
+                component: () => import('@/views/admin/SettingsView.vue'),
+            },
+            {
                 path: 'shifts',
                 name: 'AdminShifts',
                 component: () => import('@/views/admin/ShiftsView.vue'),
@@ -63,6 +78,11 @@ const routes = [
                 path: 'locations',
                 name: 'AdminLocations',
                 component: () => import('@/views/admin/LocationsView.vue'),
+            },
+            {
+                path: 'reports',
+                name: 'AdminReports',
+                component: () => import('@/views/admin/ReportsView.vue'),
             },
         ],
     },

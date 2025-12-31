@@ -1,6 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { adminApi } from '@/services/api'
+import { useToast } from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
+
+const toast = useToast()
+const { confirmDelete } = useConfirm()
 
 const locations = ref([])
 const loading = ref(true)
@@ -42,33 +47,37 @@ async function handleSubmit() {
       await adminApi.createLocation(form.value)
     }
     showForm.value = false
+    toast.success(editingLocation.value ? 'Location updated successfully' : 'Location created successfully')
     fetchLocations()
   } catch (error) {
-    alert(error.response?.data?.error || 'Failed to save location')
+    toast.error(error.response?.data?.message || error.response?.data?.error || 'Failed to save location')
   }
 }
 
 async function deleteLocation(location) {
-  if (!confirm(`Delete ${location.name}?`)) return
+  const confirmed = await confirmDelete(location.name)
+  if (!confirmed) return
   try {
     await adminApi.deleteLocation(location.id)
+    toast.success('Location deleted successfully')
     fetchLocations()
   } catch (error) {
-    alert(error.response?.data?.error || 'Failed to delete')
+    toast.error(error.response?.data?.message || error.response?.data?.error || 'Failed to delete')
   }
 }
 
 async function getCurrentLocation() {
   if (!navigator.geolocation) {
-    alert('Geolocation not supported')
+    toast.error('Geolocation not supported')
     return
   }
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       form.value.latitude = pos.coords.latitude.toFixed(8)
       form.value.longitude = pos.coords.longitude.toFixed(8)
+      toast.success('Location coordinates retrieved')
     },
-    (err) => alert('Failed to get location: ' + err.message),
+    (err) => toast.error('Failed to get location: ' + err.message),
     { enableHighAccuracy: true }
   )
 }

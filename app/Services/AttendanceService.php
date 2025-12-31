@@ -324,7 +324,8 @@ class AttendanceService
         ?float $gpsLng = null,
         ?float $gpsAccuracy = null,
         ?string $photoPath = null,
-        ?string $failureReason = null
+        ?string $failureReason = null,
+        ?string $ipAddress = null
     ): AttendanceRequest {
         $location = Location::findOrFail($locationId);
         
@@ -350,6 +351,7 @@ class AttendanceService
             'reason' => $reason,
             'photo_path' => $photoPath,
             'failure_reason' => $failureReason,
+            'ip_address' => $ipAddress,
             'status' => 'PENDING',
         ]);
 
@@ -365,16 +367,32 @@ class AttendanceService
 
         return $request;
     }
-
     /**
      * Approve a manual attendance request.
      */
     public function approveRequest(
         AttendanceRequest $request,
         User $admin,
-        ?string $adminNote = null
+        ?string $adminNote = null,
+        ?Carbon $adjustedTime = null
     ): Attendance {
-        return DB::transaction(function () use ($request, $admin, $adminNote) {
+        return DB::transaction(function () use ($request, $admin, $adminNote, $adjustedTime) {
+            // Use adjusted time if provided, otherwise use original request time
+            $approvedTime = $adjustedTime ?? $request->request_time;
+            
+            // Get user and their schedule for the request date
+            $user = User::find($request->user_id);
+            $location = Location::find($request->location_id);
+            $schedule = $this->getUserSchedule($user, $approvedTime->toDateString());
+            
+            // Calculate status based on schedule
+            $statusData = $this->calculateStatus(
+                $request->check_type,
+                $approvedTime,
+                $schedule,
+                $location->timezone ?? 'Asia/Jakarta'
+            );
+            
             // Update request status
             $request->update([
                 'status' => 'APPROVED',
@@ -387,13 +405,16 @@ class AttendanceService
             $attendance = Attendance::create([
                 'user_id' => $request->user_id,
                 'location_id' => $request->location_id,
-                'scan_time' => $request->request_time,
+                'scan_time' => $approvedTime,
                 'check_type' => $request->check_type,
                 'gps_lat' => $request->gps_lat,
                 'gps_lng' => $request->gps_lng,
                 'gps_accuracy_m' => $request->gps_accuracy_m,
                 'distance_m' => $request->distance_m,
-                'status' => 'ON_TIME', // Manual approvals default to on-time
+                'status' => $statusData['status'],
+                'late_min' => $statusData['late_min'],
+                'early_leave_min' => $statusData['early_leave_min'],
+                'penalty_tier' => $statusData['penalty_tier'],
                 'method' => 'MANUAL',
                 'approved_by' => $admin->id,
                 'approved_at' => now(),
@@ -406,7 +427,8 @@ class AttendanceService
                 $attendance->id,
                 $request->id,
                 $admin->id,
-                $adminNote
+                $adminNote,
+                $adjustedTime ? ['adjusted_time' => $adjustedTime->toIso8601String()] : null
             );
 
             return $attendance;
@@ -459,6 +481,12 @@ class AttendanceService
             ->first();
 
         $schedule = $this->getUserSchedule($user, today()->toDateString());
+        
+        // Calculate work minutes dynamically
+        $workMinutes = 0;
+        if ($checkIn && $checkOut) {
+            $workMinutes = $checkOut->scan_time->diffInMinutes($checkIn->scan_time);
+        }
 
         return [
             'has_checked_in' => $checkIn !== null,
@@ -467,8 +495,9 @@ class AttendanceService
             'check_out_time' => $checkOut?->scan_time?->toIso8601String(),
             'status' => $checkIn?->status ?? null,
             'late_min' => $checkIn?->late_min ?? 0,
-            'work_minutes' => $checkOut?->work_minutes ?? 0,
+            'work_minutes' => $workMinutes,
             'shift' => $schedule?->shift?->name ?? null,
+            'timezone' => config('app.timezone'),
         ];
     }
 
