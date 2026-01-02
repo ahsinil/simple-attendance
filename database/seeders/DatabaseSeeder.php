@@ -34,6 +34,16 @@ class DatabaseSeeder extends Seeder
         ]);
         $admin->assignRole('super_admin');
 
+        // Create display screen account for barcode kiosks
+        $display = User::create([
+            'name' => 'Barcode Display',
+            'email' => 'display@example.com',
+            'password' => Hash::make('password'),
+            'employee_id' => 'DISPLAY-001',
+            'status' => 'active',
+        ]);
+        $display->assignRole('display_screen');
+
         // Create test employee
         $employee = User::create([
             'name' => 'John Doe',
@@ -49,5 +59,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Default users created:');
         $this->command->info('  Admin: admin@example.com / password');
         $this->command->info('  Employee: john@example.com / password');
+        $this->command->info('  Display Screen: display@example.com / password');
     }
 }
+

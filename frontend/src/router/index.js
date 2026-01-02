@@ -126,6 +126,7 @@ router.beforeEach((to, from, next) => {
     const user = userStr ? JSON.parse(userStr) : null
     const isAuthenticated = !!token
     const isAdmin = user?.roles?.includes('admin') || user?.roles?.includes('super_admin')
+    const isDisplayScreen = user?.roles?.includes('display_screen')
 
     if (to.meta.requiresAuth && !isAuthenticated) {
         next({ name: 'Login', query: { redirect: to.fullPath } })
@@ -133,7 +134,18 @@ router.beforeEach((to, from, next) => {
     }
 
     if (to.meta.guest && isAuthenticated) {
-        next({ name: 'Dashboard' })
+        // Redirect display_screen users to barcode page after login
+        if (isDisplayScreen) {
+            next({ name: 'BarcodeDisplay' })
+        } else {
+            next({ name: 'Dashboard' })
+        }
+        return
+    }
+
+    // Restrict display_screen role to only barcode page
+    if (isDisplayScreen && to.name !== 'BarcodeDisplay' && to.name !== 'Login') {
+        next({ name: 'BarcodeDisplay' })
         return
     }
 
@@ -146,4 +158,3 @@ router.beforeEach((to, from, next) => {
 })
 
 export default router
-

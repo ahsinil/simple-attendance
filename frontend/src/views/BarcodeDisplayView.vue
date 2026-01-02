@@ -1,7 +1,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { barcodeApi, attendanceApi } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
 import QRCode from 'qrcode'
+
+const router = useRouter()
+const authStore = useAuthStore()
 
 const locations = ref([])
 const selectedLocation = ref(null)
@@ -9,17 +14,24 @@ const barcode = ref(null)
 const loading = ref(true)
 const countdown = ref(0)
 const qrCodeUrl = ref('')
+const currentTime = ref(new Date().toLocaleTimeString())
 
 let refreshInterval = null
 let countdownInterval = null
+let clockInterval = null
 
 onMounted(async () => {
   await fetchLocations()
   startAutoRefresh()
+  // Update clock every second
+  clockInterval = setInterval(() => {
+    currentTime.value = new Date().toLocaleTimeString()
+  }, 1000)
 })
 
 onUnmounted(() => {
   stopAutoRefresh()
+  if (clockInterval) clearInterval(clockInterval)
 })
 
 async function fetchLocations() {
@@ -82,6 +94,11 @@ async function selectLocation(location) {
   await fetchBarcode()
 }
 
+async function handleLogout() {
+  await authStore.logout()
+  router.push('/login')
+}
+
 const countdownFormatted = computed(() => {
   const min = Math.floor(countdown.value / 60)
   const sec = countdown.value % 60
@@ -94,15 +111,19 @@ const countdownFormatted = computed(() => {
     <!-- Header -->
     <div class="max-w-2xl mx-auto">
       <div class="flex items-center justify-between mb-8">
-        <RouterLink to="/" class="flex items-center gap-2 text-gray-400 hover:text-white">
-          <span class="material-symbols-outlined">arrow_back</span>
-          Back
-        </RouterLink>
+        <button 
+          @click="handleLogout" 
+          class="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors"
+        >
+          <span class="material-symbols-outlined">logout</span>
+          Logout
+        </button>
         <div class="text-right">
           <p class="text-sm text-gray-400">Current Time</p>
-          <p class="text-xl font-mono">{{ new Date().toLocaleTimeString() }}</p>
+          <p class="text-xl font-mono">{{ currentTime }}</p>
         </div>
       </div>
+
 
       <!-- Location Selector -->
       <div class="mb-8">

@@ -117,5 +117,11 @@ class RoleSeeder extends Seeder
             'shifts.view',
             'locations.view',
         ]);
+
+        // Display Screen - only for displaying barcodes on kiosks/TVs
+        $displayScreen = Role::create(['name' => 'display_screen', 'guard_name' => 'web']);
+        $displayScreen->givePermissionTo([
+            'barcode.display',
+        ]);
     }
 }
