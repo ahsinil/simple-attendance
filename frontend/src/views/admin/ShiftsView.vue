@@ -35,7 +35,11 @@ function openCreate() {
 
 function openEdit(shift) {
   editingShift.value = shift
-  form.value = { ...shift }
+  form.value = {
+    ...shift,
+    start_time: shift.start_time?.substring(0, 5) || '',
+    end_time: shift.end_time?.substring(0, 5) || '',
+  }
   showForm.value = true
 }
 

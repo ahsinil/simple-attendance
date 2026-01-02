@@ -82,10 +82,17 @@ function onCameraError(error) {
   }
 }
 
-async function onDecode(decodedString) {
+async function onDetect(detectedCodes) {
   if (scanning.value) return // Prevent multiple scans
+  if (!detectedCodes || detectedCodes.length === 0) return
   
-  scannedCode.value = decodedString
+  // vue-qrcode-reader v5.x returns an array of detected codes
+  const firstCode = detectedCodes[0]
+  console.log('=== QR SCAN DEBUG ===')
+  console.log('Detected codes:', detectedCodes)
+  console.log('First code object:', firstCode)
+  console.log('Raw value:', firstCode.rawValue)
+  scannedCode.value = firstCode.rawValue
   await handleScan()
 }
 
@@ -175,7 +182,7 @@ async function handleScan() {
 
         <!-- QR Code Stream -->
         <QrcodeStream 
-          @decode="onDecode"
+          @detect="onDetect"
           @camera-on="onCameraReady"
           @error="onCameraError"
           class="w-full h-full"

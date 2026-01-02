@@ -30,7 +30,7 @@ class UserController extends Controller
 
         $perPage = $request->input('per_page', 15);
 
-        $query = User::with(['roles', 'defaultLocation']);
+        $query = User::with(['roles', 'defaultLocation', 'schedules.shift']);
 
         if ($request->has('search')) {
             $search = $request->input('search');

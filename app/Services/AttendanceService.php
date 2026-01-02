@@ -253,7 +253,12 @@ class AttendanceService
         $penaltyTier = 'NONE';
 
         if (!$schedule || !$schedule->shift) {
-            return compact('status', 'lateMin', 'earlyLeaveMin', 'penaltyTier');
+            return [
+                'status' => $status,
+                'late_min' => $lateMin,
+                'early_leave_min' => $earlyLeaveMin,
+                'penalty_tier' => $penaltyTier,
+            ];
         }
 
         $shift = $schedule->shift;

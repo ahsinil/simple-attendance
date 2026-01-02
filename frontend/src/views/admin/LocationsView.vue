@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { adminApi } from '@/services/api'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
+import MiniMap from '@/components/MiniMap.vue'
 
 const toast = useToast()
 const { confirmDelete } = useConfirm()
@@ -117,8 +118,19 @@ async function getCurrentLocation() {
             <span>Timezone</span>
             <span class="font-medium">{{ location.timezone }}</span>
           </div>
-          <div class="text-xs text-gray-400 pt-2">
-            {{ location.latitude }}, {{ location.longitude }}
+          <div class="pt-3">
+            <!-- Interactive Map -->
+            <MiniMap 
+              :latitude="location.latitude" 
+              :longitude="location.longitude" 
+              :name="location.name"
+              height="100px"
+            />
+            <!-- Coordinates -->
+            <div class="flex items-center justify-center gap-1 text-xs text-gray-400 mt-2">
+              <span class="material-symbols-outlined text-sm">location_on</span>
+              <span>{{ location.latitude }}, {{ location.longitude }}</span>
+            </div>
           </div>
         </div>
         <div class="mt-4 pt-4 border-t border-gray-200 dark:border-dark-border">

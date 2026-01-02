@@ -177,6 +177,29 @@ function formatTime(time) {
   if (!time) return ''
   return time.substring(0, 5)
 }
+
+function getCurrentShift(user) {
+  if (!user.schedules || user.schedules.length === 0) return 'No Shift'
+  
+  const today = new Date().toISOString().split('T')[0]
+  
+  // Find active schedule
+  // Note: dates from API are typically strings. We can compare strings if they are YYYY-MM-DD
+  // But safer to compare Date objects or normalize strings
+  
+  const activeSchedule = user.schedules.find(s => {
+    const startDate = s.start_date.split('T')[0]
+    const endDate = s.end_date ? s.end_date.split('T')[0] : null
+    
+    return startDate <= today && (!endDate || endDate >= today)
+  })
+  
+  if (activeSchedule && activeSchedule.shift) {
+    return activeSchedule.shift.name
+  }
+  
+  return 'No Shift'
+}
 </script>
 
 <template>
@@ -203,6 +226,7 @@ function formatTime(time) {
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Name</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Email</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Role</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Shift</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
             <th class="px-4 py-3 text-right text-sm font-medium text-gray-500">Actions</th>
           </tr>
@@ -218,6 +242,9 @@ function formatTime(time) {
               <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
                 {{ user.roles?.[0]?.name || 'N/A' }}
               </span>
+            </td>
+            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+              {{ getCurrentShift(user) }}
             </td>
             <td class="px-4 py-3">
               <span :class="user.status === 'active' ? 'text-green-500' : 'text-gray-400'">
