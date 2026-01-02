@@ -55,20 +55,26 @@ class RoleSeeder extends Seeder
             
             // Barcode display
             'barcode.display',
+            
+            // Role management
+            'roles.view',
+            'roles.create',
+            'roles.update',
+            'roles.delete',
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::create(['name' => $permission, 'guard_name' => 'web']);
         }
 
         // Create roles and assign permissions
         
         // Super Admin - has all permissions
-        $superAdmin = Role::create(['name' => 'super_admin']);
+        $superAdmin = Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
         $superAdmin->givePermissionTo(Permission::all());
 
         // Admin - manage attendance approvals, users, shifts, locations
-        $admin = Role::create(['name' => 'admin']);
+        $admin = Role::create(['name' => 'admin', 'guard_name' => 'web']);
         $admin->givePermissionTo([
             'attendance.view-all',
             'attendance.approve-request',
@@ -90,7 +96,7 @@ class RoleSeeder extends Seeder
         ]);
 
         // Supervisor - view team attendance, recommend approvals
-        $supervisor = Role::create(['name' => 'supervisor']);
+        $supervisor = Role::create(['name' => 'supervisor', 'guard_name' => 'web']);
         $supervisor->givePermissionTo([
             'attendance.view-own',
             'attendance.view-all',
@@ -103,7 +109,7 @@ class RoleSeeder extends Seeder
         ]);
 
         // Employee - basic attendance operations
-        $employee = Role::create(['name' => 'employee']);
+        $employee = Role::create(['name' => 'employee', 'guard_name' => 'web']);
         $employee->givePermissionTo([
             'attendance.view-own',
             'attendance.create',

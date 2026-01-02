@@ -3,8 +3,11 @@
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BarcodeController;
+use App\Http\Controllers\Api\LeaveController;
 use App\Http\Controllers\Admin\AttendanceRequestController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\LeaveApprovalController;
+use App\Http\Controllers\Admin\LeaveTypeController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\ShiftController;
 use App\Http\Controllers\Admin\UserController;
@@ -55,6 +58,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/location/{location}', [BarcodeController::class, 'show']);
     });
 
+    // Leave Management (Employee)
+    Route::prefix('leave')->group(function () {
+        Route::get('/types', [LeaveController::class, 'types']);
+        Route::get('/balances', [LeaveController::class, 'balances']);
+        Route::get('/my-requests', [LeaveController::class, 'myRequests']);
+        Route::post('/request', [LeaveController::class, 'submitRequest']);
+        Route::delete('/request/{leaveRequest}', [LeaveController::class, 'cancelRequest']);
+    });
+
     /*
     |--------------------------------------------------------------------------
     | Admin Routes
@@ -88,6 +100,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users/{user}/schedules', [UserController::class, 'schedules']);
         Route::delete('/users/{user}/schedules/{schedule}', [UserController::class, 'removeSchedule']);
 
+        // Roles & Permissions
+        Route::apiResource('roles', App\Http\Controllers\Admin\RoleController::class);
+        Route::get('/permissions', [App\Http\Controllers\Admin\PermissionController::class, 'index']);
+
 
         // Reports
         Route::get('/reports', [App\Http\Controllers\Admin\ReportController::class, 'index']);
@@ -98,5 +114,16 @@ Route::middleware('auth:sanctum')->group(function () {
         // Settings
         Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index']);
         Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update']);
+
+        // Leave Types
+        Route::apiResource('leave-types', LeaveTypeController::class);
+
+        // Leave Requests (Admin approval)
+        Route::prefix('leave-requests')->group(function () {
+            Route::get('/', [LeaveApprovalController::class, 'index']);
+            Route::get('/stats', [LeaveApprovalController::class, 'stats']);
+            Route::post('/{leaveRequest}/approve', [LeaveApprovalController::class, 'approve']);
+            Route::post('/{leaveRequest}/reject', [LeaveApprovalController::class, 'reject']);
+        });
     });
 });

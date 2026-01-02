@@ -11,8 +11,11 @@ const sidebarOpen = ref(false)
 const navItems = [
   { name: 'Dashboard', icon: 'dashboard', to: '/admin' },
   { name: 'Requests', icon: 'pending_actions', to: '/admin/requests' },
+  { name: 'Leave Requests', icon: 'event_busy', to: '/admin/leave-requests' },
   { name: 'Users', icon: 'group', to: '/admin/users' },
+  { name: 'Roles', icon: 'admin_panel_settings', to: '/admin/roles' },
   { name: 'Shifts', icon: 'schedule', to: '/admin/shifts' },
+  { name: 'Leave Types', icon: 'beach_access', to: '/admin/leave-types' },
   { name: 'Locations', icon: 'location_on', to: '/admin/locations' },
   { name: 'Reports', icon: 'analytics', to: '/admin/reports' },
   { name: 'Settings', icon: 'settings_applications', to: '/admin/settings' },

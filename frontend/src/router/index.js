@@ -42,6 +42,11 @@ const routes = [
                 name: 'Settings',
                 component: () => import('@/views/SettingsView.vue'),
             },
+            {
+                path: 'leaves',
+                name: 'MyLeaves',
+                component: () => import('@/views/MyLeavesView.vue'),
+            },
         ],
     },
     {
@@ -65,6 +70,11 @@ const routes = [
                 component: () => import('@/views/admin/UsersView.vue'),
             },
             {
+                path: 'roles',
+                name: 'AdminRoles',
+                component: () => import('@/views/admin/RolesView.vue'),
+            },
+            {
                 path: 'settings',
                 name: 'AdminSettings',
                 component: () => import('@/views/admin/SettingsView.vue'),
@@ -83,6 +93,16 @@ const routes = [
                 path: 'reports',
                 name: 'AdminReports',
                 component: () => import('@/views/admin/ReportsView.vue'),
+            },
+            {
+                path: 'leave-types',
+                name: 'AdminLeaveTypes',
+                component: () => import('@/views/admin/LeaveTypesView.vue'),
+            },
+            {
+                path: 'leave-requests',
+                name: 'AdminLeaveRequests',
+                component: () => import('@/views/admin/LeaveRequestsView.vue'),
             },
         ],
     },

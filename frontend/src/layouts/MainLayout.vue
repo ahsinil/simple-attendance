@@ -13,6 +13,7 @@ const navItems = [
   { name: 'Attendance', icon: 'qr_code_scanner', to: '/attendance' },
   { name: 'History', icon: 'history', to: '/history' },
   { name: 'My Requests', icon: 'pending_actions', to: '/requests' },
+  { name: 'My Leaves', icon: 'beach_access', to: '/leaves' },
   { name: 'My Schedules', icon: 'calendar_month', to: '/schedules' },
   { name: 'Settings', icon: 'settings', to: '/settings' },
 ]
