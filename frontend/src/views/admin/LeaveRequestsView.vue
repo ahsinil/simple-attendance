@@ -1,6 +1,13 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { adminApi, leaveApi } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+
+// Permission checks
+const canApprove = computed(() => authStore.hasPermission('admin.leaves.approve'))
+const canReject = computed(() => authStore.hasPermission('admin.leaves.reject'))
 
 // Data
 const requests = ref({ data: [] })
@@ -230,8 +237,9 @@ onMounted(() => {
               </span>
             </td>
             <td class="px-4 py-3 text-right">
-              <div v-if="request.status === 'PENDING'" class="flex items-center justify-end gap-2">
+              <div v-if="request.status === 'PENDING' && (canApprove || canReject)" class="flex items-center justify-end gap-2">
                 <button
+                  v-if="canApprove"
                   @click="quickApprove(request)"
                   class="text-green-600 hover:text-green-700 flex items-center gap-1"
                   title="Approve"
@@ -239,6 +247,7 @@ onMounted(() => {
                   <span class="material-symbols-outlined text-sm">check_circle</span>
                 </button>
                 <button
+                  v-if="canReject"
                   @click="openModal(request, 'reject')"
                   class="text-red-500 hover:text-red-700 flex items-center gap-1"
                   title="Reject"

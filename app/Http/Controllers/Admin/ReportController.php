@@ -18,6 +18,10 @@ class ReportController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        if (!$request->user()->can('admin.reports.view')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $request->validate([
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -56,6 +60,10 @@ class ReportController extends Controller
      */
     public function summary(Request $request): JsonResponse
     {
+        if (!$request->user()->can('admin.reports.view')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $request->validate([
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -108,6 +116,10 @@ class ReportController extends Controller
      */
     public function export(Request $request)
     {
+        if (!$request->user()->can('admin.reports.export')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $request->validate([
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -125,6 +137,7 @@ class ReportController extends Controller
             $filename
         );
     }
+
 
     /**
      * Get available locations for filter dropdown.

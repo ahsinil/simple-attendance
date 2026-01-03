@@ -1,9 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { adminApi } from '@/services/api'
 import { useToast } from '@/composables/useToast'
+import { useAuthStore } from '@/stores/auth'
 
 const toast = useToast()
+const authStore = useAuthStore()
+
+// Permission checks
+const canApprove = computed(() => authStore.hasPermission('admin.requests.approve'))
+const canReject = computed(() => authStore.hasPermission('admin.requests.reject'))
 
 const requests = ref([])
 const loading = ref(true)
@@ -180,8 +186,9 @@ function formatTime(iso) {
               </div>
             </div>
 
-            <div v-if="statusFilter === 'PENDING'" class="flex gap-2">
+            <div v-if="statusFilter === 'PENDING' && (canApprove || canReject)" class="flex gap-2">
               <button 
+                v-if="canApprove"
                 @click="openApproveModal(request)"
                 :disabled="processingId === request.id"
                 class="btn btn-primary"
@@ -190,6 +197,7 @@ function formatTime(iso) {
                 Approve
               </button>
               <button 
+                v-if="canReject"
                 @click="openRejectModal(request)"
                 :disabled="processingId === request.id"
                 class="btn btn-danger"

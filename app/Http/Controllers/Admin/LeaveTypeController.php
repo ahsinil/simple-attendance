@@ -12,8 +12,15 @@ class LeaveTypeController extends Controller
     /**
      * Get all leave types.
      */
-    public function index(): JsonResponse
+    /**
+     * Get all leave types.
+     */
+    public function index(Request $request): JsonResponse
     {
+        if (!$request->user()->can('admin.leave-types.view')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $types = LeaveType::orderBy('name')->get();
 
         return response()->json([
@@ -27,6 +34,10 @@ class LeaveTypeController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        if (!$request->user()->can('admin.leave-types.create')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'code' => 'required|string|max:20|unique:leave_types,code',
@@ -49,8 +60,12 @@ class LeaveTypeController extends Controller
     /**
      * Get a specific leave type.
      */
-    public function show(LeaveType $leaveType): JsonResponse
+    public function show(Request $request, LeaveType $leaveType): JsonResponse
     {
+        if (!$request->user()->can('admin.leave-types.view')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         return response()->json([
             'success' => true,
             'data' => $leaveType,
@@ -62,6 +77,10 @@ class LeaveTypeController extends Controller
      */
     public function update(Request $request, LeaveType $leaveType): JsonResponse
     {
+        if (!$request->user()->can('admin.leave-types.update')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:100',
             'code' => 'sometimes|required|string|max:20|unique:leave_types,code,' . $leaveType->id,
@@ -84,8 +103,12 @@ class LeaveTypeController extends Controller
     /**
      * Delete a leave type.
      */
-    public function destroy(LeaveType $leaveType): JsonResponse
+    public function destroy(Request $request, LeaveType $leaveType): JsonResponse
     {
+        if (!$request->user()->can('admin.leave-types.delete')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         // Check if there are any leave requests using this type
         if ($leaveType->leaveRequests()->exists()) {
             return response()->json([

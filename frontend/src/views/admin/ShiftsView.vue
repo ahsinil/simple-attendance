@@ -1,11 +1,18 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { adminApi } from '@/services/api'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
+import { useAuthStore } from '@/stores/auth'
 
 const toast = useToast()
 const { confirmDelete } = useConfirm()
+const authStore = useAuthStore()
+
+// Permission checks
+const canCreate = computed(() => authStore.hasPermission('admin.shifts.create'))
+const canUpdate = computed(() => authStore.hasPermission('admin.shifts.update'))
+const canDelete = computed(() => authStore.hasPermission('admin.shifts.delete'))
 
 const shifts = ref([])
 const loading = ref(true)
@@ -74,7 +81,7 @@ async function deleteShift(shift) {
 <template>
   <div class="space-y-6">
     <div class="flex justify-end">
-      <button @click="openCreate" class="btn btn-primary">
+      <button v-if="canCreate" @click="openCreate" class="btn btn-primary">
         <span class="material-symbols-outlined text-sm">add</span>
         Add Shift
       </button>
@@ -87,11 +94,11 @@ async function deleteShift(shift) {
             <h3 class="font-semibold text-gray-900 dark:text-white">{{ shift.name }}</h3>
             <p class="text-sm text-gray-500">{{ shift.code }}</p>
           </div>
-          <div class="flex gap-1">
-            <button @click="openEdit(shift)" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded">
+          <div v-if="canUpdate || canDelete" class="flex gap-1">
+            <button v-if="canUpdate" @click="openEdit(shift)" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded">
               <span class="material-symbols-outlined text-sm">edit</span>
             </button>
-            <button @click="deleteShift(shift)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500">
+            <button v-if="canDelete" @click="deleteShift(shift)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500">
               <span class="material-symbols-outlined text-sm">delete</span>
             </button>
           </div>

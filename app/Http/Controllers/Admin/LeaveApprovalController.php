@@ -22,6 +22,10 @@ class LeaveApprovalController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        if (!$request->user()->can('admin.leaves.view')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $request->validate([
             'status' => 'nullable|in:PENDING,APPROVED,REJECTED,CANCELLED',
             'leave_type_id' => 'nullable|exists:leave_types,id',
@@ -54,6 +58,10 @@ class LeaveApprovalController extends Controller
      */
     public function stats(): JsonResponse
     {
+        if (!auth()->user()->can('admin.leaves.view')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $stats = [
             'pending' => LeaveRequest::where('status', 'PENDING')->count(),
             'approved_today' => LeaveRequest::where('status', 'APPROVED')
@@ -78,6 +86,10 @@ class LeaveApprovalController extends Controller
      */
     public function approve(Request $request, LeaveRequest $leaveRequest): JsonResponse
     {
+        if (!$request->user()->can('admin.leaves.approve')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $request->validate([
             'admin_note' => 'nullable|string|max:500',
         ]);
@@ -114,6 +126,10 @@ class LeaveApprovalController extends Controller
      */
     public function reject(Request $request, LeaveRequest $leaveRequest): JsonResponse
     {
+        if (!$request->user()->can('admin.leaves.reject')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $request->validate([
             'admin_note' => 'required|string|min:5|max:500',
         ]);

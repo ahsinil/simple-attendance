@@ -3,9 +3,16 @@ import { ref, onMounted, computed } from 'vue'
 import { adminApi } from '@/services/api'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
+import { useAuthStore } from '@/stores/auth'
 
 const toast = useToast()
 const { confirmDelete, confirmAction } = useConfirm()
+const authStore = useAuthStore()
+
+// Permission checks
+const canCreate = computed(() => authStore.hasPermission('admin.roles.create'))
+const canUpdate = computed(() => authStore.hasPermission('admin.roles.update'))
+const canDelete = computed(() => authStore.hasPermission('admin.roles.delete'))
 
 const roles = ref([])
 const permissionGroups = ref([])
@@ -150,7 +157,7 @@ function formatRoleName(name) {
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Roles & Permissions</h2>
         <p class="text-sm text-gray-500 mt-1">Manage user roles and their permissions</p>
       </div>
-      <button @click="openCreate" class="btn btn-primary">
+      <button v-if="canCreate" @click="openCreate" class="btn btn-primary">
         <span class="material-symbols-outlined text-sm">add</span>
         Add Role
       </button>
@@ -179,12 +186,12 @@ function formatRoleName(name) {
               <span v-if="role.is_system" class="text-xs text-blue-500 font-medium">System Role</span>
             </div>
           </div>
-          <div class="flex gap-1">
-            <button @click="openEdit(role)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-dark-border rounded" title="Edit">
+          <div v-if="canUpdate || canDelete" class="flex gap-1">
+            <button v-if="canUpdate" @click="openEdit(role)" class="p-1.5 hover:bg-gray-100 dark:hover:bg-dark-border rounded" title="Edit">
               <span class="material-symbols-outlined text-sm">edit</span>
             </button>
             <button 
-              v-if="!role.is_system"
+              v-if="canDelete && !role.is_system"
               @click="deleteRole(role)" 
               class="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500" 
               title="Delete"

@@ -30,7 +30,7 @@ class AttendanceRequestController extends Controller
 
         $user = $request->user();
 
-        if (!$user->can('attendance.approve-request')) {
+        if (!$user->can('admin.requests.view')) {
             return response()->json([
                 'success' => false,
                 'error' => 'Unauthorized',
@@ -56,7 +56,7 @@ class AttendanceRequestController extends Controller
      */
     public function show(Request $request, AttendanceRequest $attendanceRequest): JsonResponse
     {
-        if (!$request->user()->can('attendance.approve-request')) {
+        if (!$request->user()->can('admin.requests.view')) {
             return response()->json([
                 'success' => false,
                 'error' => 'Unauthorized',
@@ -78,7 +78,7 @@ class AttendanceRequestController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->can('attendance.approve-request')) {
+        if (!$user->can('admin.requests.approve')) {
             return response()->json([
                 'success' => false,
                 'error' => 'Unauthorized',
@@ -121,7 +121,7 @@ class AttendanceRequestController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->can('attendance.reject-request')) {
+        if (!$user->can('admin.requests.reject')) {
             return response()->json([
                 'success' => false,
                 'error' => 'Unauthorized',
@@ -157,7 +157,7 @@ class AttendanceRequestController extends Controller
      */
     public function stats(Request $request): JsonResponse
     {
-        if (!$request->user()->can('attendance.approve-request')) {
+        if (!$request->user()->can('admin.requests.view')) {
             return response()->json([
                 'success' => false,
                 'error' => 'Unauthorized',

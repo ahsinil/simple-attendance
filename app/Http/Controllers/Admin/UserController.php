@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        if (!$request->user()->can('users.view')) {
+        if (!$request->user()->can('admin.users.view')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -79,7 +79,7 @@ class UserController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        if (!$request->user()->can('users.create')) {
+        if (!$request->user()->can('admin.users.create')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -138,7 +138,7 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user): JsonResponse
     {
-        if (!$request->user()->can('users.update')) {
+        if (!$request->user()->can('admin.users.update')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -180,7 +180,7 @@ class UserController extends Controller
      */
     public function destroy(Request $request, User $user): JsonResponse
     {
-        if (!$request->user()->can('users.delete')) {
+        if (!$request->user()->can('admin.users.delete')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 

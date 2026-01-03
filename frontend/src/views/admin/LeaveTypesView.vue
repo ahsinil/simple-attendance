@@ -1,6 +1,14 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { adminApi } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+
+// Permission checks
+const canCreate = computed(() => authStore.hasPermission('admin.leave-types.create'))
+const canUpdate = computed(() => authStore.hasPermission('admin.leave-types.update'))
+const canDelete = computed(() => authStore.hasPermission('admin.leave-types.delete'))
 
 // Data
 const leaveTypes = ref([])
@@ -137,7 +145,7 @@ onMounted(() => {
     <!-- Header -->
     <div class="flex items-center justify-between">
       <h2 class="text-xl font-bold text-gray-900 dark:text-white">Leave Types</h2>
-      <button @click="openModal()" class="btn btn-primary">
+      <button v-if="canCreate" @click="openModal()" class="btn btn-primary">
         <span class="material-symbols-outlined text-sm">add</span>
         Add Leave Type
       </button>
@@ -195,11 +203,11 @@ onMounted(() => {
               </button>
             </td>
             <td class="px-4 py-3 text-right">
-              <div class="flex items-center justify-end gap-2">
-                <button @click="openModal(type)" class="text-primary hover:text-primary/80">
+              <div v-if="canUpdate || canDelete" class="flex items-center justify-end gap-2">
+                <button v-if="canUpdate" @click="openModal(type)" class="text-primary hover:text-primary/80">
                   <span class="material-symbols-outlined text-sm">edit</span>
                 </button>
-                <button @click="deleteType(type)" class="text-red-500 hover:text-red-700">
+                <button v-if="canDelete" @click="deleteType(type)" class="text-red-500 hover:text-red-700">
                   <span class="material-symbols-outlined text-sm">delete</span>
                 </button>
               </div>

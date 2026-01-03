@@ -12,21 +12,32 @@ class PermissionController extends Controller
     /**
      * Get all permissions grouped by category.
      */
+    /**
+     * Get all permissions grouped by category.
+     */
     public function index(Request $request): JsonResponse
     {
-        if (!$request->user()->can('roles.view')) {
+        if (!$request->user()->can('admin.roles.view')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
         $permissions = Permission::all(['id', 'name'])->groupBy(function ($permission) {
-            // Group by prefix (e.g., "users.view" -> "users")
+            // Group by category, handling "admin" prefix
             $parts = explode('.', $permission->name);
+            if ($parts[0] === 'admin') {
+                return $parts[1] ?? 'other';
+            }
             return $parts[0] ?? 'other';
         })->map(function ($group, $category) {
+            // Sort: admin permissions first (View All), then employee permissions (View Own)
+            $sorted = $group->sortBy(function ($permission) {
+                return str_starts_with($permission->name, 'admin.') ? 0 : 1;
+            });
+
             return [
                 'category' => $category,
                 'label' => $this->getCategoryLabel($category),
-                'permissions' => $group->map(function ($permission) {
+                'permissions' => $sorted->map(function ($permission) {
                     return [
                         'id' => $permission->id,
                         'name' => $permission->name,
@@ -48,15 +59,22 @@ class PermissionController extends Controller
     protected function getCategoryLabel(string $category): string
     {
         return match ($category) {
+            'dashboard' => 'Dashboard',
             'attendance' => 'Attendance',
+            'history' => 'History',
+            'requests' => 'Requests',
+            'leaves' => 'Leaves',
+            'schedules' => 'Schedules',
             'users' => 'User Management',
+            'rights' => 'Access Rights',
             'shifts' => 'Shift Management',
+            'leave-types' => 'Leave Types',
             'locations' => 'Location Management',
             'reports' => 'Reports',
             'settings' => 'Settings',
             'barcode' => 'Barcode Display',
             'roles' => 'Role Management',
-            default => ucfirst($category),
+            default => ucfirst(str_replace('-', ' ', $category)),
         };
     }
 
@@ -66,21 +84,24 @@ class PermissionController extends Controller
     protected function getPermissionLabel(string $permission): string
     {
         $parts = explode('.', $permission);
-        $action = $parts[1] ?? $permission;
+        $action = end($parts);
+        $isAdmin = $parts[0] === 'admin';
+
+        // Special cases
+        if (str_contains($permission, 'dashboard')) {
+            return $isAdmin ? 'Admin Panel' : 'Employee Portal';
+        }
 
         return match ($action) {
-            'view' => 'View',
+            'view' => $isAdmin ? 'View All' : 'View Own',
             'view-own' => 'View Own',
-            'view-all' => 'View All',
             'create' => 'Create',
             'update' => 'Update',
             'delete' => 'Delete',
-            'manual-request' => 'Manual Request',
-            'approve-request' => 'Approve Request',
-            'reject-request' => 'Reject Request',
-            'override' => 'Override',
+            'approve' => 'Approve',
+            'reject' => 'Reject',
             'export' => 'Export',
-            'display' => 'Display',
+            'display' => 'Display Access',
             default => ucfirst(str_replace('-', ' ', $action)),
         };
     }

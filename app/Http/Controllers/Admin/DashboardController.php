@@ -16,8 +16,12 @@ class DashboardController extends Controller
     /**
      * Get comprehensive dashboard statistics.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
+        if (!$request->user()->can('admin.dashboard.view')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         return response()->json([
             'success' => true,
             'data' => [

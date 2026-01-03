@@ -12,8 +12,15 @@ class SettingController extends Controller
     /**
      * Get all settings.
      */
-    public function index(): JsonResponse
+    /**
+     * Get all settings.
+     */
+    public function index(Request $request): JsonResponse
     {
+        if (!$request->user()->can('admin.settings.view')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $settings = AppSetting::all()->pluck('value', 'key');
 
         return response()->json([
@@ -27,6 +34,10 @@ class SettingController extends Controller
      */
     public function update(Request $request): JsonResponse
     {
+        if (!$request->user()->can('admin.settings.update')) {
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
         $data = $request->validate([
             'settings' => 'required|array',
             'settings.*' => 'nullable|string',

@@ -20,7 +20,7 @@ class RoleController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        if (!$request->user()->can('roles.view')) {
+        if (!$request->user()->can('admin.roles.view')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -48,7 +48,7 @@ class RoleController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        if (!$request->user()->can('roles.create')) {
+        if (!$request->user()->can('admin.roles.create')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -91,7 +91,7 @@ class RoleController extends Controller
      */
     public function show(Request $request, Role $role): JsonResponse
     {
-        if (!$request->user()->can('roles.view')) {
+        if (!$request->user()->can('admin.roles.view')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -115,7 +115,7 @@ class RoleController extends Controller
      */
     public function update(Request $request, Role $role): JsonResponse
     {
-        if (!$request->user()->can('roles.update')) {
+        if (!$request->user()->can('admin.roles.update')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -167,7 +167,7 @@ class RoleController extends Controller
      */
     public function destroy(Request $request, Role $role): JsonResponse
     {
-        if (!$request->user()->can('roles.delete')) {
+        if (!$request->user()->can('admin.roles.delete')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 

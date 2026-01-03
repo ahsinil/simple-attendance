@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
@@ -8,21 +8,55 @@ const authStore = useAuthStore()
 
 const sidebarOpen = ref(false)
 
-const navItems = [
-  { name: 'Dashboard', icon: 'dashboard', to: '/' },
-  { name: 'Attendance', icon: 'qr_code_scanner', to: '/attendance' },
-  { name: 'History', icon: 'history', to: '/history' },
-  { name: 'My Requests', icon: 'pending_actions', to: '/requests' },
-  { name: 'My Leaves', icon: 'beach_access', to: '/leaves' },
-  { name: 'My Schedules', icon: 'calendar_month', to: '/schedules' },
-  { name: 'Settings', icon: 'settings', to: '/settings' },
+// Admin-level permissions that grant access to admin section
+const adminPermissions = [
+  'admin.dashboard.view',
+  'admin.requests.view',
+  'admin.leaves.view',
+  'admin.users.view',
+  'admin.roles.view',
+  'admin.shifts.view',
+  'admin.leave-types.view',
+  'admin.locations.view',
+  'admin.reports.view',
+  'admin.settings.view',
 ]
+
+// Check if user has any admin permission
+const hasAnyAdminPermission = computed(() => {
+  const userPermissions = authStore.user?.permissions || []
+  return adminPermissions.some(p => userPermissions.includes(p))
+})
+
+// Navigation items with required permissions
+const allNavItems = [
+  { name: 'Dashboard', icon: 'dashboard', to: '/', permission: 'dashboard.view' },
+  { name: 'Attendance', icon: 'qr_code_scanner', to: '/attendance', permission: 'attendance.create' },
+  { name: 'History', icon: 'history', to: '/history', permission: 'history.view' },
+  { name: 'My Requests', icon: 'pending_actions', to: '/requests', permission: 'requests.view' },
+  { name: 'My Leaves', icon: 'beach_access', to: '/leaves', permission: 'leaves.view' },
+  { name: 'My Schedules', icon: 'calendar_month', to: '/schedules', permission: 'schedules.view' },
+  { name: 'Settings', icon: 'settings', to: '/settings', permission: null }, // Always visible if authenticated
+]
+
+// Filter nav items based on user permissions
+const navItems = computed(() => {
+  return allNavItems.filter(item => {
+    // If no permission required, always show
+    if (!item.permission) return true
+    // Check if user has the required permission
+    return authStore.user?.permissions?.includes(item.permission)
+  })
+})
 
 async function handleLogout() {
   await authStore.logout()
   router.push('/login')
 }
 </script>
+
+
+
 
 <template>
   <div class="min-h-screen bg-light-bg dark:bg-dark-bg">
@@ -67,7 +101,7 @@ async function handleLogout() {
 
         <!-- Admin Link -->
         <RouterLink
-          v-if="authStore.isAdmin"
+          v-if="authStore.isAdmin || hasAnyAdminPermission"
           to="/admin"
           class="sidebar-link"
           active-class="active"
