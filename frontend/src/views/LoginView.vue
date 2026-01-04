@@ -91,21 +91,7 @@ async function handleLogin() {
         </button>
       </form>
 
-      <!-- Demo Credentials -->
-      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-dark-border">
-        <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-3">Demo Credentials:</p>
-        <div class="grid grid-cols-2 gap-3 text-sm">
-          <div class="bg-gray-50 dark:bg-dark-bg rounded-lg p-3">
-            <p class="font-medium text-gray-700 dark:text-gray-300">Admin</p>
-            <p class="text-gray-500 text-xs">admin@example.com</p>
-          </div>
-          <div class="bg-gray-50 dark:bg-dark-bg rounded-lg p-3">
-            <p class="font-medium text-gray-700 dark:text-gray-300">Employee</p>
-            <p class="text-gray-500 text-xs">john@example.com</p>
-          </div>
-        </div>
-        <p class="text-xs text-gray-400 text-center mt-2">Password: password</p>
-      </div>
+
     </div>
   </div>
 </template>

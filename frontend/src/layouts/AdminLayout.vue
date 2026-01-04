@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
@@ -8,21 +8,41 @@ const authStore = useAuthStore()
 
 const sidebarOpen = ref(false)
 
-const navItems = [
-  { name: 'Dashboard', icon: 'dashboard', to: '/admin' },
-  { name: 'Requests', icon: 'pending_actions', to: '/admin/requests' },
-  { name: 'Users', icon: 'group', to: '/admin/users' },
-  { name: 'Shifts', icon: 'schedule', to: '/admin/shifts' },
-  { name: 'Locations', icon: 'location_on', to: '/admin/locations' },
-  { name: 'Reports', icon: 'analytics', to: '/admin/reports' },
-  { name: 'Settings', icon: 'settings_applications', to: '/admin/settings' },
+// Admin navigation items with required permissions
+const allNavItems = [
+  { name: 'Dashboard', icon: 'dashboard', to: '/admin', permission: 'admin.dashboard.view' },
+  { name: 'Requests', icon: 'pending_actions', to: '/admin/requests', permission: 'admin.requests.view' },
+  { name: 'Leave Requests', icon: 'event_busy', to: '/admin/leave-requests', permission: 'admin.leaves.view' },
+  { name: 'Users', icon: 'group', to: '/admin/users', permission: 'admin.users.view' },
+  { name: 'Roles', icon: 'admin_panel_settings', to: '/admin/roles', permission: 'admin.roles.view' },
+  { name: 'Shifts', icon: 'schedule', to: '/admin/shifts', permission: 'admin.shifts.view' },
+  { name: 'Leave Types', icon: 'beach_access', to: '/admin/leave-types', permission: 'admin.leave-types.view' },
+  { name: 'Locations', icon: 'location_on', to: '/admin/locations', permission: 'admin.locations.view' },
+  { name: 'Reports', icon: 'analytics', to: '/admin/reports', permission: 'admin.reports.view' },
+  { name: 'Settings', icon: 'settings_applications', to: '/admin/settings', permission: 'admin.settings.view' },
 ]
+
+// Filter nav items based on user permissions
+const navItems = computed(() => {
+  return allNavItems.filter(item => {
+    if (!item.permission) return true
+    return authStore.user?.permissions?.includes(item.permission)
+  })
+})
+
+// Check if user has any employee portal permissions
+const canAccessApp = computed(() => {
+  const appPermissions = ['dashboard.view', 'attendance.create', 'history.view', 'requests.view', 'leaves.view', 'schedules.view']
+  return appPermissions.some(p => authStore.user?.permissions?.includes(p))
+})
 
 async function handleLogout() {
   await authStore.logout()
   router.push('/login')
 }
 </script>
+
+
 
 <template>
   <div class="min-h-screen bg-light-bg dark:bg-dark-bg">
@@ -65,9 +85,10 @@ async function handleLogout() {
           {{ item.name }}
         </RouterLink>
 
-        <div class="my-4 border-t border-gray-200 dark:border-dark-border" />
+        <div v-if="canAccessApp" class="my-4 border-t border-gray-200 dark:border-dark-border" />
 
         <RouterLink
+          v-if="canAccessApp"
           to="/"
           class="sidebar-link"
           @click="sidebarOpen = false"

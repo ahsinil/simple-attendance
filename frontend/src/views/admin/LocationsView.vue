@@ -1,11 +1,19 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { adminApi } from '@/services/api'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
+import { useAuthStore } from '@/stores/auth'
+import MiniMap from '@/components/MiniMap.vue'
 
 const toast = useToast()
 const { confirmDelete } = useConfirm()
+const authStore = useAuthStore()
+
+// Permission checks
+const canCreate = computed(() => authStore.hasPermission('admin.locations.create'))
+const canUpdate = computed(() => authStore.hasPermission('admin.locations.update'))
+const canDelete = computed(() => authStore.hasPermission('admin.locations.delete'))
 
 const locations = ref([])
 const loading = ref(true)
@@ -86,7 +94,7 @@ async function getCurrentLocation() {
 <template>
   <div class="space-y-6">
     <div class="flex justify-end">
-      <button @click="openCreate" class="btn btn-primary">
+      <button v-if="canCreate" @click="openCreate" class="btn btn-primary">
         <span class="material-symbols-outlined text-sm">add</span>
         Add Location
       </button>
@@ -99,11 +107,11 @@ async function getCurrentLocation() {
             <h3 class="font-semibold text-gray-900 dark:text-white">{{ location.name }}</h3>
             <p class="text-sm text-gray-500">{{ location.code }}</p>
           </div>
-          <div class="flex gap-1">
-            <button @click="openEdit(location)" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded">
+          <div v-if="canUpdate || canDelete" class="flex gap-1">
+            <button v-if="canUpdate" @click="openEdit(location)" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded">
               <span class="material-symbols-outlined text-sm">edit</span>
             </button>
-            <button @click="deleteLocation(location)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500">
+            <button v-if="canDelete" @click="deleteLocation(location)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500">
               <span class="material-symbols-outlined text-sm">delete</span>
             </button>
           </div>
@@ -117,8 +125,19 @@ async function getCurrentLocation() {
             <span>Timezone</span>
             <span class="font-medium">{{ location.timezone }}</span>
           </div>
-          <div class="text-xs text-gray-400 pt-2">
-            {{ location.latitude }}, {{ location.longitude }}
+          <div class="pt-3">
+            <!-- Interactive Map -->
+            <MiniMap 
+              :latitude="location.latitude" 
+              :longitude="location.longitude" 
+              :name="location.name"
+              height="100px"
+            />
+            <!-- Coordinates -->
+            <div class="flex items-center justify-center gap-1 text-xs text-gray-400 mt-2">
+              <span class="material-symbols-outlined text-sm">location_on</span>
+              <span>{{ location.latitude }}, {{ location.longitude }}</span>
+            </div>
           </div>
         </div>
         <div class="mt-4 pt-4 border-t border-gray-200 dark:border-dark-border">

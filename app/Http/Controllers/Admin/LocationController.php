@@ -14,7 +14,7 @@ class LocationController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        if (!$request->user()->can('locations.view')) {
+        if (!$request->user()->can('admin.locations.view')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -31,7 +31,7 @@ class LocationController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        if (!$request->user()->can('locations.create')) {
+        if (!$request->user()->can('admin.locations.create')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -67,7 +67,7 @@ class LocationController extends Controller
      */
     public function show(Request $request, Location $location): JsonResponse
     {
-        if (!$request->user()->can('locations.view')) {
+        if (!$request->user()->can('admin.locations.view')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -84,7 +84,7 @@ class LocationController extends Controller
      */
     public function update(Request $request, Location $location): JsonResponse
     {
-        if (!$request->user()->can('locations.update')) {
+        if (!$request->user()->can('admin.locations.update')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -112,7 +112,7 @@ class LocationController extends Controller
      */
     public function destroy(Request $request, Location $location): JsonResponse
     {
-        if (!$request->user()->can('locations.delete')) {
+        if (!$request->user()->can('admin.locations.delete')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 

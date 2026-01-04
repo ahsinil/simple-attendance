@@ -105,6 +105,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all leave requests for this user.
+     */
+    public function leaveRequests(): HasMany
+    {
+        return $this->hasMany(LeaveRequest::class);
+    }
+
+    /**
+     * Get all leave balances for this user.
+     */
+    public function leaveBalances(): HasMany
+    {
+        return $this->hasMany(LeaveBalance::class);
+    }
+
+    /**
      * Check if user is admin or super admin.
      */
     public function isAdmin(): bool

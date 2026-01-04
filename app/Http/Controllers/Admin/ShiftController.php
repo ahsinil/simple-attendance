@@ -14,7 +14,7 @@ class ShiftController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        if (!$request->user()->can('shifts.view')) {
+        if (!$request->user()->can('admin.shifts.view')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -31,7 +31,7 @@ class ShiftController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        if (!$request->user()->can('shifts.create')) {
+        if (!$request->user()->can('admin.shifts.create')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -69,7 +69,7 @@ class ShiftController extends Controller
      */
     public function show(Request $request, Shift $shift): JsonResponse
     {
-        if (!$request->user()->can('shifts.view')) {
+        if (!$request->user()->can('admin.shifts.view')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -84,7 +84,7 @@ class ShiftController extends Controller
      */
     public function update(Request $request, Shift $shift): JsonResponse
     {
-        if (!$request->user()->can('shifts.update')) {
+        if (!$request->user()->can('admin.shifts.update')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -113,7 +113,7 @@ class ShiftController extends Controller
      */
     public function destroy(Request $request, Shift $shift): JsonResponse
     {
-        if (!$request->user()->can('shifts.delete')) {
+        if (!$request->user()->can('admin.shifts.delete')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 

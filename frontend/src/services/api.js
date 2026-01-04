@@ -61,6 +61,15 @@ export const barcodeApi = {
     location: (id) => api.get(`/barcode/location/${id}`),
 }
 
+// Leave API (Employee)
+export const leaveApi = {
+    getTypes: () => api.get('/leave/types'),
+    getBalances: (params) => api.get('/leave/balances', { params }),
+    getMyRequests: (params) => api.get('/leave/my-requests', { params }),
+    submitRequest: (data) => api.post('/leave/request', data),
+    cancelRequest: (id) => api.delete(`/leave/request/${id}`),
+}
+
 // Admin API
 export const adminApi = {
     // Dashboard
@@ -95,6 +104,13 @@ export const adminApi = {
 
     removeSchedule: (userId, scheduleId) => api.delete(`/admin/users/${userId}/schedules/${scheduleId}`),
 
+    // Roles & Permissions
+    getPermissions: () => api.get('/admin/permissions'),
+    createRole: (data) => api.post('/admin/roles', data),
+    getRole: (id) => api.get(`/admin/roles/${id}`),
+    updateRole: (id, data) => api.put(`/admin/roles/${id}`, data),
+    deleteRole: (id) => api.delete(`/admin/roles/${id}`),
+
     // Settings
     getSettings: () => api.get('/admin/settings'),
     updateSettings: (data) => api.post('/admin/settings', data),
@@ -107,4 +123,17 @@ export const adminApi = {
         params,
         responseType: 'blob'
     }),
+
+    // Leave Types
+    getLeaveTypes: () => api.get('/admin/leave-types'),
+    createLeaveType: (data) => api.post('/admin/leave-types', data),
+    updateLeaveType: (id, data) => api.put(`/admin/leave-types/${id}`, data),
+    deleteLeaveType: (id) => api.delete(`/admin/leave-types/${id}`),
+
+    // Leave Requests (Admin approval)
+    getLeaveRequests: (params) => api.get('/admin/leave-requests', { params }),
+    getLeaveRequestStats: () => api.get('/admin/leave-requests/stats'),
+    approveLeaveRequest: (id, data) => api.post(`/admin/leave-requests/${id}/approve`, data),
+    rejectLeaveRequest: (id, data) => api.post(`/admin/leave-requests/${id}/reject`, data),
 }
+

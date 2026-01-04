@@ -1,11 +1,18 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { adminApi } from '@/services/api'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
+import { useAuthStore } from '@/stores/auth'
 
 const toast = useToast()
 const { confirmDelete, confirmAction } = useConfirm()
+const authStore = useAuthStore()
+
+// Permission checks
+const canCreate = computed(() => authStore.hasPermission('admin.users.create'))
+const canUpdate = computed(() => authStore.hasPermission('admin.users.update'))
+const canDelete = computed(() => authStore.hasPermission('admin.users.delete'))
 
 const users = ref([])
 const roles = ref([])
@@ -177,6 +184,29 @@ function formatTime(time) {
   if (!time) return ''
   return time.substring(0, 5)
 }
+
+function getCurrentShift(user) {
+  if (!user.schedules || user.schedules.length === 0) return 'No Shift'
+  
+  const today = new Date().toISOString().split('T')[0]
+  
+  // Find active schedule
+  // Note: dates from API are typically strings. We can compare strings if they are YYYY-MM-DD
+  // But safer to compare Date objects or normalize strings
+  
+  const activeSchedule = user.schedules.find(s => {
+    const startDate = s.start_date.split('T')[0]
+    const endDate = s.end_date ? s.end_date.split('T')[0] : null
+    
+    return startDate <= today && (!endDate || endDate >= today)
+  })
+  
+  if (activeSchedule && activeSchedule.shift) {
+    return activeSchedule.shift.name
+  }
+  
+  return 'No Shift'
+}
 </script>
 
 <template>
@@ -187,7 +217,7 @@ function formatTime(time) {
         <input v-model="search" @keyup.enter="fetchUsers" class="input w-64" placeholder="Search users..." />
         <button @click="fetchUsers" class="btn btn-secondary">Search</button>
       </div>
-      <button @click="openCreate" class="btn btn-primary">
+      <button v-if="canCreate" @click="openCreate" class="btn btn-primary">
         <span class="material-symbols-outlined text-sm">add</span>
         Add User
       </button>
@@ -203,8 +233,9 @@ function formatTime(time) {
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Name</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Email</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Role</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Shift</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-            <th class="px-4 py-3 text-right text-sm font-medium text-gray-500">Actions</th>
+            <th v-if="canUpdate || canDelete" class="px-4 py-3 text-right text-sm font-medium text-gray-500">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-dark-border">
@@ -219,19 +250,22 @@ function formatTime(time) {
                 {{ user.roles?.[0]?.name || 'N/A' }}
               </span>
             </td>
+            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+              {{ getCurrentShift(user) }}
+            </td>
             <td class="px-4 py-3">
               <span :class="user.status === 'active' ? 'text-green-500' : 'text-gray-400'">
                 {{ user.status }}
               </span>
             </td>
-            <td class="px-4 py-3 text-right">
-              <button @click="openScheduleModal(user)" class="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded text-blue-500" title="Manage Shifts">
+            <td v-if="canUpdate || canDelete" class="px-4 py-3 text-right">
+              <button v-if="canUpdate" @click="openScheduleModal(user)" class="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded text-blue-500" title="Manage Shifts">
                 <span class="material-symbols-outlined text-sm">schedule</span>
               </button>
-              <button @click="openEdit(user)" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded" title="Edit User">
+              <button v-if="canUpdate" @click="openEdit(user)" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded" title="Edit User">
                 <span class="material-symbols-outlined text-sm">edit</span>
               </button>
-              <button @click="deleteUser(user)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500" title="Delete User">
+              <button v-if="canDelete" @click="deleteUser(user)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500" title="Delete User">
                 <span class="material-symbols-outlined text-sm">delete</span>
               </button>
             </td>
