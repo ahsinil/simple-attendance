@@ -124,10 +124,65 @@ async function handleScan() {
   scanning.value = false
   scannedCode.value = ''
 }
+
+function dismissResult() {
+  result.value = null
+}
 </script>
 
 <template>
   <div class="max-w-lg mx-auto space-y-6">
+    <!-- Success Popup Modal -->
+    <Teleport to="body">
+      <Transition name="popup">
+        <div v-if="result && result.success" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <!-- Backdrop -->
+          <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="dismissResult"></div>
+          
+          <!-- Modal Content -->
+          <div class="relative bg-white dark:bg-dark-card rounded-2xl shadow-2xl p-8 max-w-sm w-full transform animate-bounce-in">
+            <!-- Success Icon -->
+            <div class="flex justify-center mb-4">
+              <div class="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center animate-pulse">
+                <span class="material-symbols-outlined text-5xl text-green-500">check_circle</span>
+              </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="text-center">
+              <h3 class="text-xl font-bold text-green-600 dark:text-green-400 mb-2">
+                {{ result.message }}
+              </h3>
+              <p v-if="result.attendance" class="text-gray-600 dark:text-gray-300">
+                {{ result.attendance.check_type }} at {{ new Date(result.attendance.scan_time).toLocaleTimeString() }}
+              </p>
+            </div>
+            
+            <!-- Close Button -->
+            <button 
+              @click="dismissResult"
+              class="mt-6 w-full btn btn-primary py-3"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Error Alert (inline, stays visible) -->
+    <div v-if="result && !result.success" class="card p-4 border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20">
+      <div class="flex items-center gap-3 text-red-600 dark:text-red-400">
+        <span class="material-symbols-outlined text-2xl">error</span>
+        <div>
+          <p class="font-medium">{{ result.error }}</p>
+        </div>
+        <button @click="dismissResult" class="ml-auto">
+          <span class="material-symbols-outlined text-gray-400 hover:text-gray-600">close</span>
+        </button>
+      </div>
+    </div>
+
     <!-- GPS Status -->
     <div class="card p-4">
       <div class="flex items-center gap-3">
@@ -233,29 +288,46 @@ async function handleScan() {
       </div>
     </div>
 
-    <!-- Result -->
-    <div v-if="result" class="card p-4">
-      <div 
-        class="flex items-center gap-3"
-        :class="result.success ? 'text-green-600' : 'text-red-600'"
-      >
-        <span class="material-symbols-outlined text-2xl">
-          {{ result.success ? 'check_circle' : 'error' }}
-        </span>
-        <div>
-          <p class="font-medium">
-            {{ result.success ? result.message : result.error }}
-          </p>
-          <p v-if="result.attendance" class="text-sm opacity-75">
-            {{ result.attendance.check_type }} at {{ new Date(result.attendance.scan_time).toLocaleTimeString() }}
-          </p>
-        </div>
-      </div>
-    </div>
-
     <!-- Note -->
     <p class="text-center text-sm text-gray-500">
       Make sure you're within the office area before scanning
     </p>
   </div>
 </template>
+
+<style scoped>
+/* Popup transition */
+.popup-enter-active,
+.popup-leave-active {
+  transition: all 0.3s ease;
+}
+
+.popup-enter-from,
+.popup-leave-to {
+  opacity: 0;
+}
+
+.popup-enter-from .relative,
+.popup-leave-to .relative {
+  transform: scale(0.9);
+}
+
+/* Bounce-in animation for the modal */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.4s ease-out;
+}
+</style>

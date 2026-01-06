@@ -10,20 +10,20 @@ RUN apt-get update && apt-get install -y \
     curl \
     libpng-dev \
     libjpeg-dev \
+    libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip bcmath gd \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip bcmath gd exif \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Database Migration
-RUN php artisan migrate:fresh --seed --force
-
-# Storage Link
-RUN php artisan storage:link
-
 # Optional: Install Composer
-# COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy application files
+COPY . .
+
+# Set proper permissions for Laravel storage and cache
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache

@@ -40,13 +40,13 @@ class SettingController extends Controller
 
         $data = $request->validate([
             'settings' => 'required|array',
-            'settings.*' => 'nullable|string',
+            'settings.*' => 'nullable',
         ]);
 
         foreach ($data['settings'] as $key => $value) {
             AppSetting::updateOrCreate(
                 ['key' => $key],
-                ['value' => $value]
+                ['value' => $value !== null ? (string) $value : null]
             );
         }
 

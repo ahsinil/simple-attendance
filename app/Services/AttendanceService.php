@@ -72,8 +72,14 @@ class AttendanceService
             ]);
         }
 
-        // Determine check type (IN or OUT)
-        $checkType = $this->determineCheckType($user, $location);
+        // Determine and validate check type (IN or OUT)
+        $checkTypeResult = $this->validateCheckType($user, $location);
+        
+        if (!$checkTypeResult['valid']) {
+            return $this->failResponse($checkTypeResult['error']);
+        }
+        
+        $checkType = $checkTypeResult['check_type'];
         
         // Process the attendance
         return $this->recordAttendance(
@@ -91,23 +97,71 @@ class AttendanceService
     }
 
     /**
-     * Determine if this is a check-in or check-out.
+     * Validate and determine if this is a check-in or check-out.
+     * Returns validation result with check_type or error message.
      */
-    protected function determineCheckType(User $user, Location $location): string
+    protected function validateCheckType(User $user, Location $location): array
     {
         // Get today's attendance for this user
-        $lastAttendance = Attendance::where('user_id', $user->id)
+        $todayAttendances = Attendance::where('user_id', $user->id)
             ->whereDate('scan_time', today())
-            ->orderBy('scan_time', 'desc')
-            ->first();
+            ->orderBy('scan_time', 'asc')
+            ->get();
 
         // If no attendance today, it's a check-in
-        if (!$lastAttendance) {
-            return 'IN';
+        if ($todayAttendances->isEmpty()) {
+            return [
+                'valid' => true,
+                'check_type' => 'IN',
+            ];
         }
 
-        // Alternate between IN and OUT
-        return $lastAttendance->check_type === 'IN' ? 'OUT' : 'IN';
+        // Get check-in and check-out records
+        $checkIn = $todayAttendances->where('check_type', 'IN')->first();
+        $checkOut = $todayAttendances->where('check_type', 'OUT')->first();
+
+        // If user already has both check-in and check-out, prevent further scans
+        if ($checkIn && $checkOut) {
+            return [
+                'valid' => false,
+                'error' => 'You have already completed your attendance for this shift. Check-in and check-out have been recorded.',
+            ];
+        }
+
+        // If user has checked in but not checked out
+        if ($checkIn && !$checkOut) {
+            // Prevent immediate checkout (minimum 5 minutes after check-in)
+            $minimumWorkSeconds = 5 * 60; // 5 minutes in seconds
+            $secondsSinceCheckIn = now()->timestamp - $checkIn->scan_time->timestamp;
+            
+            if ($secondsSinceCheckIn < $minimumWorkSeconds) {
+                $remainingSeconds = $minimumWorkSeconds - $secondsSinceCheckIn;
+                $remainingMinutes = (int) ceil($remainingSeconds / 60);
+                return [
+                    'valid' => false,
+                    'error' => "Cannot check out immediately after check-in. Please wait {$remainingMinutes} more minute(s).",
+                ];
+            }
+
+            return [
+                'valid' => true,
+                'check_type' => 'OUT',
+            ];
+        }
+
+        // This shouldn't happen (checkout without check-in), but handle it
+        if (!$checkIn && $checkOut) {
+            return [
+                'valid' => false,
+                'error' => 'Invalid attendance state. Please contact administrator.',
+            ];
+        }
+
+        // Default to check-in (fallback)
+        return [
+            'valid' => true,
+            'check_type' => 'IN',
+        ];
     }
 
     /**

@@ -62,7 +62,7 @@ class UserController extends Controller
      */
     public function roles(Request $request): JsonResponse
     {
-        if (!$request->user()->can('users.view')) {
+        if (!$request->user()->can('admin.users.view')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -121,7 +121,7 @@ class UserController extends Controller
      */
     public function show(Request $request, User $user): JsonResponse
     {
-        if (!$request->user()->can('users.view')) {
+        if (!$request->user()->can('admin.users.view')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -205,7 +205,7 @@ class UserController extends Controller
      */
     public function assignSchedule(Request $request, User $user): JsonResponse
     {
-        if (!$request->user()->can('users.update')) {
+        if (!$request->user()->can('admin.users.update')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -234,7 +234,7 @@ class UserController extends Controller
      */
     public function schedules(Request $request, User $user): JsonResponse
     {
-        if (!$request->user()->can('users.view')) {
+        if (!$request->user()->can('admin.users.view')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
@@ -254,7 +254,7 @@ class UserController extends Controller
      */
     public function removeSchedule(Request $request, User $user, UserSchedule $schedule): JsonResponse
     {
-        if (!$request->user()->can('users.update')) {
+        if (!$request->user()->can('admin.users.update')) {
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
