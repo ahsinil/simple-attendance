@@ -139,12 +139,12 @@ function formatTime(iso) {
 <template>
   <div class="space-y-6">
     <!-- Filters -->
-    <div class="flex gap-2">
+    <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
       <button 
         v-for="status in ['PENDING', 'APPROVED', 'REJECTED']"
         :key="status"
         @click="statusFilter = status; fetchRequests()"
-        class="px-4 py-2 rounded-lg transition-colors"
+        class="px-4 py-2 rounded-lg transition-colors flex-shrink-0"
         :class="statusFilter === status 
           ? 'bg-primary text-white' 
           : 'bg-white dark:bg-dark-surface text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-dark-border'"

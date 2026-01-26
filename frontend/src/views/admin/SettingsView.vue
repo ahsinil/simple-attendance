@@ -13,6 +13,9 @@ const settings = ref({
   work_days: 'Mon,Tue,Wed,Thu,Fri',
   ip_whitelist_enabled: 'false',
   ip_whitelist: '',
+  device_registration_enabled: 'false',
+  device_registration_mode: 'require_approval',
+  max_devices_per_user: '2',
 })
 
 const message = ref({ type: '', text: '' })
@@ -166,6 +169,49 @@ function showMessage(type, text) {
               />
               <span class="text-sm font-medium">{{ day }}</span>
             </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Security -->
+      <div class="bg-white dark:bg-dark-surface p-6 rounded-xl shadow-sm border border-gray-100 dark:border-dark-border space-y-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+           <span class="material-symbols-outlined text-gray-500">devices</span>
+           Device Security
+        </h2>
+
+        <div>
+           <label class="flex items-center gap-2">
+             <input type="checkbox" v-model="settings.device_registration_enabled" class="rounded border-gray-300 text-primary focus:ring-primary" true-value="true" false-value="false" />
+             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Enable Device Registration</span>
+           </label>
+           <p class="text-xs text-gray-500 mt-1 ml-6">If enabled, employees must use registered devices for attendance.</p>
+        </div>
+
+        <div v-if="settings.device_registration_enabled === 'true'" class="space-y-4 pl-6 border-l-2 border-primary/30">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registration Mode</label>
+            <select v-model="settings.device_registration_mode" class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5">
+              <option value="require_approval">Require Admin Approval</option>
+              <option value="auto_approve">Auto-Approve (with limit)</option>
+            </select>
+            <p class="text-xs text-gray-500 mt-1">
+              {{ settings.device_registration_mode === 'require_approval' 
+                ? 'New devices require admin approval before use.' 
+                : 'Devices are automatically approved up to the limit.' }}
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Devices Per User</label>
+            <input 
+              v-model="settings.max_devices_per_user" 
+              type="number" 
+              min="1" 
+              max="10"
+              class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5" 
+            />
+            <p class="text-xs text-gray-500 mt-1">Maximum number of devices each employee can register (1-10).</p>
           </div>
         </div>
       </div>

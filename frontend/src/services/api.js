@@ -40,6 +40,12 @@ export const authApi = {
     updateProfile: (data) => api.put('/auth/profile', data),
     changePassword: (data) => api.put('/auth/password', data),
     activeDevices: () => api.get('/auth/devices'),
+
+    // Registered Devices (for attendance)
+    myDevices: () => api.get('/auth/my-devices'),
+    registerDevice: (data) => api.post('/auth/devices/register', data),
+    renameDevice: (id, data) => api.put(`/auth/devices/${id}/rename`, data),
+    removeDevice: (id) => api.delete(`/auth/devices/${id}`),
 }
 
 // Attendance API
@@ -135,5 +141,13 @@ export const adminApi = {
     getLeaveRequestStats: () => api.get('/admin/leave-requests/stats'),
     approveLeaveRequest: (id, data) => api.post(`/admin/leave-requests/${id}/approve`, data),
     rejectLeaveRequest: (id, data) => api.post(`/admin/leave-requests/${id}/reject`, data),
+
+    // Devices
+    getDevices: (params) => api.get('/admin/devices', { params }),
+    getDeviceStats: () => api.get('/admin/devices/stats'),
+    getUserDevices: (userId) => api.get(`/admin/devices/user/${userId}`),
+    approveDevice: (id) => api.post(`/admin/devices/${id}/approve`),
+    rejectDevice: (id) => api.post(`/admin/devices/${id}/reject`),
+    revokeDevice: (id) => api.delete(`/admin/devices/${id}`),
 }
 

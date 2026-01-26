@@ -143,9 +143,9 @@ onMounted(() => {
 <template>
   <div class="space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
       <h2 class="text-xl font-bold text-gray-900 dark:text-white">Leave Types</h2>
-      <button v-if="canCreate" @click="openModal()" class="btn btn-primary">
+      <button v-if="canCreate" @click="openModal()" class="btn btn-primary w-full sm:w-auto">
         <span class="material-symbols-outlined text-sm">add</span>
         Add Leave Type
       </button>
@@ -153,7 +153,8 @@ onMounted(() => {
 
     <!-- Table -->
     <div class="card overflow-hidden">
-      <table class="w-full">
+      <div class="overflow-x-auto">
+      <table class="w-full min-w-[700px]">
         <thead class="bg-gray-50 dark:bg-dark-surface">
           <tr>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
@@ -215,6 +216,7 @@ onMounted(() => {
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
 
     <!-- Modal -->

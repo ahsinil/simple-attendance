@@ -98,6 +98,11 @@ class RoleSeeder extends Seeder
             'admin.settings.view',         // View system settings
             'admin.settings.update',       // Update system settings
             
+            // Admin Devices
+            'admin.devices.view',          // View all registered devices
+            'admin.devices.approve',       // Approve or reject pending devices
+            'admin.devices.delete',        // Remove/revoke devices
+            
             // =========================================
             // SPECIAL PERMISSIONS
             // =========================================

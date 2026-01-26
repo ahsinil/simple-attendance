@@ -122,6 +122,12 @@ const routes = [
                 component: () => import('@/views/admin/LeaveRequestsView.vue'),
                 meta: { permission: 'admin.leaves.view' },
             },
+            {
+                path: 'devices',
+                name: 'AdminDevices',
+                component: () => import('@/views/admin/DevicesView.vue'),
+                meta: { permission: 'admin.devices.view' },
+            },
         ],
     },
 
@@ -164,6 +170,7 @@ router.beforeEach((to, from, next) => {
         'admin.locations.view',
         'admin.reports.view',
         'admin.settings.view',
+        'admin.devices.view',
     ]
 
     // Check if user has any admin permission
@@ -230,6 +237,7 @@ function findFirstAccessibleRoute(permissions) {
         { name: 'AdminLocations', permission: 'admin.locations.view' },
         { name: 'AdminReports', permission: 'admin.reports.view' },
         { name: 'AdminSettings', permission: 'admin.settings.view' },
+        { name: 'AdminDevices', permission: 'admin.devices.view' },
     ]
 
     for (const route of routePermissions) {

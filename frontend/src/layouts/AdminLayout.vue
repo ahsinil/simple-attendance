@@ -19,6 +19,7 @@ const allNavItems = [
   { name: 'Leave Types', icon: 'beach_access', to: '/admin/leave-types', permission: 'admin.leave-types.view' },
   { name: 'Locations', icon: 'location_on', to: '/admin/locations', permission: 'admin.locations.view' },
   { name: 'Reports', icon: 'analytics', to: '/admin/reports', permission: 'admin.reports.view' },
+  { name: 'Devices', icon: 'devices', to: '/admin/devices', permission: 'admin.devices.view' },
   { name: 'Settings', icon: 'settings_applications', to: '/admin/settings', permission: 'admin.settings.view' },
 ]
 
@@ -78,7 +79,7 @@ async function handleLogout() {
           :key="item.to"
           :to="item.to"
           class="sidebar-link"
-          active-class="active"
+          :class="{ 'active': item.to === '/admin' ? $route.path === '/admin' : $route.path.startsWith(item.to + '/') || $route.path === item.to }"
           @click="sidebarOpen = false"
         >
           <span class="material-symbols-outlined">{{ item.icon }}</span>

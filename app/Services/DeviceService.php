@@ -26,6 +26,24 @@ class DeviceService
     }
 
     /**
+     * Get device registration mode.
+     * 
+     * @return string 'require_approval' or 'auto_approve'
+     */
+    public function getRegistrationMode(): string
+    {
+        return AppSetting::get('device_registration_mode', 'require_approval');
+    }
+
+    /**
+     * Check if auto-approve is enabled.
+     */
+    public function isAutoApproveEnabled(): bool
+    {
+        return $this->getRegistrationMode() === 'auto_approve';
+    }
+
+    /**
      * Generate device fingerprint from request.
      */
     public function generateFingerprint(Request $request): string

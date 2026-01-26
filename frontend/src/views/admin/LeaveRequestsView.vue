@@ -165,10 +165,10 @@ onMounted(() => {
     </div>
 
     <!-- Filters -->
-    <div class="flex items-center gap-4 flex-wrap">
-      <div>
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Status:</label>
-        <select v-model="filters.status" @change="fetchRequests" class="input w-auto">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+      <div class="flex items-center gap-2">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Status:</label>
+        <select v-model="filters.status" @change="fetchRequests" class="input flex-1 sm:w-auto">
           <option value="">All</option>
           <option value="PENDING">Pending</option>
           <option value="APPROVED">Approved</option>
@@ -176,9 +176,9 @@ onMounted(() => {
           <option value="CANCELLED">Cancelled</option>
         </select>
       </div>
-      <div>
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Type:</label>
-        <select v-model="filters.leave_type_id" @change="fetchRequests" class="input w-auto">
+      <div class="flex items-center gap-2">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Type:</label>
+        <select v-model="filters.leave_type_id" @change="fetchRequests" class="input flex-1 sm:w-auto">
           <option value="">All Types</option>
           <option v-for="type in leaveTypes" :key="type.id" :value="type.id">{{ type.name }}</option>
         </select>
@@ -187,7 +187,8 @@ onMounted(() => {
 
     <!-- Requests Table -->
     <div class="card overflow-hidden">
-      <table class="w-full">
+      <div class="overflow-x-auto">
+      <table class="w-full min-w-[700px]">
         <thead class="bg-gray-50 dark:bg-dark-surface">
           <tr>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
@@ -262,6 +263,7 @@ onMounted(() => {
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
 
     <!-- Approve/Reject Modal -->

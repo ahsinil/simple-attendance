@@ -166,10 +166,10 @@ function getStatusClass(status) {
 
     <!-- Filters -->
     <div class="bg-white dark:bg-dark-surface rounded-xl shadow-sm border border-gray-100 dark:border-dark-border p-5">
-      <div class="flex flex-col xl:flex-row gap-5 items-start xl:items-end">
+      <div class="flex flex-col gap-4">
         <!-- Date Range -->
-        <div class="flex gap-4 w-full xl:w-auto flex-1 min-w-[300px]">
-          <label class="flex flex-col gap-1.5 flex-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label class="flex flex-col gap-1.5">
             <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">Start Date</span>
             <input
               v-model="filters.start_date"
@@ -177,7 +177,7 @@ function getStatusClass(status) {
               class="w-full bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg px-3 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none text-sm"
             />
           </label>
-          <label class="flex flex-col gap-1.5 flex-1">
+          <label class="flex flex-col gap-1.5">
             <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">End Date</span>
             <input
               v-model="filters.end_date"
@@ -188,10 +188,10 @@ function getStatusClass(status) {
         </div>
 
         <!-- Dropdowns -->
-        <div class="flex flex-wrap gap-3 flex-[2]">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <select
             v-model="filters.location_id"
-            class="px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium"
+            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium"
           >
             <option value="">All Locations</option>
             <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
@@ -199,7 +199,7 @@ function getStatusClass(status) {
 
           <select
             v-model="filters.status"
-            class="px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium"
+            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium"
           >
             <option value="">All Statuses</option>
             <option value="ON_TIME">On Time</option>
@@ -211,7 +211,7 @@ function getStatusClass(status) {
         </div>
 
         <!-- Actions -->
-        <div class="flex items-center gap-3 w-full xl:w-auto justify-end">
+        <div class="flex items-center gap-3 justify-end">
           <button @click="resetFilters" class="text-sm font-medium text-gray-500 hover:text-primary transition-colors px-3">Reset</button>
           <button @click="applyFilters" class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity">
             Apply Filters

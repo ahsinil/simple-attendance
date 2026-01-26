@@ -68,9 +68,11 @@ const workDuration = computed(() => {
 
 function formatMinutes(min) {
   if (!min) return '0h 0m'
-  const hours = Math.floor(min / 60)
-  const minutes = min % 60
-  return `${hours}h ${minutes}m`
+  const totalMinutes = Math.round(min)
+  const hours = Math.floor(Math.abs(totalMinutes) / 60)
+  const minutes = Math.abs(totalMinutes) % 60
+  const sign = totalMinutes < 0 ? '-' : ''
+  return `${sign}${hours}h ${minutes}m`
 }
 </script>
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BarcodeController;
 use App\Http\Controllers\Api\LeaveController;
 use App\Http\Controllers\Admin\AttendanceRequestController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DeviceController;
 use App\Http\Controllers\Admin\LeaveApprovalController;
 use App\Http\Controllers\Admin\LeaveTypeController;
 use App\Http\Controllers\Admin\LocationController;
@@ -37,6 +38,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/password', [AuthController::class, 'changePassword']);
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/logout-all', [AuthController::class, 'logoutAll']);
+        
+        // Registered Devices (for attendance)
+        Route::get('/my-devices', [AuthController::class, 'myDevices']);
+        Route::post('/devices/register', [AuthController::class, 'registerDevice']);
+        Route::put('/devices/{device}/rename', [AuthController::class, 'renameDevice']);
+        Route::delete('/devices/{device}', [AuthController::class, 'removeDevice']);
     });
 
     // Attendance
@@ -114,6 +121,16 @@ Route::middleware('auth:sanctum')->group(function () {
         // Settings
         Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index']);
         Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update']);
+
+        // Devices
+        Route::prefix('devices')->group(function () {
+            Route::get('/', [DeviceController::class, 'index']);
+            Route::get('/stats', [DeviceController::class, 'stats']);
+            Route::get('/user/{user}', [DeviceController::class, 'userDevices']);
+            Route::post('/{device}/approve', [DeviceController::class, 'approve']);
+            Route::post('/{device}/reject', [DeviceController::class, 'reject']);
+            Route::delete('/{device}', [DeviceController::class, 'revoke']);
+        });
 
         // Leave Types
         Route::apiResource('leave-types', LeaveTypeController::class);

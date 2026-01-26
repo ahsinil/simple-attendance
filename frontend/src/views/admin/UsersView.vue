@@ -212,12 +212,12 @@ function getCurrentShift(user) {
 <template>
   <div class="space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
       <div class="flex gap-2">
-        <input v-model="search" @keyup.enter="fetchUsers" class="input w-64" placeholder="Search users..." />
-        <button @click="fetchUsers" class="btn btn-secondary">Search</button>
+        <input v-model="search" @keyup.enter="fetchUsers" class="input flex-1 sm:w-64" placeholder="Search users..." />
+        <button @click="fetchUsers" class="btn btn-secondary whitespace-nowrap">Search</button>
       </div>
-      <button v-if="canCreate" @click="openCreate" class="btn btn-primary">
+      <button v-if="canCreate" @click="openCreate" class="btn btn-primary w-full sm:w-auto">
         <span class="material-symbols-outlined text-sm">add</span>
         Add User
       </button>
@@ -227,7 +227,8 @@ function getCurrentShift(user) {
     <div class="card overflow-hidden">
       <div v-if="loading" class="p-8 text-center text-gray-500">Loading...</div>
 
-      <table v-else class="w-full">
+      <div v-else class="overflow-x-auto">
+      <table class="w-full min-w-[700px]">
         <thead class="bg-gray-50 dark:bg-dark-border">
           <tr>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Name</th>
@@ -272,6 +273,7 @@ function getCurrentShift(user) {
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
 
     <!-- User Form Modal -->

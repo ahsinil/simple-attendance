@@ -5,6 +5,34 @@ import { QrcodeStream } from 'vue-qrcode-reader'
 
 const attendanceStore = useAttendanceStore()
 
+// Audio context for beep sound
+let audioContext = null
+
+function playBeep() {
+  try {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    }
+    
+    const oscillator = audioContext.createOscillator()
+    const gainNode = audioContext.createGain()
+    
+    oscillator.connect(gainNode)
+    gainNode.connect(audioContext.destination)
+    
+    oscillator.frequency.value = 1000 // 1000 Hz beep
+    oscillator.type = 'sine'
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15)
+    
+    oscillator.start(audioContext.currentTime)
+    oscillator.stop(audioContext.currentTime + 0.15)
+  } catch (e) {
+    console.warn('Could not play beep sound:', e)
+  }
+}
+
 const scanning = ref(false)
 const scannedCode = ref('')
 const gpsLocation = ref(null)
@@ -85,6 +113,9 @@ function onCameraError(error) {
 async function onDetect(detectedCodes) {
   if (scanning.value) return // Prevent multiple scans
   if (!detectedCodes || detectedCodes.length === 0) return
+  
+  // Play beep sound on successful detection
+  playBeep()
   
   // vue-qrcode-reader v5.x returns an array of detected codes
   const firstCode = detectedCodes[0]
