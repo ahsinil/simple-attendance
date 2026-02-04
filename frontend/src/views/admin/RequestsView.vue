@@ -159,8 +159,22 @@ function formatTime(iso) {
 
       <div v-else-if="requests.length" class="divide-y divide-gray-200 dark:divide-dark-border">
         <div v-for="request in requests" :key="request.id" class="p-4">
-          <div class="flex items-start justify-between gap-4">
-            <div class="flex-1">
+          <div class="flex items-center gap-4">
+            <!-- Photo thumbnail (left column) -->
+            <div v-if="request.photo_path" class="flex-shrink-0">
+              <img 
+                :src="getPhotoUrl(request.photo_path)" 
+                alt="Attached photo" 
+                class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-dark-border cursor-pointer hover:opacity-80 transition-opacity"
+                @click="openPhotoModal(request.photo_path)"
+              />
+            </div>
+            <div v-else class="flex-shrink-0 w-16 h-16 rounded-lg bg-gray-100 dark:bg-dark-border flex items-center justify-center">
+              <span class="material-symbols-outlined text-gray-400">image</span>
+            </div>
+
+            <!-- Text content (middle column) -->
+            <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 mb-1">
                 <span class="font-medium text-gray-900 dark:text-white">{{ request.user?.name }}</span>
                 <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-dark-border text-gray-600 dark:text-gray-400">
@@ -174,19 +188,10 @@ function formatTime(iso) {
                 Submitted: {{ formatDateTime(request.created_at) }}
               </p>
               <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ request.reason }}</p>
-              
-              <!-- Photo thumbnail -->
-              <div v-if="request.photo_path" class="mt-2">
-                <img 
-                  :src="getPhotoUrl(request.photo_path)" 
-                  alt="Attached photo" 
-                  class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-dark-border cursor-pointer hover:opacity-80 transition-opacity"
-                  @click="openPhotoModal(request.photo_path)"
-                />
-              </div>
             </div>
 
-            <div v-if="statusFilter === 'PENDING' && (canApprove || canReject)" class="flex gap-2">
+            <!-- Actions (right column) -->
+            <div v-if="statusFilter === 'PENDING' && (canApprove || canReject)" class="flex gap-2 flex-shrink-0">
               <button 
                 v-if="canApprove"
                 @click="openApproveModal(request)"
@@ -206,7 +211,7 @@ function formatTime(iso) {
                 Reject
               </button>
             </div>
-            <div v-else class="text-right">
+            <div v-else class="text-right flex-shrink-0">
               <p class="text-sm text-gray-500">Reviewed by {{ request.reviewer?.name }}</p>
               <p v-if="request.admin_note" class="text-sm text-primary">{{ request.admin_note }}</p>
             </div>

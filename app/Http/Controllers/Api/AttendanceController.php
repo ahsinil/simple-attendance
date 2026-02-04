@@ -218,7 +218,7 @@ class AttendanceController extends Controller
         }
 
         // Check if user can make manual requests
-        if (!$user->can('attendance.manual-request')) {
+        if (!$user->can('requests.create')) {
             return response()->json([
                 'success' => false,
                 'error' => 'Unauthorized to make manual requests',

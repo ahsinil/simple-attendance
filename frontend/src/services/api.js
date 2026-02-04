@@ -8,12 +8,19 @@ const api = axios.create({
     },
 })
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and handle FormData
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token')
     if (token) {
         config.headers.Authorization = `Bearer ${token}`
     }
+
+    // When sending FormData, let the browser set Content-Type automatically
+    // This is required for file uploads to work correctly with multipart/form-data
+    if (config.data instanceof FormData) {
+        delete config.headers['Content-Type']
+    }
+
     return config
 })
 

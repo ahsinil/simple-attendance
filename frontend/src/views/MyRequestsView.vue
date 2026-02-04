@@ -252,8 +252,22 @@ function formatDate(iso) {
           :key="request.id"
           class="p-4"
         >
-          <div class="flex items-start justify-between">
-            <div>
+          <div class="flex items-center gap-4">
+            <!-- Photo thumbnail (left column) -->
+            <div v-if="request.photo_path" class="flex-shrink-0">
+              <img 
+                :src="getPhotoUrl(request.photo_path)" 
+                alt="Attached photo" 
+                class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-dark-border cursor-pointer hover:opacity-80"
+                @click="openPhotoModal(request.photo_path)"
+              />
+            </div>
+            <div v-else class="flex-shrink-0 w-16 h-16 rounded-lg bg-gray-100 dark:bg-dark-border flex items-center justify-center">
+              <span class="material-symbols-outlined text-gray-400">image</span>
+            </div>
+            
+            <!-- Text content (right column) -->
+            <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 mb-1">
                 <span class="font-medium text-gray-900 dark:text-white">
                   {{ request.check_type === 'IN' ? 'Check In' : 'Check Out' }} Request
@@ -267,16 +281,6 @@ function formatDate(iso) {
               <p v-if="request.admin_note" class="text-sm text-primary mt-1">
                 Note: {{ request.admin_note }}
               </p>
-              
-              <!-- Photo thumbnail -->
-              <div v-if="request.photo_path" class="mt-2">
-                <img 
-                  :src="getPhotoUrl(request.photo_path)" 
-                  alt="Attached photo" 
-                  class="w-12 h-12 object-cover rounded-lg border border-gray-200 dark:border-dark-border cursor-pointer hover:opacity-80"
-                  @click="openPhotoModal(request.photo_path)"
-                />
-              </div>
             </div>
           </div>
         </div>
