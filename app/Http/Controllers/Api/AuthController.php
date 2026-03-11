@@ -21,6 +21,10 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|string',
             'device_name' => 'nullable|string|max:255',
+            'device_fingerprint' => 'nullable|string|max:64',
+            'screen_resolution' => 'nullable|string|max:20',
+            'timezone' => 'nullable|string|max:50',
+            'canvas_fingerprint' => 'nullable|string',
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -40,12 +44,40 @@ class AuthController extends Controller
         $deviceName = $request->device_name ?? $request->userAgent() ?? 'Unknown Device';
         $token = $user->createToken($deviceName)->plainTextToken;
 
+        // Auto-register device if fingerprint is provided and feature is enabled
+        $deviceRegistration = null;
+        if ($request->input('device_fingerprint')) {
+            try {
+                $deviceService = app(\App\Services\DeviceService::class);
+                if ($deviceService->isDeviceRegistrationEnabled()) {
+                    $fingerprint = $request->input('device_fingerprint');
+                    $deviceInfo = $deviceService->getDeviceInfo($request);
+                    $autoApprove = $deviceService->isAutoApproveEnabled();
+                    $device = $deviceService->registerDevice(
+                        $user,
+                        $fingerprint,
+                        $deviceInfo,
+                        $request->input('device_name'),
+                        $autoApprove
+                    );
+                    $deviceRegistration = [
+                        'id' => $device->id,
+                        'is_approved' => $device->is_approved,
+                    ];
+                }
+            } catch (\Exception $e) {
+                // Don't fail login if device registration fails
+                $deviceRegistration = ['error' => $e->getMessage()];
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
             'data' => [
                 'user' => $this->formatUser($user),
                 'token' => $token,
+                'device' => $deviceRegistration,
             ],
         ]);
     }

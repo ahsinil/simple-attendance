@@ -2,8 +2,11 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useAttendanceStore } from '@/stores/attendance'
 import { QrcodeStream } from 'vue-qrcode-reader'
+import { getDeviceFingerprint, getDeviceData } from '@/utils/deviceFingerprint'
 
 const attendanceStore = useAttendanceStore()
+const deviceFingerprint = ref(null)
+const deviceData = ref({})
 
 // Audio context for beep sound
 let audioContext = null
@@ -44,9 +47,16 @@ const cameraLoading = ref(true)
 
 let watchId = null
 
-onMounted(() => {
+onMounted(async () => {
   attendanceStore.fetchLocations()
   startGpsTracking()
+  // Generate device fingerprint for attendance scans
+  try {
+    deviceFingerprint.value = await getDeviceFingerprint()
+    deviceData.value = getDeviceData()
+  } catch (e) {
+    console.warn('Could not generate device fingerprint:', e)
+  }
 })
 
 onUnmounted(() => {
@@ -146,6 +156,8 @@ async function handleScan() {
     gps_lat: gpsLocation.value.lat,
     gps_lng: gpsLocation.value.lng,
     gps_accuracy: gpsAccuracy.value,
+    device_fingerprint: deviceFingerprint.value,
+    ...deviceData.value,
   })
 
   result.value = response.success 

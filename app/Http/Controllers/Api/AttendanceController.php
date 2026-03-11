@@ -41,6 +41,9 @@ class AttendanceController extends Controller
             'gps_lng' => 'required|numeric|between:-180,180',
             'gps_accuracy' => 'nullable|numeric|min:0',
             'device_fingerprint' => 'nullable|string',
+            'screen_resolution' => 'nullable|string|max:20',
+            'timezone' => 'nullable|string|max:50',
+            'canvas_fingerprint' => 'nullable|string',
         ]);
 
         $user = $request->user();
@@ -54,16 +57,20 @@ class AttendanceController extends Controller
             ], 403);
         }
 
-        // Validate device if device registration is enabled
+        // Auto-register and validate device if fingerprint is provided
         $deviceFingerprint = $request->input('device_fingerprint');
         if ($deviceFingerprint) {
-            $deviceResult = $this->deviceService->validateDevice($user, $deviceFingerprint);
+            $deviceInfo = $this->deviceService->getDeviceInfo($request);
+            $deviceResult = $this->deviceService->registerOrValidateDevice(
+                $user,
+                $deviceFingerprint,
+                $deviceInfo
+            );
             
             if (!$deviceResult['valid']) {
                 return response()->json([
                     'success' => false,
                     'error' => $deviceResult['error'],
-                    'needs_registration' => $deviceResult['needs_registration'] ?? false,
                 ], 400);
             }
         }

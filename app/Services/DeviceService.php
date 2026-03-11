@@ -243,6 +243,62 @@ class DeviceService
     }
 
     /**
+     * Register and validate a device in one step.
+     * If the device doesn't exist, register it first, then validate.
+     * Used during attendance scan to avoid rejecting unregistered devices.
+     */
+    public function registerOrValidateDevice(
+        User $user,
+        string $fingerprint,
+        array $deviceInfo = [],
+        ?string $deviceName = null
+    ): array {
+        // If device registration is not enabled, always pass
+        if (!$this->isDeviceRegistrationEnabled()) {
+            return ['valid' => true, 'device_id' => $fingerprint];
+        }
+
+        $device = Device::where('user_id', $user->id)
+            ->where('device_fingerprint', $fingerprint)
+            ->first();
+
+        // Auto-register if not found
+        if (!$device) {
+            try {
+                $autoApprove = $this->isAutoApproveEnabled();
+                $device = $this->registerDevice(
+                    $user,
+                    $fingerprint,
+                    $deviceInfo,
+                    $deviceName,
+                    $autoApprove
+                );
+            } catch (\Exception $e) {
+                return [
+                    'valid' => false,
+                    'error' => $e->getMessage(),
+                ];
+            }
+        } else {
+            // Update last used
+            $device->update(['last_used_at' => now()]);
+        }
+
+        if (!$device->is_approved) {
+            return [
+                'valid' => false,
+                'error' => 'Device pending approval',
+                'device_id' => $device->id,
+            ];
+        }
+
+        return [
+            'valid' => true,
+            'device_id' => $device->device_fingerprint,
+        ];
+    }
+
+    /**
      * Approve a device.
      */
     public function approveDevice(Device $device): Device

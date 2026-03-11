@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { authApi } from '@/services/api'
+import { getDeviceFingerprint, getDeviceData, getDeviceName } from '@/utils/deviceFingerprint'
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -22,7 +23,21 @@ export const useAuthStore = defineStore('auth', {
             this.error = null
 
             try {
-                const response = await authApi.login(email, password)
+                // Collect device fingerprint data to send with login
+                let deviceData = {}
+                try {
+                    const fingerprint = await getDeviceFingerprint()
+                    const extraData = getDeviceData()
+                    deviceData = {
+                        device_fingerprint: fingerprint,
+                        device_name: getDeviceName(),
+                        ...extraData,
+                    }
+                } catch (e) {
+                    console.warn('Could not generate device fingerprint:', e)
+                }
+
+                const response = await authApi.login(email, password, deviceData)
                 const { user, token } = response.data.data
 
                 this.user = user
@@ -31,12 +46,31 @@ export const useAuthStore = defineStore('auth', {
                 localStorage.setItem('user', JSON.stringify(user))
                 localStorage.setItem('token', token)
 
+                // Also call device registration endpoint as a fallback
+                // (in case login didn't register because feature was disabled at login time)
+                if (deviceData.device_fingerprint) {
+                    this._registerDeviceInBackground(deviceData)
+                }
+
                 return { success: true }
             } catch (error) {
                 this.error = error.response?.data?.message || 'Login failed'
                 return { success: false, error: this.error }
             } finally {
                 this.loading = false
+            }
+        },
+
+        /**
+         * Register device in background (fire-and-forget).
+         * Does not block login flow.
+         */
+        async _registerDeviceInBackground(deviceData) {
+            try {
+                await authApi.registerDevice(deviceData)
+            } catch (e) {
+                // Silently ignore - device registration is best-effort
+                console.warn('Background device registration failed:', e)
             }
         },
 

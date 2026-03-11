@@ -42,9 +42,9 @@ onMounted(async () => {
 
 async function fetchDevices() {
   try {
-    const response = await authApi.activeDevices()
+    const response = await authApi.myDevices()
     if (response.data.success) {
-      devices.value = response.data.data
+      devices.value = response.data.data.devices || []
     }
   } catch (err) {
     console.error('Failed to load devices', err)
@@ -100,6 +100,19 @@ async function changePassword() {
     }
   } finally {
     loading.value = false
+  }
+}
+
+async function removeDevice(device) {
+  if (!confirm(`Remove device "${device.device_name || 'Unknown Device'}"?`)) return
+  try {
+    const response = await authApi.removeDevice(device.id)
+    if (response.data.success) {
+      showMessage('success', 'Device removed successfully')
+      await fetchDevices()
+    }
+  } catch (err) {
+    showMessage('error', err.response?.data?.error || 'Failed to remove device')
   }
 }
 </script>
@@ -311,33 +324,50 @@ async function changePassword() {
           <div class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-dark-bg flex items-center justify-center">
               <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">
-                {{ device.name.toLowerCase().includes('phone') || device.name.toLowerCase().includes('android') || device.name.toLowerCase().includes('ios') ? 'smartphone' : 'laptop' }}
+                {{ (device.platform || '').toLowerCase().includes('android') || (device.platform || '').toLowerCase().includes('ios') ? 'smartphone' : 'laptop' }}
               </span>
             </div>
             <div>
-              <h4 class="font-medium text-gray-900 dark:text-white">{{ device.name }}</h4>
+              <h4 class="font-medium text-gray-900 dark:text-white">{{ device.device_name || 'Unknown Device' }}</h4>
               <div class="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
-                <span class="material-symbols-outlined text-[12px]">location_on</span>
-                {{ authStore.user?.default_location?.name || 'Unknown Location' }}
+                <span>{{ device.platform || 'Unknown' }} • {{ device.browser || 'Unknown' }}</span>
                 <span>•</span>
-                {{ device.is_current ? 'Active now' : `Last active ${device.last_used_at}` }}
+                <span>{{ device.is_current ? 'This device' : `Last used ${device.last_used_at}` }}</span>
               </div>
             </div>
           </div>
           
-          <span 
-            v-if="device.is_current"
-            class="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-medium rounded-full border border-emerald-500/20"
-          >
-            Current Device
-          </span>
-          <button v-else class="text-gray-400 hover:text-red-500 transition-colors">
-            <span class="material-symbols-outlined">delete</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <span 
+              v-if="device.is_current"
+              class="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-medium rounded-full border border-emerald-500/20"
+            >
+              Current Device
+            </span>
+            <span 
+              v-if="!device.is_approved"
+              class="px-3 py-1 bg-yellow-500/10 text-yellow-600 text-xs font-medium rounded-full border border-yellow-500/20"
+            >
+              Pending Approval
+            </span>
+            <span 
+              v-else-if="device.is_approved && !device.is_current"
+              class="px-3 py-1 bg-green-500/10 text-green-600 text-xs font-medium rounded-full border border-green-500/20"
+            >
+              Approved
+            </span>
+            <button 
+              v-if="!device.is_current" 
+              @click="removeDevice(device)"
+              class="text-gray-400 hover:text-red-500 transition-colors"
+            >
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
         </div>
 
         <div v-if="devices.length === 0" class="text-center py-8 text-gray-500">
-          No devices found.
+          No devices registered yet. Devices are auto-registered when you log in or submit attendance.
         </div>
       </div>
     </div>
