@@ -142,5 +142,19 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{leaveRequest}/approve', [LeaveApprovalController::class, 'approve']);
             Route::post('/{leaveRequest}/reject', [LeaveApprovalController::class, 'reject']);
         });
+
+        // Payroll
+        Route::prefix('payroll')->group(function () {
+            Route::get('/summary', [App\Http\Controllers\Admin\PayrollController::class, 'summary']);
+            Route::get('/export', [App\Http\Controllers\Admin\PayrollController::class, 'export']);
+            Route::get('/departments', [App\Http\Controllers\Admin\PayrollController::class, 'departments']);
+        });
+
+        // Salary Components
+        Route::apiResource('salary-components', App\Http\Controllers\Admin\SalaryComponentController::class);
+
+        // User Salary
+        Route::get('/users/{user}/salary', [App\Http\Controllers\Admin\SalaryComponentController::class, 'getUserSalary']);
+        Route::post('/users/{user}/salary', [App\Http\Controllers\Admin\SalaryComponentController::class, 'updateUserSalary']);
     });
 });

@@ -156,5 +156,20 @@ export const adminApi = {
     approveDevice: (id) => api.post(`/admin/devices/${id}/approve`),
     rejectDevice: (id) => api.post(`/admin/devices/${id}/reject`),
     revokeDevice: (id) => api.delete(`/admin/devices/${id}`),
+
+    // Payroll
+    getPayrollSummary: (params) => api.get('/admin/payroll/summary', { params }),
+    exportPayroll: (params) => api.get('/admin/payroll/export', { params, responseType: 'blob' }),
+    getPayrollDepartments: () => api.get('/admin/payroll/departments'),
+
+    // Salary Components
+    getSalaryComponents: () => api.get('/admin/salary-components'),
+    createSalaryComponent: (data) => api.post('/admin/salary-components', data),
+    updateSalaryComponent: (id, data) => api.put(`/admin/salary-components/${id}`, data),
+    deleteSalaryComponent: (id) => api.delete(`/admin/salary-components/${id}`),
+
+    // User Salary
+    getUserSalary: (userId) => api.get(`/admin/users/${userId}/salary`),
+    updateUserSalary: (userId, data) => api.post(`/admin/users/${userId}/salary`, data),
 }
 

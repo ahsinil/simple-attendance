@@ -18,6 +18,8 @@ const allNavItems = [
   { name: 'Shifts', icon: 'schedule', to: '/admin/shifts', permission: 'admin.shifts.view' },
   { name: 'Leave Types', icon: 'beach_access', to: '/admin/leave-types', permission: 'admin.leave-types.view' },
   { name: 'Locations', icon: 'location_on', to: '/admin/locations', permission: 'admin.locations.view' },
+  { name: 'Payroll', icon: 'payments', to: '/admin/payroll', permission: 'admin.payroll.view' },
+  { name: 'Salary Components', icon: 'account_balance', to: '/admin/salary-components', permission: 'admin.salary.view' },
   { name: 'Reports', icon: 'analytics', to: '/admin/reports', permission: 'admin.reports.view' },
   { name: 'Devices', icon: 'devices', to: '/admin/devices', permission: 'admin.devices.view' },
   { name: 'Settings', icon: 'settings_applications', to: '/admin/settings', permission: 'admin.settings.view' },

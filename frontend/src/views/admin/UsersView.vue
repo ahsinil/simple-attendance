@@ -33,6 +33,14 @@ const scheduleForm = ref({
   end_date: '',
 })
 
+// Salary management
+const showSalaryModal = ref(false)
+const salaryUser = ref(null)
+const salaryData = ref({ base_salary: 0, components: [], total_fixed: 0, total_variable: 0, hourly_rate: 0 })
+const availableComponents = ref([])
+const loadingSalary = ref(false)
+const salaryForm = ref({ base_salary: 0, components: [] })
+
 const form = ref({
   name: '',
   email: '',
@@ -41,6 +49,7 @@ const form = ref({
   department: '',
   position: '',
   role: 'employee',
+  base_salary: '',
 })
 
 onMounted(async () => {
@@ -77,7 +86,7 @@ async function fetchShifts() {
 
 function openCreate() {
   editingUser.value = null
-  form.value = { name: '', email: '', password: '', employee_id: '', department: '', position: '', role: 'employee' }
+  form.value = { name: '', email: '', password: '', employee_id: '', department: '', position: '', role: 'employee', base_salary: '' }
   showForm.value = true
 }
 
@@ -91,6 +100,7 @@ function openEdit(user) {
     department: user.department || '',
     position: user.position || '',
     role: user.roles?.[0]?.name || 'employee',
+    base_salary: user.base_salary || '',
   }
   showForm.value = true
 }
@@ -175,6 +185,75 @@ async function removeSchedule(schedule) {
   }
 }
 
+// Salary management functions
+async function openSalaryModal(user) {
+  salaryUser.value = user
+  showSalaryModal.value = true
+  loadingSalary.value = true
+  try {
+    const [salaryRes, compRes] = await Promise.all([
+      adminApi.getUserSalary(user.id),
+      adminApi.getSalaryComponents(),
+    ])
+    if (salaryRes.data.success) {
+      salaryData.value = salaryRes.data.data
+      // Build form from existing data
+      salaryForm.value = {
+        base_salary: salaryRes.data.data.base_salary || 0,
+        components: (salaryRes.data.data.components || []).map(c => ({
+          salary_component_id: c.salary_component_id,
+          amount: c.amount,
+          name: c.salary_component?.name,
+          type: c.salary_component?.type,
+        })),
+      }
+    }
+    if (compRes.data.success) {
+      availableComponents.value = compRes.data.data.filter(c => c.is_active)
+    }
+  } catch (error) {
+    console.error('Failed to load salary data:', error)
+  } finally {
+    loadingSalary.value = false
+  }
+}
+
+function addSalaryComponent(comp) {
+  if (salaryForm.value.components.find(c => c.salary_component_id === comp.id)) return
+  salaryForm.value.components.push({
+    salary_component_id: comp.id,
+    amount: 0,
+    name: comp.name,
+    type: comp.type,
+  })
+}
+
+function removeSalaryComponent(index) {
+  salaryForm.value.components.splice(index, 1)
+}
+
+async function saveSalary() {
+  try {
+    await adminApi.updateUserSalary(salaryUser.value.id, {
+      base_salary: salaryForm.value.base_salary,
+      components: salaryForm.value.components.map(c => ({
+        salary_component_id: c.salary_component_id,
+        amount: c.amount,
+      })),
+    })
+    toast.success('Salary updated successfully')
+    showSalaryModal.value = false
+    fetchUsers()
+  } catch (error) {
+    toast.error(error.response?.data?.message || 'Failed to update salary')
+  }
+}
+
+function formatCurrency(amount) {
+  if (amount == null || amount == 0) return '-'
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount)
+}
+
 function formatDate(date) {
   if (!date) return 'Ongoing'
   return new Date(date).toLocaleDateString()
@@ -189,10 +268,6 @@ function getCurrentShift(user) {
   if (!user.schedules || user.schedules.length === 0) return 'No Shift'
   
   const today = new Date().toISOString().split('T')[0]
-  
-  // Find active schedule
-  // Note: dates from API are typically strings. We can compare strings if they are YYYY-MM-DD
-  // But safer to compare Date objects or normalize strings
   
   const activeSchedule = user.schedules.find(s => {
     const startDate = s.start_date.split('T')[0]
@@ -260,6 +335,9 @@ function getCurrentShift(user) {
               </span>
             </td>
             <td v-if="canUpdate || canDelete" class="px-4 py-3 text-right">
+              <button v-if="canUpdate" @click="openSalaryModal(user)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/20 rounded text-green-500" title="Manage Salary">
+                <span class="material-symbols-outlined text-sm">payments</span>
+              </button>
               <button v-if="canUpdate" @click="openScheduleModal(user)" class="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded text-blue-500" title="Manage Shifts">
                 <span class="material-symbols-outlined text-sm">schedule</span>
               </button>
@@ -318,6 +396,10 @@ function getCurrentShift(user) {
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position</label>
               <input v-model="form.position" class="input" />
             </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Base Salary (Gaji Pokok)</label>
+            <input v-model.number="form.base_salary" type="number" class="input" placeholder="0" min="0" />
           </div>
           <div class="flex gap-3 pt-4">
             <button type="submit" class="btn btn-primary flex-1">Save</button>
@@ -398,6 +480,80 @@ function getCurrentShift(user) {
 
         <div class="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-dark-border">
           <button @click="showScheduleModal = false" class="btn btn-secondary">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Salary Modal -->
+    <div v-if="showSalaryModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div class="card p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            Salary - {{ salaryUser?.name }}
+          </h3>
+          <button @click="showSalaryModal = false" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div v-if="loadingSalary" class="text-center py-8 text-gray-500">Loading...</div>
+
+        <div v-else class="space-y-5">
+          <!-- Base Salary -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Base Salary (Gaji Pokok)</label>
+            <input v-model.number="salaryForm.base_salary" type="number" class="input" placeholder="0" min="0" />
+          </div>
+
+          <!-- Assigned Components -->
+          <div>
+            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Allowances</h4>
+            <div v-if="salaryForm.components.length === 0" class="text-sm text-gray-400 py-2">No allowances assigned.</div>
+            <div v-else class="space-y-2">
+              <div v-for="(comp, index) in salaryForm.components" :key="index"
+                   class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-dark-border rounded-lg">
+                <div class="flex-1 min-w-0">
+                  <p class="font-medium text-gray-900 dark:text-white text-sm truncate">{{ comp.name }}</p>
+                  <span class="text-xs px-1.5 py-0.5 rounded-full"
+                        :class="comp.type === 'FIXED' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600'">
+                    {{ comp.type }}
+                  </span>
+                </div>
+                <input v-model.number="comp.amount" type="number" class="input w-36" placeholder="Amount" min="0" />
+                <button @click="removeSalaryComponent(index)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500">
+                  <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Component -->
+          <div>
+            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Add Allowance</h4>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="comp in availableComponents.filter(c => !salaryForm.components.find(sc => sc.salary_component_id === c.id))"
+                :key="comp.id"
+                @click="addSalaryComponent(comp)"
+                class="text-xs px-3 py-1.5 rounded-full border border-gray-200 dark:border-dark-line hover:bg-primary/10 hover:border-primary text-gray-600 dark:text-gray-300 transition-colors"
+              >
+                + {{ comp.name }}
+              </button>
+              <span v-if="availableComponents.filter(c => !salaryForm.components.find(sc => sc.salary_component_id === c.id)).length === 0"
+                    class="text-xs text-gray-400">All components assigned</span>
+            </div>
+          </div>
+
+          <!-- Save -->
+          <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-dark-border">
+            <div class="text-xs text-gray-400">
+              OT Rate: {{ formatCurrency(((salaryForm.base_salary || 0) + salaryForm.components.filter(c => c.type === 'FIXED').reduce((s, c) => s + (c.amount || 0), 0)) / 173) }}/hr
+            </div>
+            <div class="flex gap-3">
+              <button @click="showSalaryModal = false" class="btn btn-secondary">Cancel</button>
+              <button @click="saveSalary" class="btn btn-primary">Save Salary</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

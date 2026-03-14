@@ -17,11 +17,13 @@ class AttendanceService
 {
     protected GpsService $gpsService;
     protected BarcodeService $barcodeService;
+    protected OvertimeService $overtimeService;
 
-    public function __construct(GpsService $gpsService, BarcodeService $barcodeService)
+    public function __construct(GpsService $gpsService, BarcodeService $barcodeService, OvertimeService $overtimeService)
     {
         $this->gpsService = $gpsService;
         $this->barcodeService = $barcodeService;
+        $this->overtimeService = $overtimeService;
     }
 
     /**
@@ -187,10 +189,10 @@ class AttendanceService
         // Calculate late/early status
         $statusData = $this->calculateStatus($checkType, $now, $schedule, $location->timezone);
 
-        // Check if today is a holiday
-        $holiday = $this->getHoliday($now->toDateString());
-        $isHoliday = $holiday !== null;
-        $overtimeMultiplier = $holiday ? (float) $holiday->overtime_multiplier : 1.0;
+        // Get overtime info (holiday, weekend, or regular)
+        $overtimeInfo = $this->overtimeService->getOvertimeMultiplier($now);
+        $isHoliday = $overtimeInfo['is_holiday'];
+        $overtimeMultiplier = $overtimeInfo['multiplier'];
 
         // Calculate work minutes if checking out
         $workMinutes = 0;
@@ -209,7 +211,13 @@ class AttendanceService
                 // Calculate overtime if applicable
                 if ($schedule && $schedule->shift) {
                     $expectedMinutes = $this->calculateExpectedMinutes($schedule->shift);
-                    $overtimeMin = max(0, $workMinutes - $expectedMinutes);
+
+                    // On holidays/weekends, all work is overtime
+                    if ($overtimeInfo['type'] === 'HOLIDAY' || $overtimeInfo['type'] === 'WEEKEND') {
+                        $overtimeMin = $workMinutes;
+                    } else {
+                        $overtimeMin = max(0, $workMinutes - $expectedMinutes);
+                    }
                 }
             }
         }

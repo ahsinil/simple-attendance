@@ -128,6 +128,18 @@ const routes = [
                 component: () => import('@/views/admin/DevicesView.vue'),
                 meta: { permission: 'admin.devices.view' },
             },
+            {
+                path: 'payroll',
+                name: 'AdminPayroll',
+                component: () => import('@/views/admin/PayrollView.vue'),
+                meta: { permission: 'admin.payroll.view' },
+            },
+            {
+                path: 'salary-components',
+                name: 'AdminSalaryComponents',
+                component: () => import('@/views/admin/SalaryComponentsView.vue'),
+                meta: { permission: 'admin.salary.view' },
+            },
         ],
     },
 
@@ -171,6 +183,8 @@ router.beforeEach((to, from, next) => {
         'admin.reports.view',
         'admin.settings.view',
         'admin.devices.view',
+        'admin.payroll.view',
+        'admin.salary.view',
     ]
 
     // Check if user has any admin permission
@@ -238,6 +252,8 @@ function findFirstAccessibleRoute(permissions) {
         { name: 'AdminReports', permission: 'admin.reports.view' },
         { name: 'AdminSettings', permission: 'admin.settings.view' },
         { name: 'AdminDevices', permission: 'admin.devices.view' },
+        { name: 'AdminPayroll', permission: 'admin.payroll.view' },
+        { name: 'AdminSalaryComponents', permission: 'admin.salary.view' },
     ]
 
     for (const route of routePermissions) {

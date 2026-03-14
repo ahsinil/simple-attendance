@@ -16,6 +16,10 @@ const settings = ref({
   device_registration_enabled: 'false',
   device_registration_mode: 'require_approval',
   max_devices_per_user: '2',
+  weekend_overtime_enabled: 'true',
+  saturday_multiplier: '1.5',
+  sunday_multiplier: '2.0',
+  monthly_working_hours: '173',
 })
 
 const message = ref({ type: '', text: '' })
@@ -213,6 +217,60 @@ function showMessage(type, text) {
             />
             <p class="text-xs text-gray-500 mt-1">Maximum number of devices each employee can register (1-10).</p>
           </div>
+        </div>
+      </div>
+
+      <!-- Overtime Settings -->
+      <div class="bg-white dark:bg-dark-surface p-6 rounded-xl shadow-sm border border-gray-100 dark:border-dark-border space-y-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+           <span class="material-symbols-outlined text-gray-500">schedule</span>
+           Overtime Settings
+        </h2>
+
+        <div>
+           <label class="flex items-center gap-2">
+             <input type="checkbox" v-model="settings.weekend_overtime_enabled" class="rounded border-gray-300 text-primary focus:ring-primary" true-value="true" false-value="false" />
+             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Enable Weekend Overtime</span>
+           </label>
+           <p class="text-xs text-gray-500 mt-1 ml-6">Treat Saturday and Sunday work as overtime with configurable multipliers.</p>
+        </div>
+
+        <div v-if="settings.weekend_overtime_enabled === 'true'" class="space-y-4 pl-6 border-l-2 border-primary/30">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Saturday Multiplier</label>
+              <input 
+                v-model="settings.saturday_multiplier" 
+                type="number" 
+                step="0.1" 
+                min="1"
+                class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5" 
+              />
+              <p class="text-xs text-gray-500 mt-1">e.g., 1.5 = 150% pay rate</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sunday Multiplier</label>
+              <input 
+                v-model="settings.sunday_multiplier" 
+                type="number" 
+                step="0.1" 
+                min="1"
+                class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5" 
+              />
+              <p class="text-xs text-gray-500 mt-1">e.g., 2.0 = 200% pay rate</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monthly Working Hours</label>
+          <input 
+            v-model="settings.monthly_working_hours" 
+            type="number" 
+            min="1"
+            class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5" 
+          />
+          <p class="text-xs text-gray-500 mt-1">Divisor for hourly rate calculation (PP 35/2021 default: 173). Formula: (Base Salary + Fixed Allowances) / This Value = OT Hourly Rate</p>
         </div>
       </div>
 

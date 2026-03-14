@@ -31,6 +31,7 @@ class User extends Authenticatable
         'default_location_id',
         'status',
         'avatar',
+        'base_salary',
     ];
 
     /**
@@ -118,6 +119,51 @@ class User extends Authenticatable
     public function leaveBalances(): HasMany
     {
         return $this->hasMany(LeaveBalance::class);
+    }
+
+    /**
+     * Get all salary component assignments for this user.
+     */
+    public function salaryComponents(): HasMany
+    {
+        return $this->hasMany(UserSalaryComponent::class);
+    }
+
+    /**
+     * Get total fixed allowances (tunjangan tetap).
+     */
+    public function totalFixedAllowances(): float
+    {
+        return (float) $this->salaryComponents()
+            ->whereHas('salaryComponent', fn ($q) => $q->where('type', 'FIXED')->where('is_active', true))
+            ->sum('amount');
+    }
+
+    /**
+     * Get total variable allowances (tunjangan tidak tetap).
+     */
+    public function totalVariableAllowances(): float
+    {
+        return (float) $this->salaryComponents()
+            ->whereHas('salaryComponent', fn ($q) => $q->where('type', 'VARIABLE')->where('is_active', true))
+            ->sum('amount');
+    }
+
+    /**
+     * Calculate overtime hourly rate per PP 35/2021.
+     * Formula: (base_salary + fixed_allowances) / monthly_working_hours
+     */
+    public function overtimeHourlyRate(): float
+    {
+        $monthlyHours = (int) AppSetting::get('monthly_working_hours', 173);
+        $base = (float) ($this->base_salary ?? 0);
+        $fixed = $this->totalFixedAllowances();
+
+        if ($monthlyHours <= 0) {
+            return 0;
+        }
+
+        return ($base + $fixed) / $monthlyHours;
     }
 
     /**
