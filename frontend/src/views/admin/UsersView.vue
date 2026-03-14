@@ -5,8 +5,13 @@ import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
 import { useAuthStore } from '@/stores/auth'
 
+// Import Extracted Modals
+import UserFormModal from '@/components/admin/Users/UserFormModal.vue'
+import ScheduleModal from '@/components/admin/Users/ScheduleModal.vue'
+import SalaryModal from '@/components/admin/Users/SalaryModal.vue'
+
 const toast = useToast()
-const { confirmDelete, confirmAction } = useConfirm()
+const { confirmDelete } = useConfirm()
 const authStore = useAuthStore()
 
 // Permission checks
@@ -18,39 +23,15 @@ const users = ref([])
 const roles = ref([])
 const shifts = ref([])
 const loading = ref(true)
-const showForm = ref(false)
-const editingUser = ref(null)
 const search = ref('')
 
-// Schedule management
+// Modal States
+const showForm = ref(false)
 const showScheduleModal = ref(false)
-const scheduleUser = ref(null)
-const userSchedules = ref([])
-const loadingSchedules = ref(false)
-const scheduleForm = ref({
-  shift_id: '',
-  start_date: '',
-  end_date: '',
-})
-
-// Salary management
 const showSalaryModal = ref(false)
-const salaryUser = ref(null)
-const salaryData = ref({ base_salary: 0, components: [], total_fixed: 0, total_variable: 0, hourly_rate: 0 })
-const availableComponents = ref([])
-const loadingSalary = ref(false)
-const salaryForm = ref({ base_salary: 0, components: [] })
 
-const form = ref({
-  name: '',
-  email: '',
-  password: '',
-  employee_id: '',
-  department: '',
-  position: '',
-  role: 'employee',
-  base_salary: '',
-})
+// Selected User States
+const activeUser = ref(null)
 
 onMounted(async () => {
   await Promise.all([fetchUsers(), fetchRoles(), fetchShifts()])
@@ -84,44 +65,29 @@ async function fetchShifts() {
   }
 }
 
+// User Form Actions
 function openCreate() {
-  editingUser.value = null
-  form.value = { name: '', email: '', password: '', employee_id: '', department: '', position: '', role: 'employee', base_salary: '' }
+  activeUser.value = null
   showForm.value = true
 }
 
 function openEdit(user) {
-  editingUser.value = user
-  form.value = {
-    name: user.name,
-    email: user.email,
-    password: '',
-    employee_id: user.employee_id || '',
-    department: user.department || '',
-    position: user.position || '',
-    role: user.roles?.[0]?.name || 'employee',
-    base_salary: user.base_salary || '',
-  }
+  activeUser.value = user
   showForm.value = true
 }
 
-async function handleSubmit() {
-  try {
-    if (editingUser.value) {
-      const data = { ...form.value }
-      if (!data.password) delete data.password
-      await adminApi.updateUser(editingUser.value.id, data)
-    } else {
-      await adminApi.createUser(form.value)
-    }
-    showForm.value = false
-    toast.success(editingUser.value ? 'User updated successfully' : 'User created successfully')
-    fetchUsers()
-  } catch (error) {
-    toast.error(error.response?.data?.message || error.response?.data?.error || 'Failed to save user')
-  }
+// Schedule & Salary Actions
+function openScheduleModal(user) {
+  activeUser.value = user
+  showScheduleModal.value = true
 }
 
+function openSalaryModal(user) {
+  activeUser.value = user
+  showSalaryModal.value = true
+}
+
+// Delete Action
 async function deleteUser(user) {
   const confirmed = await confirmDelete(user.name)
   if (!confirmed) return
@@ -134,136 +100,7 @@ async function deleteUser(user) {
   }
 }
 
-// Schedule management functions
-async function openScheduleModal(user) {
-  scheduleUser.value = user
-  showScheduleModal.value = true
-  scheduleForm.value = { shift_id: '', start_date: '', end_date: '' }
-  await fetchUserSchedules(user.id)
-}
-
-async function fetchUserSchedules(userId) {
-  loadingSchedules.value = true
-  try {
-    const response = await adminApi.getUserSchedules(userId)
-    userSchedules.value = response.data.data || []
-  } catch (error) {
-    console.error('Failed to fetch schedules:', error)
-  } finally {
-    loadingSchedules.value = false
-  }
-}
-
-async function assignSchedule() {
-  if (!scheduleForm.value.shift_id || !scheduleForm.value.start_date) {
-    toast.warning('Please select a shift and start date')
-    return
-  }
-  try {
-    await adminApi.assignSchedule(scheduleUser.value.id, {
-      shift_id: scheduleForm.value.shift_id,
-      start_date: scheduleForm.value.start_date,
-      end_date: scheduleForm.value.end_date || null,
-    })
-    scheduleForm.value = { shift_id: '', start_date: '', end_date: '' }
-    toast.success('Schedule assigned successfully')
-    await fetchUserSchedules(scheduleUser.value.id)
-  } catch (error) {
-    toast.error(error.response?.data?.message || error.response?.data?.error || 'Failed to assign schedule')
-  }
-}
-
-async function removeSchedule(schedule) {
-  const confirmed = await confirmAction('Remove this schedule?', 'Remove Schedule')
-  if (!confirmed) return
-  try {
-    await adminApi.removeSchedule(scheduleUser.value.id, schedule.id)
-    toast.success('Schedule removed')
-    await fetchUserSchedules(scheduleUser.value.id)
-  } catch (error) {
-    toast.error(error.response?.data?.message || error.response?.data?.error || 'Failed to remove schedule')
-  }
-}
-
-// Salary management functions
-async function openSalaryModal(user) {
-  salaryUser.value = user
-  showSalaryModal.value = true
-  loadingSalary.value = true
-  try {
-    const [salaryRes, compRes] = await Promise.all([
-      adminApi.getUserSalary(user.id),
-      adminApi.getSalaryComponents(),
-    ])
-    if (salaryRes.data.success) {
-      salaryData.value = salaryRes.data.data
-      // Build form from existing data
-      salaryForm.value = {
-        base_salary: salaryRes.data.data.base_salary || 0,
-        components: (salaryRes.data.data.components || []).map(c => ({
-          salary_component_id: c.salary_component_id,
-          amount: c.amount,
-          name: c.salary_component?.name,
-          type: c.salary_component?.type,
-        })),
-      }
-    }
-    if (compRes.data.success) {
-      availableComponents.value = compRes.data.data.filter(c => c.is_active)
-    }
-  } catch (error) {
-    console.error('Failed to load salary data:', error)
-  } finally {
-    loadingSalary.value = false
-  }
-}
-
-function addSalaryComponent(comp) {
-  if (salaryForm.value.components.find(c => c.salary_component_id === comp.id)) return
-  salaryForm.value.components.push({
-    salary_component_id: comp.id,
-    amount: 0,
-    name: comp.name,
-    type: comp.type,
-  })
-}
-
-function removeSalaryComponent(index) {
-  salaryForm.value.components.splice(index, 1)
-}
-
-async function saveSalary() {
-  try {
-    await adminApi.updateUserSalary(salaryUser.value.id, {
-      base_salary: salaryForm.value.base_salary,
-      components: salaryForm.value.components.map(c => ({
-        salary_component_id: c.salary_component_id,
-        amount: c.amount,
-      })),
-    })
-    toast.success('Salary updated successfully')
-    showSalaryModal.value = false
-    fetchUsers()
-  } catch (error) {
-    toast.error(error.response?.data?.message || 'Failed to update salary')
-  }
-}
-
-function formatCurrency(amount) {
-  if (amount == null || amount == 0) return '-'
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount)
-}
-
-function formatDate(date) {
-  if (!date) return 'Ongoing'
-  return new Date(date).toLocaleDateString()
-}
-
-function formatTime(time) {
-  if (!time) return ''
-  return time.substring(0, 5)
-}
-
+// Table formatting helpers
 function getCurrentShift(user) {
   if (!user.schedules || user.schedules.length === 0) return 'No Shift'
   
@@ -303,263 +140,79 @@ function getCurrentShift(user) {
       <div v-if="loading" class="p-8 text-center text-gray-500">Loading...</div>
 
       <div v-else class="overflow-x-auto">
-      <table class="w-full min-w-[700px]">
-        <thead class="bg-gray-50 dark:bg-dark-border">
-          <tr>
-            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Name</th>
-            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Email</th>
-            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Role</th>
-            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Shift</th>
-            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-            <th v-if="canUpdate || canDelete" class="px-4 py-3 text-right text-sm font-medium text-gray-500">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 dark:divide-dark-border">
-          <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50 dark:hover:bg-dark-border/50">
-            <td class="px-4 py-3">
-              <p class="font-medium text-gray-900 dark:text-white">{{ user.name }}</p>
-              <p class="text-sm text-gray-500">{{ user.employee_id }}</p>
-            </td>
-            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">{{ user.email }}</td>
-            <td class="px-4 py-3">
-              <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
-                {{ user.roles?.[0]?.name || 'N/A' }}
-              </span>
-            </td>
-            <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
-              {{ getCurrentShift(user) }}
-            </td>
-            <td class="px-4 py-3">
-              <span :class="user.status === 'active' ? 'text-green-500' : 'text-gray-400'">
-                {{ user.status }}
-              </span>
-            </td>
-            <td v-if="canUpdate || canDelete" class="px-4 py-3 text-right">
-              <button v-if="canUpdate" @click="openSalaryModal(user)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/20 rounded text-green-500" title="Manage Salary">
-                <span class="material-symbols-outlined text-sm">payments</span>
-              </button>
-              <button v-if="canUpdate" @click="openScheduleModal(user)" class="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded text-blue-500" title="Manage Shifts">
-                <span class="material-symbols-outlined text-sm">schedule</span>
-              </button>
-              <button v-if="canUpdate" @click="openEdit(user)" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded" title="Edit User">
-                <span class="material-symbols-outlined text-sm">edit</span>
-              </button>
-              <button v-if="canDelete" @click="deleteUser(user)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500" title="Delete User">
-                <span class="material-symbols-outlined text-sm">delete</span>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      </div>
-    </div>
-
-    <!-- User Form Modal -->
-    <div v-if="showForm" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div class="card p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {{ editingUser ? 'Edit User' : 'Add User' }}
-        </h3>
-        <form @submit.prevent="handleSubmit" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
-            <input v-model="form.name" class="input" required />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
-            <input v-model="form.email" type="email" class="input" required />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Password {{ editingUser ? '(leave blank to keep)' : '*' }}
-            </label>
-            <input v-model="form.password" type="password" class="input" :required="!editingUser" />
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Employee ID</label>
-              <input v-model="form.employee_id" class="input" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role *</label>
-              <select v-model="form.role" class="input" required>
-                <option v-for="role in roles" :key="role.id" :value="role.name">{{ role.name }}</option>
-              </select>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Department</label>
-              <input v-model="form.department" class="input" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position</label>
-              <input v-model="form.position" class="input" />
-            </div>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Base Salary (Gaji Pokok)</label>
-            <input v-model.number="form.base_salary" type="number" class="input" placeholder="0" min="0" />
-          </div>
-          <div class="flex gap-3 pt-4">
-            <button type="submit" class="btn btn-primary flex-1">Save</button>
-            <button type="button" @click="showForm = false" class="btn btn-secondary flex-1">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Schedule Modal -->
-    <div v-if="showScheduleModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div class="card p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            Manage Shifts - {{ scheduleUser?.name }}
-          </h3>
-          <button @click="showScheduleModal = false" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-
-        <!-- Add Schedule Form -->
-        <div class="bg-gray-50 dark:bg-dark-border rounded-lg p-4 mb-4">
-          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Assign New Shift</h4>
-          <div class="grid grid-cols-1 gap-3">
-            <div>
-              <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1">Shift *</label>
-              <select v-model="scheduleForm.shift_id" class="input">
-                <option value="">Select a shift...</option>
-                <option v-for="shift in shifts" :key="shift.id" :value="shift.id">
-                  {{ shift.name }} ({{ formatTime(shift.start_time) }} - {{ formatTime(shift.end_time) }})
-                </option>
-              </select>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1">Start Date *</label>
-                <input v-model="scheduleForm.start_date" type="date" class="input" />
-              </div>
-              <div>
-                <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1">End Date</label>
-                <input v-model="scheduleForm.end_date" type="date" class="input" placeholder="Leave empty for ongoing" />
-              </div>
-            </div>
-            <button @click="assignSchedule" class="btn btn-primary w-full">
-              <span class="material-symbols-outlined text-sm mr-1">add</span>
-              Assign Shift
-            </button>
-          </div>
-        </div>
-
-        <!-- Current Schedules -->
-        <div>
-          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Current Schedules</h4>
-          <div v-if="loadingSchedules" class="text-center py-4 text-gray-500">Loading...</div>
-          <div v-else-if="userSchedules.length === 0" class="text-center py-4 text-gray-500">
-            No schedules assigned
-          </div>
-          <div v-else class="space-y-2">
-            <div v-for="schedule in userSchedules" :key="schedule.id" 
-                 class="flex items-center justify-between p-3 bg-gray-50 dark:bg-dark-border rounded-lg">
-              <div>
-                <p class="font-medium text-gray-900 dark:text-white">{{ schedule.shift?.name }}</p>
-                <p class="text-sm text-gray-500">
-                  {{ formatTime(schedule.shift?.start_time) }} - {{ formatTime(schedule.shift?.end_time) }}
-                </p>
-                <p class="text-xs text-gray-400 mt-1">
-                  {{ formatDate(schedule.start_date) }} → {{ formatDate(schedule.end_date) }}
-                </p>
-              </div>
-              <button @click="removeSchedule(schedule)" 
-                      class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500" title="Remove Schedule">
-                <span class="material-symbols-outlined text-sm">delete</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex justify-end mt-4 pt-4 border-t border-gray-200 dark:border-dark-border">
-          <button @click="showScheduleModal = false" class="btn btn-secondary">Close</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Salary Modal -->
-    <div v-if="showSalaryModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div class="card p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            Salary - {{ salaryUser?.name }}
-          </h3>
-          <button @click="showSalaryModal = false" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-
-        <div v-if="loadingSalary" class="text-center py-8 text-gray-500">Loading...</div>
-
-        <div v-else class="space-y-5">
-          <!-- Base Salary -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Base Salary (Gaji Pokok)</label>
-            <input v-model.number="salaryForm.base_salary" type="number" class="input" placeholder="0" min="0" />
-          </div>
-
-          <!-- Assigned Components -->
-          <div>
-            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Allowances</h4>
-            <div v-if="salaryForm.components.length === 0" class="text-sm text-gray-400 py-2">No allowances assigned.</div>
-            <div v-else class="space-y-2">
-              <div v-for="(comp, index) in salaryForm.components" :key="index"
-                   class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-dark-border rounded-lg">
-                <div class="flex-1 min-w-0">
-                  <p class="font-medium text-gray-900 dark:text-white text-sm truncate">{{ comp.name }}</p>
-                  <span class="text-xs px-1.5 py-0.5 rounded-full"
-                        :class="comp.type === 'FIXED' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600' : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600'">
-                    {{ comp.type }}
-                  </span>
-                </div>
-                <input v-model.number="comp.amount" type="number" class="input w-36" placeholder="Amount" min="0" />
-                <button @click="removeSalaryComponent(index)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500">
-                  <span class="material-symbols-outlined text-sm">close</span>
+        <table class="w-full min-w-[700px]">
+          <thead class="bg-gray-50 dark:bg-dark-border">
+            <tr>
+              <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Name</th>
+              <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Email</th>
+              <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Role</th>
+              <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Shift</th>
+              <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
+              <th v-if="canUpdate || canDelete" class="px-4 py-3 text-right text-sm font-medium text-gray-500">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-dark-border">
+            <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50 dark:hover:bg-dark-border/50">
+              <td class="px-4 py-3">
+                <p class="font-medium text-gray-900 dark:text-white">{{ user.name }}</p>
+                <p class="text-sm text-gray-500">{{ user.employee_id }}</p>
+              </td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400">{{ user.email }}</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
+                  {{ user.roles?.[0]?.name || 'N/A' }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                {{ getCurrentShift(user) }}
+              </td>
+              <td class="px-4 py-3">
+                <span :class="user.status === 'active' ? 'text-green-500' : 'text-gray-400'">
+                  {{ user.status }}
+                </span>
+              </td>
+              <td v-if="canUpdate || canDelete" class="px-4 py-3 text-right">
+                <button v-if="canUpdate" @click="openSalaryModal(user)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/20 rounded text-green-500" title="Manage Salary">
+                  <span class="material-symbols-outlined text-sm">payments</span>
                 </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Add Component -->
-          <div>
-            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Add Allowance</h4>
-            <div class="flex flex-wrap gap-2">
-              <button
-                v-for="comp in availableComponents.filter(c => !salaryForm.components.find(sc => sc.salary_component_id === c.id))"
-                :key="comp.id"
-                @click="addSalaryComponent(comp)"
-                class="text-xs px-3 py-1.5 rounded-full border border-gray-200 dark:border-dark-line hover:bg-primary/10 hover:border-primary text-gray-600 dark:text-gray-300 transition-colors"
-              >
-                + {{ comp.name }}
-              </button>
-              <span v-if="availableComponents.filter(c => !salaryForm.components.find(sc => sc.salary_component_id === c.id)).length === 0"
-                    class="text-xs text-gray-400">All components assigned</span>
-            </div>
-          </div>
-
-          <!-- Save -->
-          <div class="flex flex-col gap-3 pt-4 border-t border-gray-200 dark:border-dark-border">
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-gray-500">Total Salary</span>
-              <span class="font-bold text-gray-900 dark:text-white">{{ formatCurrency((parseFloat(salaryForm.base_salary) || 0) + salaryForm.components.reduce((s, c) => s + (parseFloat(c.amount) || 0), 0)) }}</span>
-            </div>
-            <div class="flex items-center justify-between text-xs text-gray-400">
-              <span>OT Rate: {{ formatCurrency(((parseFloat(salaryForm.base_salary) || 0) + salaryForm.components.filter(c => c.type === 'FIXED').reduce((s, c) => s + (parseFloat(c.amount) || 0), 0)) / 173) }}/hr</span>
-            </div>
-            <div class="flex gap-3 justify-end">
-              <button @click="showSalaryModal = false" class="btn btn-secondary">Cancel</button>
-              <button @click="saveSalary" class="btn btn-primary">Save Salary</button>
-            </div>
-          </div>
-        </div>
+                <button v-if="canUpdate" @click="openScheduleModal(user)" class="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded text-blue-500" title="Manage Shifts">
+                  <span class="material-symbols-outlined text-sm">schedule</span>
+                </button>
+                <button v-if="canUpdate" @click="openEdit(user)" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded" title="Edit User">
+                  <span class="material-symbols-outlined text-sm">edit</span>
+                </button>
+                <button v-if="canDelete" @click="deleteUser(user)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded text-red-500" title="Delete User">
+                  <span class="material-symbols-outlined text-sm">delete</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
+
+    <!-- Extracted Modals -->
+    <UserFormModal
+      :show="showForm"
+      :user="activeUser"
+      :roles="roles"
+      @close="showForm = false"
+      @saved="fetchUsers"
+    />
+
+    <ScheduleModal
+      :show="showScheduleModal"
+      :user="activeUser"
+      :shifts="shifts"
+      @close="showScheduleModal = false"
+      @changed="fetchUsers"
+    />
+
+    <SalaryModal
+      :show="showSalaryModal"
+      :user="activeUser"
+      @close="showSalaryModal = false"
+      @saved="fetchUsers"
+    />
   </div>
 </template>

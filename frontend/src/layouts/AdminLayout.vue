@@ -58,7 +58,7 @@ async function handleLogout() {
 
     <!-- Sidebar -->
     <aside 
-      class="fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-dark-surface border-r border-gray-200 dark:border-dark-border transform transition-transform duration-300 lg:translate-x-0"
+      class="fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-dark-surface border-r border-gray-200 dark:border-dark-border transform transition-transform duration-300 lg:translate-x-0 flex flex-col"
       :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
     >
       <!-- Logo -->
@@ -75,7 +75,7 @@ async function handleLogout() {
       </div>
 
       <!-- Navigation -->
-      <nav class="p-4 space-y-1">
+      <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
         <RouterLink
           v-for="item in navItems"
           :key="item.to"
@@ -102,7 +102,7 @@ async function handleLogout() {
       </nav>
 
       <!-- User Info -->
-      <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-dark-border">
+      <div class="mt-auto p-4 border-t border-gray-200 dark:border-dark-border">
         <div class="flex items-center gap-3 mb-3">
           <div class="w-10 h-10 bg-red-500/10 rounded-full flex items-center justify-center">
             <span class="text-red-500 font-medium">{{ authStore.user?.name?.[0] }}</span>

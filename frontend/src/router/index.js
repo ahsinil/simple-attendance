@@ -150,6 +150,11 @@ const routes = [
         component: () => import('@/views/BarcodeDisplayView.vue'),
         meta: { requiresAuth: true },
     },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: () => import('@/views/NotFoundView.vue'),
+    },
 ]
 
 const router = createRouter({
@@ -168,7 +173,7 @@ router.beforeEach((to, from, next) => {
     const userPermissions = user?.permissions || []
 
     // Helper to check if user has a permission
-    const hasPermission = (permission) => userPermissions.includes(permission)
+    const hasPermission = (permission) => isAdmin || userPermissions.includes(permission)
 
     // Admin-level permissions that grant access to admin section
     const adminPermissions = [
@@ -210,6 +215,13 @@ router.beforeEach((to, from, next) => {
     // Restrict display_screen role to only barcode page
     if (isDisplayScreen && to.name !== 'BarcodeDisplay' && to.name !== 'Login') {
         next({ name: 'BarcodeDisplay' })
+        return
+    }
+
+    // Restrict barcode page to only display_screen role
+    if (to.name === 'BarcodeDisplay' && !isDisplayScreen) {
+        const firstAccessible = findFirstAccessibleRoute(userPermissions)
+        next({ name: firstAccessible })
         return
     }
 

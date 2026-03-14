@@ -30,7 +30,8 @@ class AttendanceServiceProvider extends ServiceProvider
         $this->app->singleton(AttendanceService::class, function ($app) {
             return new AttendanceService(
                 $app->make(GpsService::class),
-                $app->make(BarcodeService::class)
+                $app->make(BarcodeService::class),
+                $app->make(\App\Services\OvertimeService::class)
             );
         });
     }

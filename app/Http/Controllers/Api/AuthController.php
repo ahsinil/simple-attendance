@@ -267,7 +267,7 @@ class AuthController extends Controller
             'device_name' => 'nullable|string|max:100',
             'screen_resolution' => 'nullable|string|max:20',
             'timezone' => 'nullable|string|max:50',
-            'canvas_fingerprint' => 'nullable|string|max:64',
+            'canvas_fingerprint' => 'nullable|string',
         ]);
 
         $deviceService = app(\App\Services\DeviceService::class);
