@@ -103,6 +103,14 @@ class RoleSeeder extends Seeder
             'admin.devices.approve',       // Approve or reject pending devices
             'admin.devices.delete',        // Remove/revoke devices
             
+            // Admin Payroll
+            'admin.payroll.view',          // View payroll summary
+            'admin.payroll.export',        // Export payroll to Excel
+            
+            // Admin Salary
+            'admin.salary.view',           // View salary components
+            'admin.salary.manage',         // Create/edit/delete salary components
+            
             // =========================================
             // SPECIAL PERMISSIONS
             // =========================================
@@ -153,6 +161,10 @@ class RoleSeeder extends Seeder
             'admin.locations.update',
             'admin.reports.view',
             'admin.reports.export',
+            'admin.payroll.view',
+            'admin.payroll.export',
+            'admin.salary.view',
+            'admin.salary.manage',
             'barcode.display',
         ]);
 

@@ -4,7 +4,7 @@ import { adminApi } from '@/services/api'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
 
-const { showToast } = useToast()
+const toast = useToast()
 const { confirm } = useConfirm()
 
 const loading = ref(false)
@@ -56,16 +56,16 @@ async function saveComponent() {
   try {
     if (editingId.value) {
       await adminApi.updateSalaryComponent(editingId.value, form.value)
-      showToast('Component updated successfully', 'success')
+      toast.success('Component updated successfully')
     } else {
       await adminApi.createSalaryComponent(form.value)
-      showToast('Component created successfully', 'success')
+      toast.success('Component created successfully')
     }
     showModal.value = false
     fetchComponents()
   } catch (error) {
     const msg = error.response?.data?.message || 'Failed to save component'
-    showToast(msg, 'error')
+    toast.error(msg)
   }
 }
 
@@ -73,9 +73,9 @@ async function toggleActive(component) {
   try {
     await adminApi.updateSalaryComponent(component.id, { is_active: !component.is_active })
     component.is_active = !component.is_active
-    showToast(`Component ${component.is_active ? 'activated' : 'deactivated'}`, 'success')
+    toast.success(`Component ${component.is_active ? 'activated' : 'deactivated'}`)
   } catch (error) {
-    showToast('Failed to update status', 'error')
+    toast.error('Failed to update status')
   }
 }
 
@@ -90,10 +90,10 @@ async function deleteComponent(component) {
 
   try {
     await adminApi.deleteSalaryComponent(component.id)
-    showToast('Component deleted', 'success')
+    toast.success('Component deleted')
     fetchComponents()
   } catch (error) {
-    showToast('Failed to delete component', 'error')
+    toast.error('Failed to delete component')
   }
 }
 </script>

@@ -136,6 +136,13 @@ export const adminApi = {
         params,
         responseType: 'blob'
     }),
+    getReportsDepartments: () => api.get('/admin/reports/departments'),
+    getReportsEmployees: () => api.get('/admin/reports/employees'),
+    getEmployeeReport: (params) => api.get('/admin/reports/employee', { params }),
+    exportEmployeeReport: (params) => api.get('/admin/reports/employee/export', {
+        params,
+        responseType: 'blob'
+    }),
 
     // Leave Types
     getLeaveTypes: () => api.get('/admin/leave-types'),

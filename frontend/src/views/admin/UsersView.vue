@@ -545,11 +545,15 @@ function getCurrentShift(user) {
           </div>
 
           <!-- Save -->
-          <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-dark-border">
-            <div class="text-xs text-gray-400">
-              OT Rate: {{ formatCurrency(((salaryForm.base_salary || 0) + salaryForm.components.filter(c => c.type === 'FIXED').reduce((s, c) => s + (c.amount || 0), 0)) / 173) }}/hr
+          <div class="flex flex-col gap-3 pt-4 border-t border-gray-200 dark:border-dark-border">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-500">Total Salary</span>
+              <span class="font-bold text-gray-900 dark:text-white">{{ formatCurrency((parseFloat(salaryForm.base_salary) || 0) + salaryForm.components.reduce((s, c) => s + (parseFloat(c.amount) || 0), 0)) }}</span>
             </div>
-            <div class="flex gap-3">
+            <div class="flex items-center justify-between text-xs text-gray-400">
+              <span>OT Rate: {{ formatCurrency(((parseFloat(salaryForm.base_salary) || 0) + salaryForm.components.filter(c => c.type === 'FIXED').reduce((s, c) => s + (parseFloat(c.amount) || 0), 0)) / 173) }}/hr</span>
+            </div>
+            <div class="flex gap-3 justify-end">
               <button @click="showSalaryModal = false" class="btn btn-secondary">Cancel</button>
               <button @click="saveSalary" class="btn btn-primary">Save Salary</button>
             </div>

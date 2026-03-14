@@ -117,6 +117,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/reports/summary', [App\Http\Controllers\Admin\ReportController::class, 'summary']);
         Route::get('/reports/export', [App\Http\Controllers\Admin\ReportController::class, 'export']);
         Route::get('/reports/locations', [App\Http\Controllers\Admin\ReportController::class, 'locations']);
+        Route::get('/reports/departments', [App\Http\Controllers\Admin\ReportController::class, 'departments']);
+        Route::get('/reports/employees', [App\Http\Controllers\Admin\ReportController::class, 'employees']);
+        Route::get('/reports/employee', [App\Http\Controllers\Admin\ReportController::class, 'employeeReport']);
+        Route::get('/reports/employee/export', [App\Http\Controllers\Admin\ReportController::class, 'exportEmployeeReport']);
 
         // Settings
         Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index']);

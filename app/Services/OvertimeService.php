@@ -199,7 +199,7 @@ class OvertimeService
                             ->where('end_date', '>=', $endDate);
                     });
             })
-            ->sum('days');
+            ->sum('days_requested');
 
         // Calculate hours
         $totalWorkMinutes = $checkOuts->sum('work_minutes');

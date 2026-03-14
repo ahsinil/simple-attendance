@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { adminApi } from '@/services/api'
 import { useToast } from '@/composables/useToast'
 
-const { showToast } = useToast()
+const toast = useToast()
 
 const loading = ref(false)
 const exporting = ref(false)
@@ -52,7 +52,7 @@ async function fetchData() {
     }
   } catch (error) {
     console.error('Failed to load payroll', error)
-    showToast('Failed to load payroll data', 'error')
+    toast.error('Failed to load payroll data')
   } finally {
     loading.value = false
   }
@@ -83,10 +83,10 @@ async function exportToExcel() {
     link.click()
     link.remove()
     window.URL.revokeObjectURL(url)
-    showToast('Payroll exported successfully', 'success')
+    toast.success('Payroll exported successfully')
   } catch (error) {
     console.error('Export failed', error)
-    showToast('Export failed', 'error')
+    toast.error('Export failed')
   } finally {
     exporting.value = false
   }
@@ -230,6 +230,7 @@ function formatNumber(num, decimals = 1) {
               <th class="px-4 py-3 text-right">Base Salary</th>
               <th class="px-4 py-3 text-right">Fixed Allow.</th>
               <th class="px-4 py-3 text-right">Variable Allow.</th>
+              <th class="px-4 py-3 text-right">Total Salary</th>
               <th class="px-4 py-3 text-right">OT Pay</th>
               <th class="px-4 py-3 text-right">Deductions</th>
               <th class="px-4 py-3 text-right">Est. Total</th>
@@ -237,7 +238,7 @@ function formatNumber(num, decimals = 1) {
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-dark-border text-sm">
             <tr v-if="payrollData.length === 0">
-              <td colspan="10" class="px-4 py-12 text-center text-gray-500">No payroll data found for the selected period.</td>
+              <td colspan="11" class="px-4 py-12 text-center text-gray-500">No payroll data found for the selected period.</td>
             </tr>
             <tr v-for="row in payrollData" :key="row.user_id" class="group hover:bg-gray-50 dark:hover:bg-dark-bg transition-colors">
               <td class="px-4 py-3 sticky left-0 bg-white dark:bg-dark-surface group-hover:bg-gray-50 dark:group-hover:bg-dark-bg z-10">
@@ -271,6 +272,7 @@ function formatNumber(num, decimals = 1) {
               <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{{ formatCurrency(row.base_salary) }}</td>
               <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{{ formatCurrency(row.fixed_allowances) }}</td>
               <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{{ formatCurrency(row.variable_allowances) }}</td>
+              <td class="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{{ formatCurrency(row.base_salary + row.fixed_allowances + row.variable_allowances) }}</td>
               <td class="px-4 py-3 text-right font-medium text-green-600 dark:text-green-400">{{ formatCurrency(row.overtime_pay) }}</td>
               <td class="px-4 py-3 text-right font-medium text-red-600 dark:text-red-400">
                 {{ row.variable_deduction > 0 ? '-' + formatCurrency(row.variable_deduction) : '-' }}
@@ -285,6 +287,7 @@ function formatNumber(num, decimals = 1) {
               <td class="px-4 py-3"></td>
               <td class="px-4 py-3"></td>
               <td class="px-4 py-3 text-right text-amber-600 dark:text-amber-400">{{ formatNumber(kpis.total_overtime_hours) }}</td>
+              <td class="px-4 py-3"></td>
               <td class="px-4 py-3"></td>
               <td class="px-4 py-3"></td>
               <td class="px-4 py-3"></td>
