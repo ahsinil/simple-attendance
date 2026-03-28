@@ -71,6 +71,11 @@ class AppSettingSeeder extends Seeder
             ],
         ];
 
-        DB::table('app_settings')->insert($settings);
+        foreach ($settings as $setting) {
+            DB::table('app_settings')->updateOrInsert(
+                ['key' => $setting['key']],
+                $setting
+            );
+        }
     }
 }

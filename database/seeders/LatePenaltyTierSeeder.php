@@ -55,6 +55,11 @@ class LatePenaltyTierSeeder extends Seeder
             ],
         ];
 
-        DB::table('late_penalty_tiers')->insert($tiers);
+        foreach ($tiers as $tier) {
+            DB::table('late_penalty_tiers')->updateOrInsert(
+                ['code' => $tier['code']],
+                $tier
+            );
+        }
     }
 }

@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { adminApi } from '@/services/api'
 import { useToast } from '@/composables/useToast'
+import { toDateInputValue, toStartOfMonthInputValue } from '@/utils/date'
 
 const toast = useToast()
 
@@ -20,8 +21,8 @@ const departments = ref([])
 
 // Filters
 const filters = ref({
-  start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-  end_date: new Date().toISOString().split('T')[0],
+  start_date: toStartOfMonthInputValue(),
+  end_date: toDateInputValue(),
   department: '',
 })
 
@@ -64,8 +65,8 @@ function applyFilters() {
 
 function resetFilters() {
   filters.value = {
-    start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    end_date: new Date().toISOString().split('T')[0],
+    start_date: toStartOfMonthInputValue(),
+    end_date: toDateInputValue(),
     department: '',
   }
   fetchData()

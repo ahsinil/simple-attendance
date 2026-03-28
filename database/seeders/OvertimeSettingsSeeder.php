@@ -37,7 +37,7 @@ class OvertimeSettingsSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            AppSetting::firstOrCreate(
+            AppSetting::updateOrCreate(
                 ['key' => $setting['key']],
                 $setting
             );

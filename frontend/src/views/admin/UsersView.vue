@@ -4,6 +4,7 @@ import { adminApi } from '@/services/api'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
 import { useAuthStore } from '@/stores/auth'
+import { toDateInputValue } from '@/utils/date'
 
 // Import Extracted Modals
 import UserFormModal from '@/components/admin/Users/UserFormModal.vue'
@@ -104,7 +105,7 @@ async function deleteUser(user) {
 function getCurrentShift(user) {
   if (!user.schedules || user.schedules.length === 0) return 'No Shift'
   
-  const today = new Date().toISOString().split('T')[0]
+  const today = toDateInputValue()
   
   const activeSchedule = user.schedules.find(s => {
     const startDate = s.start_date.split('T')[0]

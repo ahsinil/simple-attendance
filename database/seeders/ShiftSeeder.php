@@ -63,6 +63,11 @@ class ShiftSeeder extends Seeder
             ],
         ];
 
-        DB::table('shifts')->insert($shifts);
+        foreach ($shifts as $shift) {
+            DB::table('shifts')->updateOrInsert(
+                ['code' => $shift['code']],
+                $shift
+            );
+        }
     }
 }

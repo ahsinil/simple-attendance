@@ -7,10 +7,8 @@ use App\Models\Attendance;
 use App\Models\Holiday;
 use App\Models\LeaveRequest;
 use App\Models\User;
-use App\Models\UserSchedule;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class OvertimeService
 {
@@ -175,10 +173,9 @@ class OvertimeService
         }
 
         $checkIns = $checkInQuery->get();
-        $presentDays = $checkIns->pluck(DB::raw("DATE(scan_time)"))->unique()->count();
-
-        // Actually, let's use groupBy on date
-        $presentDays = $checkIns->groupBy(fn ($att) => Carbon::parse($att->scan_time)->toDateString())->count();
+        $presentDays = $checkIns
+            ->groupBy(fn ($att) => Carbon::parse($att->scan_time)->toDateString())
+            ->count();
 
         // Count absent days (marked by system)
         $absentDays = Attendance::where('user_id', $user->id)

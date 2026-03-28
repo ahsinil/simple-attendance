@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { adminApi } from '@/services/api'
+import { toDateInputValue, toStartOfMonthInputValue } from '@/utils/date'
 
 // Define exactly what this component needs to emit context upwards
 const emit = defineEmits(['export-start', 'export-end'])
@@ -26,8 +27,8 @@ const pagination = ref({
 })
 
 const filters = ref({
-  start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-  end_date: new Date().toISOString().split('T')[0],
+  start_date: toStartOfMonthInputValue(),
+  end_date: toDateInputValue(),
   location_id: '',
   status: '',
 })
@@ -85,8 +86,8 @@ function applyFilters() {
 
 function resetFilters() {
   filters.value = {
-    start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    end_date: new Date().toISOString().split('T')[0],
+    start_date: toStartOfMonthInputValue(),
+    end_date: toDateInputValue(),
     location_id: '',
     status: '',
   }

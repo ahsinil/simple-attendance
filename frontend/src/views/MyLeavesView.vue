@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { leaveApi } from '@/services/api'
+import { toDateInputValue } from '@/utils/date'
 
 // Data
 const leaveTypes = ref([])
@@ -45,8 +46,7 @@ function formatDateRange(start, end) {
 
 // Get today's date in YYYY-MM-DD format
 function getTodayDate() {
-  const now = new Date()
-  return now.toISOString().split('T')[0]
+  return toDateInputValue()
 }
 
 // Status badge class
@@ -361,4 +361,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-

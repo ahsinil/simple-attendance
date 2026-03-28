@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,50 +14,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Run seeders in order
         $this->call([
             RoleSeeder::class,
             AppSettingSeeder::class,
+            OvertimeSettingsSeeder::class,
             LatePenaltyTierSeeder::class,
             ShiftSeeder::class,
+            LeaveTypeSeeder::class,
+            DummyDataSeeder::class,
         ]);
-
-        // Create default admin user
-        $admin = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
-            'employee_id' => 'EMP-001',
-            'status' => 'active',
-        ]);
-        $admin->assignRole('super_admin');
-
-        // Create display screen account for barcode kiosks
-        $display = User::create([
-            'name' => 'Barcode Display',
-            'email' => 'display@example.com',
-            'password' => Hash::make('password'),
-            'employee_id' => 'DISPLAY-001',
-            'status' => 'active',
-        ]);
-        $display->assignRole('display_screen');
-
-        // Create test employee
-        $employee = User::create([
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'password' => Hash::make('password'),
-            'employee_id' => 'EMP-002',
-            'department' => 'Engineering',
-            'position' => 'Software Developer',
-            'status' => 'active',
-        ]);
-        $employee->assignRole('employee');
-
-        $this->command->info('Default users created:');
-        $this->command->info('  Admin: admin@example.com / password');
-        $this->command->info('  Employee: john@example.com / password');
-        $this->command->info('  Display Screen: display@example.com / password');
     }
 }
-
