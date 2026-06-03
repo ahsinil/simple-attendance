@@ -254,4 +254,25 @@ class ReportController extends Controller
             'data' => $employees,
         ]);
     }
+
+    /**
+     * Toggle variable allowance paid status for a specific attendance record.
+     */
+    public function toggleAllowancePaid(Request $request, Attendance $attendance): JsonResponse
+    {
+        if (!$request->user()->can('admin.reports.update') && !$request->user()->can('admin.reports.view')) {
+            // Using view permission temporarily if update is not defined, adjust as needed based on actual roles
+            return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+        }
+
+        $attendance->update([
+            'variable_allowance_paid' => !$attendance->variable_allowance_paid
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status pencairan tunjangan berhasil diperbarui',
+            'data' => $attendance->fresh()
+        ]);
+    }
 }

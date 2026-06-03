@@ -160,6 +160,22 @@ function getStatusClass(status) {
   }
   return classes[status] || 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400'
 }
+
+import { useToast } from '@/composables/useToast'
+const toast = useToast()
+
+async function toggleAllowancePaid(att) {
+  try {
+    const res = await adminApi.toggleAllowancePaid(att.id)
+    if (res.data.success) {
+      att.variable_allowance_paid = res.data.data.variable_allowance_paid
+      toast.success(att.variable_allowance_paid ? 'Ditandai sudah dicairkan' : 'Status pencairan dibatalkan')
+    }
+  } catch (error) {
+    toast.error('Gagal memperbarui status tunjangan')
+    console.error(error)
+  }
+}
 </script>
 
 <template>
@@ -284,6 +300,7 @@ function getStatusClass(status) {
               <th class="px-6 py-4">Check Type</th>
               <th class="px-6 py-4">Status</th>
               <th class="px-6 py-4">Method</th>
+              <th class="px-6 py-4 text-center">Tunjangan</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-dark-border text-sm">
@@ -327,6 +344,23 @@ function getStatusClass(status) {
               </td>
               <td class="px-6 py-4">
                 <span class="text-xs text-gray-500 uppercase">{{ att.method }}</span>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <button
+                  v-if="att.check_type === 'IN'"
+                  @click="toggleAllowancePaid(att)"
+                  class="p-1.5 rounded-lg transition-colors border text-xs font-medium inline-flex items-center gap-1"
+                  :class="att.variable_allowance_paid 
+                    ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50' 
+                    : 'bg-white dark:bg-dark-surface border-gray-200 dark:border-dark-line text-gray-500 hover:bg-gray-50 dark:hover:bg-dark-bg'"
+                  :title="att.variable_allowance_paid ? 'Tunjangan sudah dicairkan. Klik untuk membatalkan.' : 'Tandai tunjangan sudah dicairkan untuk hari ini.'"
+                >
+                  <span class="material-symbols-outlined text-[16px]">
+                    {{ att.variable_allowance_paid ? 'payments' : 'money_off' }}
+                  </span>
+                  <span>{{ att.variable_allowance_paid ? 'Dicairkan' : 'Klaim' }}</span>
+                </button>
+                <span v-else class="text-xs text-gray-400">-</span>
               </td>
             </tr>
           </tbody>

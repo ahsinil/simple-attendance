@@ -3,12 +3,21 @@ import { authApi } from '@/services/api'
 import { getDeviceFingerprint, getDeviceData, getDeviceName } from '@/utils/deviceFingerprint'
 
 export const useAuthStore = defineStore('auth', {
-    state: () => ({
-        user: JSON.parse(localStorage.getItem('user') || 'null'),
-        token: localStorage.getItem('token') || null,
-        loading: false,
-        error: null,
-    }),
+    state: () => {
+        let user = null
+        try {
+            user = JSON.parse(localStorage.getItem('user') || 'null')
+        } catch (e) {
+            localStorage.removeItem('user')
+            localStorage.removeItem('token')
+        }
+        return {
+            user,
+            token: localStorage.getItem('token') || null,
+            loading: false,
+            error: null,
+        }
+    },
 
     getters: {
         isAuthenticated: (state) => !!state.token,
@@ -38,7 +47,7 @@ export const useAuthStore = defineStore('auth', {
                 }
 
                 const response = await authApi.login(email, password, deviceData)
-                const { user, token } = response.data.data
+                const { user, token, device } = response.data.data
 
                 this.user = user
                 this.token = token
@@ -46,9 +55,8 @@ export const useAuthStore = defineStore('auth', {
                 localStorage.setItem('user', JSON.stringify(user))
                 localStorage.setItem('token', token)
 
-                // Also call device registration endpoint as a fallback
-                // (in case login didn't register because feature was disabled at login time)
-                if (deviceData.device_fingerprint) {
+                // Only fallback to background registration if it explicitly failed during login
+                if (deviceData.device_fingerprint && device?.error) {
                     this._registerDeviceInBackground(deviceData)
                 }
 

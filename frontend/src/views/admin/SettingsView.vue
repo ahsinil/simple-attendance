@@ -101,17 +101,17 @@ function showMessage(type, text) {
 
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Name</label>
-          <input v-model="settings.company_name" type="text" class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5" />
+          <input v-model="settings.company_name" type="text" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" />
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contact Email</label>
-          <input v-model="settings.contact_email" type="email" class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5" />
+          <input v-model="settings.contact_email" type="email" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" />
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Timezone</label>
-          <select v-model="settings.timezone" class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5">
+          <select v-model="settings.timezone" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm">
             <option value="UTC">UTC</option>
             <option value="Asia/Jakarta">Asia/Jakarta</option>
             <option value="America/New_York">America/New_York</option>
@@ -129,7 +129,7 @@ function showMessage(type, text) {
 
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Allowed Radius (meters)</label>
-          <input v-model="settings.attendance_radius" type="number" class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5" />
+          <input v-model="settings.attendance_radius" type="number" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" />
           <p class="text-xs text-gray-500 mt-1">Maximum distance allowed from office location.</p>
         </div>
 
@@ -195,7 +195,7 @@ function showMessage(type, text) {
         <div v-if="settings.device_registration_enabled === 'true'" class="space-y-4 pl-6 border-l-2 border-primary/30">
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registration Mode</label>
-            <select v-model="settings.device_registration_mode" class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5">
+            <select v-model="settings.device_registration_mode" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm">
               <option value="require_approval">Require Admin Approval</option>
               <option value="auto_approve">Auto-Approve (with limit)</option>
             </select>
@@ -213,7 +213,7 @@ function showMessage(type, text) {
               type="number" 
               min="1" 
               max="10"
-              class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5" 
+              class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" 
             />
             <p class="text-xs text-gray-500 mt-1">Maximum number of devices each employee can register (1-10).</p>
           </div>
@@ -244,7 +244,7 @@ function showMessage(type, text) {
                 type="number" 
                 step="0.1" 
                 min="1"
-                class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5" 
+                class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" 
               />
               <p class="text-xs text-gray-500 mt-1">e.g., 1.5 = 150% pay rate</p>
             </div>
@@ -255,7 +255,7 @@ function showMessage(type, text) {
                 type="number" 
                 step="0.1" 
                 min="1"
-                class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5" 
+                class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" 
               />
               <p class="text-xs text-gray-500 mt-1">e.g., 2.0 = 200% pay rate</p>
             </div>
@@ -268,7 +268,7 @@ function showMessage(type, text) {
             v-model="settings.monthly_working_hours" 
             type="number" 
             min="1"
-            class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5" 
+            class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" 
           />
           <p class="text-xs text-gray-500 mt-1">Divisor for hourly rate calculation (PP 35/2021 default: 173). Formula: (Base Salary + Fixed Allowances) / This Value = OT Hourly Rate</p>
         </div>
@@ -295,7 +295,7 @@ function showMessage(type, text) {
             v-model="settings.ip_whitelist"
             rows="4"
             placeholder="Enter one IP per line, e.g.&#10;192.168.1.1&#10;10.0.0.0/24" 
-            class="w-full rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2.5 text-sm font-mono"
+            class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm text-sm font-mono"
           ></textarea>
           <p class="text-xs text-gray-500 mt-1">Supports individual IPs and CIDR notation (e.g., 192.168.1.0/24).</p>
         </div>

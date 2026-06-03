@@ -120,6 +120,35 @@ function getCurrentShift(user) {
   
   return 'No Shift'
 }
+
+/**
+ * Hitung total tunjangan tetap (FIXED) yang diterima user.
+ */
+function getFixedAllowanceSummary(user) {
+  if (!user.salary_components || user.salary_components.length === 0) {
+    return null
+  }
+
+  const fixedComponents = user.salary_components.filter(
+    c => c.salary_component?.type === 'FIXED' && c.salary_component?.is_active
+  )
+
+  if (fixedComponents.length === 0) return null
+
+  const total = fixedComponents.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0)
+  return { count: fixedComponents.length, total }
+}
+
+function formatCurrencyShort(amount) {
+  if (!amount || amount === 0) return '-'
+  if (amount >= 1_000_000) {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount / 1_000_000).replace(/[.,]\d+/, '') + ' jt'
+  }
+  if (amount >= 1_000) {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount / 1_000).replace(/[.,]\d+/, '') + ' rb'
+  }
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount)
+}
 </script>
 
 <template>
@@ -148,6 +177,7 @@ function getCurrentShift(user) {
               <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Email</th>
               <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Role</th>
               <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Shift</th>
+              <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Tunjangan Tetap</th>
               <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
               <th v-if="canUpdate || canDelete" class="px-4 py-3 text-right text-sm font-medium text-gray-500">Actions</th>
             </tr>
@@ -167,13 +197,32 @@ function getCurrentShift(user) {
               <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
                 {{ getCurrentShift(user) }}
               </td>
+              <!-- Tunjangan Tetap Badge -->
+              <td class="px-4 py-3">
+                <template v-if="getFixedAllowanceSummary(user)">
+                  <button
+                    v-if="canUpdate"
+                    @click="openSalaryModal(user)"
+                    class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                    :title="`${getFixedAllowanceSummary(user).count} komponen tunjangan tetap`"
+                  >
+                    <span class="material-symbols-outlined text-xs">lock</span>
+                    {{ formatCurrencyShort(getFixedAllowanceSummary(user).total) }}
+                  </button>
+                  <span v-else class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-medium">
+                    <span class="material-symbols-outlined text-xs">lock</span>
+                    {{ formatCurrencyShort(getFixedAllowanceSummary(user).total) }}
+                  </span>
+                </template>
+                <span v-else class="text-xs text-gray-400">—</span>
+              </td>
               <td class="px-4 py-3">
                 <span :class="user.status === 'active' ? 'text-green-500' : 'text-gray-400'">
                   {{ user.status }}
                 </span>
               </td>
               <td v-if="canUpdate || canDelete" class="px-4 py-3 text-right">
-                <button v-if="canUpdate" @click="openSalaryModal(user)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/20 rounded text-green-500" title="Manage Salary">
+                <button v-if="canUpdate" @click="openSalaryModal(user)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/20 rounded text-green-500" title="Kelola Gaji & Tunjangan">
                   <span class="material-symbols-outlined text-sm">payments</span>
                 </button>
                 <button v-if="canUpdate" @click="openScheduleModal(user)" class="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded text-blue-500" title="Manage Shifts">

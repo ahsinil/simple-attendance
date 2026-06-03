@@ -130,6 +130,7 @@ export const adminApi = {
 
     // Reports
     getReports: (params) => api.get('/admin/reports', { params }),
+    toggleAllowancePaid: (id) => api.put(`/admin/reports/attendances/${id}/toggle-allowance-paid`),
     getReportsSummary: (params) => api.get('/admin/reports/summary', { params }),
     getReportsLocations: () => api.get('/admin/reports/locations'),
     exportReports: (params) => api.get('/admin/reports/export', {

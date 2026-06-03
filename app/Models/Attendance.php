@@ -34,6 +34,7 @@ class Attendance extends Model
         'method',
         'approved_by',
         'approved_at',
+        'variable_allowance_paid',
     ];
 
     protected $casts = [
@@ -45,6 +46,7 @@ class Attendance extends Model
         'is_holiday' => 'boolean',
         'overtime_multiplier' => 'decimal:1',
         'approved_at' => 'datetime',
+        'variable_allowance_paid' => 'boolean',
     ];
 
     /**

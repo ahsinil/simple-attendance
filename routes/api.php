@@ -114,6 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Reports
         Route::get('/reports', [App\Http\Controllers\Admin\ReportController::class, 'index']);
+        Route::put('/reports/attendances/{attendance}/toggle-allowance-paid', [App\Http\Controllers\Admin\ReportController::class, 'toggleAllowancePaid']);
         Route::get('/reports/summary', [App\Http\Controllers\Admin\ReportController::class, 'summary']);
         Route::get('/reports/export', [App\Http\Controllers\Admin\ReportController::class, 'export']);
         Route::get('/reports/locations', [App\Http\Controllers\Admin\ReportController::class, 'locations']);

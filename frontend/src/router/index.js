@@ -164,9 +164,17 @@ const router = createRouter({
 
 // Navigation guard - uses localStorage directly to avoid Pinia initialization issues
 router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem('token')
+    let token = localStorage.getItem('token')
     const userStr = localStorage.getItem('user')
-    const user = userStr ? JSON.parse(userStr) : null
+    let user = null
+    try {
+        user = userStr ? JSON.parse(userStr) : null
+    } catch (e) {
+        console.error('Error parsing user from localStorage', e)
+        localStorage.removeItem('user')
+        localStorage.removeItem('token')
+        token = null
+    }
     const isAuthenticated = !!token
     const isAdmin = user?.roles?.includes('admin') || user?.roles?.includes('super_admin')
     const isDisplayScreen = user?.roles?.includes('display_screen')

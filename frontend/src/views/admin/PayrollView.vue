@@ -230,7 +230,7 @@ function formatNumber(num, decimals = 1) {
               <th class="px-4 py-3 text-right">OT Hrs</th>
               <th class="px-4 py-3 text-right">Base Salary</th>
               <th class="px-4 py-3 text-right">Fixed Allow.</th>
-              <th class="px-4 py-3 text-right">Variable Allow.</th>
+              <th class="px-4 py-3 text-right" title="Dibayar hanya untuk hari hadir">Var. Allow. <span class="text-gray-400 font-normal">(Hadir)</span></th>
               <th class="px-4 py-3 text-right">Total Salary</th>
               <th class="px-4 py-3 text-right">OT Pay</th>
               <th class="px-4 py-3 text-right">Deductions</th>
@@ -272,11 +272,21 @@ function formatNumber(num, decimals = 1) {
               </td>
               <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{{ formatCurrency(row.base_salary) }}</td>
               <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{{ formatCurrency(row.fixed_allowances) }}</td>
-              <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{{ formatCurrency(row.variable_allowances) }}</td>
+              <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">
+                <div class="flex flex-col items-end">
+                  <span>{{ formatCurrency(row.variable_allowances) }}</span>
+                  <span v-if="row.variable_allowances_full > row.variable_allowances" class="text-xs text-gray-400">
+                    dari {{ formatCurrency(row.variable_allowances_full) }}
+                  </span>
+                </div>
+              </td>
               <td class="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{{ formatCurrency(row.base_salary + row.fixed_allowances + row.variable_allowances) }}</td>
               <td class="px-4 py-3 text-right font-medium text-green-600 dark:text-green-400">{{ formatCurrency(row.overtime_pay) }}</td>
               <td class="px-4 py-3 text-right font-medium text-red-600 dark:text-red-400">
-                {{ row.variable_deduction > 0 ? '-' + formatCurrency(row.variable_deduction) : '-' }}
+                <div class="flex flex-col items-end">
+                  <span>{{ row.variable_deduction > 0 ? '-' + formatCurrency(row.variable_deduction) : '-' }}</span>
+                  <span v-if="row.variable_deduction > 0" class="text-xs text-gray-400">{{ row.absent_days + row.leave_days }} hari tidak hadir</span>
+                </div>
               </td>
               <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">{{ formatCurrency(row.estimated_total) }}</td>
             </tr>

@@ -124,7 +124,7 @@ async function deleteComponent(component) {
           </span>
           <div>
             <h3 class="font-bold text-gray-900 dark:text-white">Fixed (Tunjangan Tetap)</h3>
-            <p class="text-xs text-gray-500">Always paid monthly. Included in overtime hourly rate calculation.</p>
+            <p class="text-xs text-gray-500">Dibayar penuh setiap bulan tanpa syarat kehadiran. Termasuk dalam kalkulasi lembur (OT).</p>
           </div>
         </div>
         <p class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -138,7 +138,7 @@ async function deleteComponent(component) {
           </span>
           <div>
             <h3 class="font-bold text-gray-900 dark:text-white">Variable (Tunjangan Tidak Tetap)</h3>
-            <p class="text-xs text-gray-500">Deducted on absent/leave days. NOT included in OT calculation.</p>
+            <p class="text-xs text-gray-500">Bersifat opsional. Dibayar per hari karyawan hadir. Tidak diberikan jika absen. Tidak termasuk dalam kalkulasi lembur.</p>
           </div>
         </div>
         <p class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -237,8 +237,8 @@ async function deleteComponent(component) {
               </select>
               <p class="text-xs text-gray-400">
                 {{ form.type === 'FIXED'
-                  ? 'Always paid. Used in overtime hourly rate calculation.'
-                  : 'Deducted on absent/leave days. NOT used in overtime calculation.'
+                  ? 'Dibayar penuh setiap bulan. Termasuk dalam kalkulasi rate lembur.'
+                  : 'Opsional. Dibayar per hari karyawan hadir. Tidak diberikan jika absen. Tidak termasuk dalam lembur.'
                 }}
               </p>
             </label>
