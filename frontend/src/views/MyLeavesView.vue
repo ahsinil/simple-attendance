@@ -180,15 +180,15 @@ onMounted(() => {
     <!-- Success Alert -->
     <div v-if="submitSuccess" class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 px-4 py-3 rounded-lg flex items-center gap-2">
       <span class="material-symbols-outlined">check_circle</span>
-      Leave request submitted successfully!
+      {{ $t('app.myLeavesView.leaveSubmitted') }}
     </div>
 
     <!-- Header -->
     <div class="flex items-center justify-between">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white">My Leaves</h2>
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ $t('app.myLeavesView.myLeaves') }}</h2>
       <button @click="openForm" class="btn btn-primary">
         <span class="material-symbols-outlined text-sm">add</span>
-        Request Leave
+        {{ $t('app.myLeavesView.requestLeave') }}
       </button>
     </div>
 
@@ -207,17 +207,17 @@ onMounted(() => {
           {{ item.remaining }}
         </div>
         <div class="text-xs text-gray-500">
-          of {{ item.balance.allocated_days }} days
+          {{ $t('app.myLeavesView.ofDays', { days: item.balance.allocated_days }) }}
         </div>
         <div v-if="item.balance.pending_days > 0" class="text-xs text-amber-600 mt-1">
-          {{ item.balance.pending_days }} pending
+          {{ $t('app.myLeavesView.pending', { days: item.balance.pending_days }) }}
         </div>
       </div>
     </div>
 
     <!-- Request Form -->
     <div v-if="showForm" class="card p-6">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Request Leave</h3>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ $t('app.myLeavesView.requestLeave') }}</h3>
 
       <div v-if="submitError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 px-4 py-3 rounded-lg mb-4">
         {{ submitError }}
@@ -226,39 +226,39 @@ onMounted(() => {
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Leave Type *</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('app.myLeavesView.leaveType') }}</label>
             <select v-model="form.leave_type_id" class="input">
-              <option value="">Select type</option>
+              <option value="">{{ $t('app.myLeavesView.selectType') }}</option>
               <option v-for="type in leaveTypes" :key="type.id" :value="type.id">
-                {{ type.name }} {{ !type.is_paid ? '(Unpaid)' : '' }}
+                {{ type.name }} {{ !type.is_paid ? $t('app.myLeavesView.unpaid') : '' }}
               </option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date *</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('app.myLeavesView.startDate') }}</label>
             <input v-model="form.start_date" type="date" class="input" :min="getTodayDate()" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date *</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('app.myLeavesView.endDate') }}</label>
             <input v-model="form.end_date" type="date" class="input" :min="form.start_date || getTodayDate()" />
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason *</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('app.myRequestsView.reason') }}</label>
           <textarea
             v-model="form.reason"
             class="input min-h-[100px]"
-            placeholder="Please provide a reason for your leave request (minimum 10 characters)..."
+            :placeholder="$t('app.myLeavesView.reasonPlaceholder')"
           />
         </div>
 
         <div class="flex gap-3">
           <button type="submit" class="btn btn-primary" :disabled="submitting">
-            {{ submitting ? 'Submitting...' : 'Submit Request' }}
+            {{ submitting ? $t('app.myLeavesView.submitting') : $t('app.myLeavesView.submitRequest') }}
           </button>
           <button type="button" @click="showForm = false; resetForm()" class="btn btn-secondary">
-            Cancel
+            {{ $t('app.myLeavesView.cancel') }}
           </button>
         </div>
       </form>
@@ -266,20 +266,20 @@ onMounted(() => {
 
     <!-- Status Filter -->
     <div class="flex items-center gap-4">
-      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Filter:</label>
+      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('app.myLeavesView.filter') }}</label>
       <select v-model="statusFilter" @change="fetchRequests" class="input w-auto">
-        <option value="">All Requests</option>
-        <option value="PENDING">Pending</option>
-        <option value="APPROVED">Approved</option>
-        <option value="REJECTED">Rejected</option>
-        <option value="CANCELLED">Cancelled</option>
+        <option value="">{{ $t('app.myLeavesView.allRequests') }}</option>
+        <option value="PENDING">{{ $t('app.myLeavesView.pendingFilter') }}</option>
+        <option value="APPROVED">{{ $t('app.myLeavesView.approvedFilter') }}</option>
+        <option value="REJECTED">{{ $t('app.myLeavesView.rejectedFilter') }}</option>
+        <option value="CANCELLED">{{ $t('app.myLeavesView.cancelledFilter') }}</option>
       </select>
     </div>
 
     <!-- Requests List -->
     <div class="card overflow-hidden">
       <div v-if="loading" class="p-8 text-center text-gray-500">
-        Loading...
+        {{ $t('app.historyView.loading') }}
       </div>
 
       <div v-else-if="requests.data?.length" class="divide-y divide-gray-200 dark:divide-dark-border">
@@ -299,7 +299,7 @@ onMounted(() => {
                   {{ request.status }}
                 </span>
                 <span class="text-sm text-gray-500">
-                  {{ request.days_requested }} day{{ request.days_requested > 1 ? 's' : '' }}
+                  {{ $t('app.myLeavesView.daysRequested', { days: request.days_requested }) }}
                 </span>
               </div>
               <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -307,7 +307,7 @@ onMounted(() => {
               </p>
               <p class="text-sm text-gray-500 mt-1">{{ request.reason }}</p>
               <p v-if="request.admin_note" class="text-sm text-primary mt-1">
-                Note: {{ request.admin_note }}
+                {{ $t('app.myRequestsView.note', { note: request.admin_note }) }}
               </p>
             </div>
             <div v-if="request.status === 'PENDING'" class="flex-shrink-0">
@@ -315,7 +315,7 @@ onMounted(() => {
                 @click="openCancelModal(request.id)"
                 class="text-red-500 hover:text-red-700 text-sm"
               >
-                Cancel
+                {{ $t('app.myLeavesView.cancel') }}
               </button>
             </div>
           </div>
@@ -324,7 +324,7 @@ onMounted(() => {
 
       <div v-else class="p-8 text-center text-gray-500">
         <span class="material-symbols-outlined text-4xl mb-2">beach_access</span>
-        <p>No leave requests yet</p>
+        <p>{{ $t('app.myLeavesView.noLeaveRequests') }}</p>
       </div>
     </div>
 
@@ -335,11 +335,11 @@ onMounted(() => {
           <div class="w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
             <span class="material-symbols-outlined text-red-500">warning</span>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Cancel Request</h3>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('app.myLeavesView.cancelRequest') }}</h3>
         </div>
 
         <p class="text-gray-600 dark:text-gray-400 mb-6">
-          Are you sure you want to cancel this leave request? This action cannot be undone.
+          {{ $t('app.myLeavesView.cancelConfirm') }}
         </p>
 
         <div class="flex gap-3">
@@ -348,13 +348,13 @@ onMounted(() => {
             :disabled="cancelling"
             class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
           >
-            {{ cancelling ? 'Cancelling...' : 'Yes, Cancel' }}
+            {{ cancelling ? $t('app.myLeavesView.cancelling') : $t('app.myLeavesView.yesCancel') }}
           </button>
           <button
             @click="closeCancelModal"
             class="flex-1 btn btn-secondary"
           >
-            No, Keep It
+            {{ $t('app.myLeavesView.noKeepIt') }}
           </button>
         </div>
       </div>

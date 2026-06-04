@@ -109,8 +109,8 @@ function formatNumber(num, decimals = 1) {
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Payroll Summary</h1>
-        <p class="text-gray-500 dark:text-gray-400">Overtime tracking, salary allowances, and estimated payroll.</p>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $t('admin.payrollView.title') }}</h1>
+        <p class="text-gray-500 dark:text-gray-400">{{ $t('admin.payrollView.subtitle') }}</p>
       </div>
       <button
         @click="exportToExcel"
@@ -119,7 +119,7 @@ function formatNumber(num, decimals = 1) {
       >
         <span v-if="exporting" class="material-symbols-outlined animate-spin text-sm">progress_activity</span>
         <span v-else class="material-symbols-outlined text-sm">download</span>
-        {{ exporting ? 'Exporting...' : 'Export Excel' }}
+        {{ exporting ? $t('admin.payrollView.exporting') : $t('admin.payrollView.exportExcel') }}
       </button>
     </div>
 
@@ -128,7 +128,7 @@ function formatNumber(num, decimals = 1) {
       <div class="flex flex-col gap-4">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">Start Date</span>
+            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">{{ $t('admin.payrollView.startDate') }}</span>
             <input
               v-model="filters.start_date"
               type="date"
@@ -136,7 +136,7 @@ function formatNumber(num, decimals = 1) {
             />
           </label>
           <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">End Date</span>
+            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">{{ $t('admin.payrollView.endDate') }}</span>
             <input
               v-model="filters.end_date"
               type="date"
@@ -144,20 +144,20 @@ function formatNumber(num, decimals = 1) {
             />
           </label>
           <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">Department</span>
+            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">{{ $t('admin.payrollView.department') }}</span>
             <select
               v-model="filters.department"
               class="w-full px-3 py-2.5 bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium"
             >
-              <option value="">All Departments</option>
+              <option value="">{{ $t('admin.payrollView.allDepartments') }}</option>
               <option v-for="dept in departments" :key="dept" :value="dept">{{ dept }}</option>
             </select>
           </label>
         </div>
         <div class="flex items-center gap-3 justify-end">
-          <button @click="resetFilters" class="text-sm font-medium text-gray-500 hover:text-primary transition-colors px-3">Reset</button>
+          <button @click="resetFilters" class="text-sm font-medium text-gray-500 hover:text-primary transition-colors px-3">{{ $t('admin.payrollView.reset') }}</button>
           <button @click="applyFilters" class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity">
-            Apply Filters
+            {{ $t('admin.payrollView.applyFilters') }}
           </button>
         </div>
       </div>
@@ -167,53 +167,53 @@ function formatNumber(num, decimals = 1) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Employees</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.payrollView.employees') }}</span>
           <span class="p-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-md">
             <span class="material-symbols-outlined text-lg">group</span>
           </span>
         </div>
         <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ kpis.total_employees }}</span>
-        <span class="text-xs text-gray-400">With payroll data</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.payrollView.withPayrollData') }}</span>
       </div>
 
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total OT Hours</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.payrollView.totalOtHours') }}</span>
           <span class="p-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-md">
             <span class="material-symbols-outlined text-lg">schedule</span>
           </span>
         </div>
         <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ formatNumber(kpis.total_overtime_hours) }}</span>
-        <span class="text-xs text-gray-400">Avg {{ formatNumber(kpis.avg_overtime_per_employee) }}h / employee</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.payrollView.avgOt', { avg: formatNumber(kpis.avg_overtime_per_employee) }) }}</span>
       </div>
 
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Overtime Pay</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.payrollView.overtimePay') }}</span>
           <span class="p-1.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-md">
             <span class="material-symbols-outlined text-lg">payments</span>
           </span>
         </div>
         <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(kpis.total_overtime_pay) }}</span>
-        <span class="text-xs text-gray-400">Estimated</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.payrollView.estimated') }}</span>
       </div>
 
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Est. Total Payroll</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.payrollView.estTotalPayroll') }}</span>
           <span class="p-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-md">
             <span class="material-symbols-outlined text-lg">account_balance</span>
           </span>
         </div>
         <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(kpis.total_estimated_payroll) }}</span>
-        <span class="text-xs text-gray-400">Deductions: {{ formatCurrency(kpis.total_variable_deductions) }}</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.payrollView.deductionsAmount', { amount: formatCurrency(kpis.total_variable_deductions) }) }}</span>
       </div>
     </div>
 
     <!-- Data Table -->
     <div class="bg-white dark:bg-dark-surface rounded-xl border border-gray-100 dark:border-dark-border shadow-sm overflow-hidden">
       <div class="p-5 border-b border-gray-100 dark:border-dark-border">
-        <h3 class="font-bold text-gray-900 dark:text-white">Per-Employee Payroll Breakdown</h3>
+        <h3 class="font-bold text-gray-900 dark:text-white">{{ $t('admin.payrollView.breakdown') }}</h3>
       </div>
 
       <div v-if="loading" class="flex justify-center py-12">
@@ -224,23 +224,23 @@ function formatNumber(num, decimals = 1) {
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-gray-50 dark:bg-dark-bg text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold">
-              <th class="px-4 py-3 sticky left-0 bg-gray-50 dark:bg-dark-bg z-10">Employee</th>
-              <th class="px-4 py-3 text-center">Days</th>
-              <th class="px-4 py-3 text-right">Regular Hrs</th>
-              <th class="px-4 py-3 text-right">OT Hrs</th>
-              <th class="px-4 py-3 text-right">Base Salary</th>
-              <th class="px-4 py-3 text-right">Fixed Allow.</th>
-              <th class="px-4 py-3 text-right" title="Dibayar hanya untuk hari hadir">Var. Allow. <span class="text-gray-400 font-normal">(Hadir)</span></th>
-              <th class="px-4 py-3 text-right" title="Tunjangan tambahan custom per bulan">Custom Allow.</th>
-              <th class="px-4 py-3 text-right">Total Salary</th>
-              <th class="px-4 py-3 text-right">OT Pay</th>
-              <th class="px-4 py-3 text-right">Deductions</th>
-              <th class="px-4 py-3 text-right">Est. Total</th>
+              <th class="px-4 py-3 sticky left-0 bg-gray-50 dark:bg-dark-bg z-10">{{ $t('admin.dashboardView.employee') }}</th>
+              <th class="px-4 py-3 text-center">{{ $t('admin.payrollView.days') }}</th>
+              <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.regularHrs') }}</th>
+              <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.otHrs') }}</th>
+              <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.baseSalary') }}</th>
+              <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.fixedAllow') }}</th>
+              <th class="px-4 py-3 text-right" title="Dibayar hanya untuk hari hadir">{{ $t('admin.payrollView.varAllow') }}</th>
+              <th class="px-4 py-3 text-right" title="Tunjangan tambahan custom per bulan">{{ $t('admin.payrollView.customAllow') }}</th>
+              <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.totalSalary') }}</th>
+              <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.otPay') }}</th>
+              <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.deductions') }}</th>
+              <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.estTotal') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-dark-border text-sm">
             <tr v-if="payrollData.length === 0">
-              <td colspan="12" class="px-4 py-12 text-center text-gray-500">No payroll data found for the selected period.</td>
+              <td colspan="12" class="px-4 py-12 text-center text-gray-500">{{ $t('admin.payrollView.noData') }}</td>
             </tr>
             <tr v-for="row in payrollData" :key="row.user_id" class="group hover:bg-gray-50 dark:hover:bg-dark-bg transition-colors">
               <td class="px-4 py-3 sticky left-0 bg-white dark:bg-dark-surface group-hover:bg-gray-50 dark:group-hover:bg-dark-bg z-10">
@@ -257,8 +257,8 @@ function formatNumber(num, decimals = 1) {
               <td class="px-4 py-3 text-center">
                 <div class="flex flex-col items-center">
                   <span class="font-medium text-gray-900 dark:text-white">{{ row.work_days_present }}</span>
-                  <span v-if="row.absent_days > 0" class="text-xs text-red-500">{{ row.absent_days }} absent</span>
-                  <span v-if="row.leave_days > 0" class="text-xs text-blue-500">{{ row.leave_days }} leave</span>
+                  <span v-if="row.absent_days > 0" class="text-xs text-red-500">{{ $t('admin.payrollView.absent', { count: row.absent_days }) }}</span>
+                  <span v-if="row.leave_days > 0" class="text-xs text-blue-500">{{ $t('admin.payrollView.leave', { count: row.leave_days }) }}</span>
                 </div>
               </td>
               <td class="px-4 py-3 text-right font-medium text-gray-900 dark:text-white">{{ formatNumber(row.regular_hours) }}</td>
@@ -267,8 +267,8 @@ function formatNumber(num, decimals = 1) {
                   <span class="font-bold" :class="row.overtime_hours > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-500'">
                     {{ formatNumber(row.overtime_hours) }}
                   </span>
-                  <span v-if="row.holiday_ot_hours > 0" class="text-xs text-red-500">{{ formatNumber(row.holiday_ot_hours) }} hol</span>
-                  <span v-if="row.weekend_ot_hours > 0" class="text-xs text-orange-500">{{ formatNumber(row.weekend_ot_hours) }} wknd</span>
+                  <span v-if="row.holiday_ot_hours > 0" class="text-xs text-red-500">{{ $t('admin.payrollView.hol', { count: formatNumber(row.holiday_ot_hours) }) }}</span>
+                  <span v-if="row.weekend_ot_hours > 0" class="text-xs text-orange-500">{{ $t('admin.payrollView.wknd', { count: formatNumber(row.weekend_ot_hours) }) }}</span>
                 </div>
               </td>
               <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{{ formatCurrency(row.base_salary) }}</td>
@@ -277,7 +277,7 @@ function formatNumber(num, decimals = 1) {
                 <div class="flex flex-col items-end">
                   <span>{{ formatCurrency(row.variable_allowances) }}</span>
                   <span v-if="row.variable_allowances_full > row.variable_allowances" class="text-xs text-gray-400">
-                    dari {{ formatCurrency(row.variable_allowances_full) }}
+                    {{ $t('admin.payrollView.dari', { amount: formatCurrency(row.variable_allowances_full) }) }}
                   </span>
                 </div>
               </td>
@@ -296,7 +296,7 @@ function formatNumber(num, decimals = 1) {
               <td class="px-4 py-3 text-right font-medium text-red-600 dark:text-red-400">
                 <div class="flex flex-col items-end">
                   <span>{{ row.variable_deduction > 0 ? '-' + formatCurrency(row.variable_deduction) : '-' }}</span>
-                  <span v-if="row.variable_deduction > 0" class="text-xs text-gray-400">{{ row.absent_days + row.leave_days }} hari tidak hadir</span>
+                  <span v-if="row.variable_deduction > 0" class="text-xs text-gray-400">{{ $t('admin.payrollView.hariTidakHadir', { days: row.absent_days + row.leave_days }) }}</span>
                 </div>
               </td>
               <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">{{ formatCurrency(row.estimated_total) }}</td>
@@ -305,7 +305,7 @@ function formatNumber(num, decimals = 1) {
           <!-- Totals Row -->
           <tfoot v-if="payrollData.length > 0">
             <tr class="bg-gray-50 dark:bg-dark-bg font-bold text-sm">
-              <td class="px-4 py-3 sticky left-0 bg-gray-50 dark:bg-dark-bg z-10 text-gray-900 dark:text-white">TOTAL</td>
+              <td class="px-4 py-3 sticky left-0 bg-gray-50 dark:bg-dark-bg z-10 text-gray-900 dark:text-white">{{ $t('admin.payrollView.total') }}</td>
               <td class="px-4 py-3"></td>
               <td class="px-4 py-3"></td>
               <td class="px-4 py-3 text-right text-amber-600 dark:text-amber-400">{{ formatNumber(kpis.total_overtime_hours) }}</td>

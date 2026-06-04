@@ -30,13 +30,13 @@ const hasAnyAdminPermission = computed(() => {
 
 // Navigation items with required permissions
 const allNavItems = [
-  { name: 'Dashboard', icon: 'dashboard', to: '/', permission: 'dashboard.view' },
-  { name: 'Attendance', icon: 'qr_code_scanner', to: '/attendance', permission: 'attendance.create' },
-  { name: 'History', icon: 'history', to: '/history', permission: 'history.view' },
-  { name: 'My Requests', icon: 'pending_actions', to: '/requests', permission: 'requests.view' },
-  { name: 'My Leaves', icon: 'beach_access', to: '/leaves', permission: 'leaves.view' },
-  { name: 'My Schedules', icon: 'calendar_month', to: '/schedules', permission: 'schedules.view' },
-  { name: 'Settings', icon: 'settings', to: '/settings', permission: null }, // Always visible if authenticated
+  { name: 'app.dashboard', icon: 'dashboard', to: '/', permission: 'dashboard.view' },
+  { name: 'app.attendance', icon: 'qr_code_scanner', to: '/attendance', permission: 'attendance.create' },
+  { name: 'app.history', icon: 'history', to: '/history', permission: 'history.view' },
+  { name: 'app.myRequests', icon: 'pending_actions', to: '/requests', permission: 'requests.view' },
+  { name: 'app.myLeaves', icon: 'beach_access', to: '/leaves', permission: 'leaves.view' },
+  { name: 'app.mySchedules', icon: 'calendar_month', to: '/schedules', permission: 'schedules.view' },
+  { name: 'app.settings', icon: 'settings', to: '/settings', permission: null }, // Always visible if authenticated
 ]
 
 // Filter nav items based on user permissions
@@ -79,8 +79,8 @@ async function handleLogout() {
             <span class="material-symbols-outlined text-primary">fingerprint</span>
           </div>
           <div>
-            <h1 class="font-bold text-gray-900 dark:text-white">Attendance</h1>
-            <p class="text-xs text-gray-500">Employee Portal</p>
+            <h1 class="font-bold text-gray-900 dark:text-white">{{ $t('app.attendanceTitle') }}</h1>
+            <p class="text-xs text-gray-500">{{ $t('app.employeePortal') }}</p>
           </div>
         </div>
       </div>
@@ -92,11 +92,11 @@ async function handleLogout() {
           :key="item.to"
           :to="item.to"
           class="sidebar-link"
-          active-class="active"
+          :class="{ 'active': item.to === '/' ? $route.path === '/' : $route.path.startsWith(item.to) }"
           @click="sidebarOpen = false"
         >
           <span class="material-symbols-outlined">{{ item.icon }}</span>
-          {{ item.name }}
+          {{ $t(item.name) }}
         </RouterLink>
 
         <!-- Admin Link -->
@@ -104,11 +104,11 @@ async function handleLogout() {
           v-if="authStore.isAdmin || hasAnyAdminPermission"
           to="/admin"
           class="sidebar-link"
-          active-class="active"
+          :class="{ 'active': $route.path.startsWith('/admin') }"
           @click="sidebarOpen = false"
         >
           <span class="material-symbols-outlined">admin_panel_settings</span>
-          Admin Panel
+          {{ $t('app.adminPanel') }}
         </RouterLink>
       </nav>
 
@@ -128,7 +128,7 @@ async function handleLogout() {
           class="sidebar-link w-full text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
         >
           <span class="material-symbols-outlined">logout</span>
-          Logout
+          {{ $t('app.logout') }}
         </button>
       </div>
     </aside>
@@ -147,7 +147,7 @@ async function handleLogout() {
           
           <div class="flex-1 lg:pl-0">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ $route.name }}
+              {{ $t('app.' + ($route.name ? $route.name.charAt(0).toLowerCase() + $route.name.slice(1) : 'dashboard')) }}
             </h2>
           </div>
 

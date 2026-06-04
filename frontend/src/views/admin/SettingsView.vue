@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { adminApi } from '@/services/api'
+import { useI18n } from 'vue-i18n'
 
 const loading = ref(false)
 const saving = ref(false)
@@ -21,6 +22,13 @@ const settings = ref({
   sunday_multiplier: '2.0',
   monthly_working_hours: '173',
 })
+
+const { locale, t: $t } = useI18n({ useScope: 'global' })
+
+function updateLanguage(lang) {
+  locale.value = lang
+  localStorage.setItem('app-language', lang)
+}
 
 const message = ref({ type: '', text: '' })
 
@@ -68,7 +76,7 @@ function showMessage(type, text) {
 <template>
   <div class="space-y-6">
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">System Settings</h1>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $t('admin.settingsPageView.title') }}</h1>
       <button
         @click="saveSettings"
         :disabled="saving"
@@ -76,7 +84,7 @@ function showMessage(type, text) {
       >
         <span v-if="saving" class="material-symbols-outlined animate-spin text-sm">progress_activity</span>
         <span v-else class="material-symbols-outlined text-sm">save</span>
-        {{ saving ? 'Saving...' : 'Save Changes' }}
+        {{ saving ? $t('admin.settingsPageView.saving') : $t('admin.settingsPageView.saveChanges') }}
       </button>
     </div>
 
@@ -96,21 +104,29 @@ function showMessage(type, text) {
       <div class="bg-white dark:bg-dark-surface p-6 rounded-xl shadow-sm border border-gray-100 dark:border-dark-border space-y-6">
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
           <span class="material-symbols-outlined text-gray-500">domain</span>
-          General Information
+          {{ $t('admin.settingsPageView.generalInfo') }}
         </h2>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Name</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.companyName') }}</label>
           <input v-model="settings.company_name" type="text" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contact Email</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.language') }}</label>
+          <select :value="locale" @change="e => updateLanguage(e.target.value)" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm">
+            <option value="id">Bahasa Indonesia</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.contactEmail') }}</label>
           <input v-model="settings.contact_email" type="email" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Timezone</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.timezone') }}</label>
           <select v-model="settings.timezone" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm">
             <option value="UTC">UTC</option>
             <option value="Asia/Jakarta">Asia/Jakarta</option>
@@ -124,25 +140,25 @@ function showMessage(type, text) {
       <div class="bg-white dark:bg-dark-surface p-6 rounded-xl shadow-sm border border-gray-100 dark:border-dark-border space-y-6">
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
            <span class="material-symbols-outlined text-gray-500">rule</span>
-           Attendance Rules
+           {{ $t('admin.settingsPageView.attendanceRules') }}
         </h2>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Allowed Radius (meters)</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.allowedRadius') }}</label>
           <input v-model="settings.attendance_radius" type="number" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" />
-          <p class="text-xs text-gray-500 mt-1">Maximum distance allowed from office location.</p>
+          <p class="text-xs text-gray-500 mt-1">{{ $t('admin.settingsPageView.radiusDesc') }}</p>
         </div>
 
         <div>
            <label class="flex items-center gap-2">
              <input type="checkbox" v-model="settings.require_photo" class="rounded border-gray-300 text-primary focus:ring-primary" true-value="true" false-value="false" />
-             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Require Photo Evidence</span>
+             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('admin.settingsPageView.requirePhoto') }}</span>
            </label>
-           <p class="text-xs text-gray-500 mt-1 ml-6">If enabled, employees must take a photo when checking in.</p>
+           <p class="text-xs text-gray-500 mt-1 ml-6">{{ $t('admin.settingsPageView.photoDesc') }}</p>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Work Days</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ $t('admin.settingsPageView.workDays') }}</label>
           <div class="flex flex-wrap gap-3">
             <label 
               v-for="day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" 
@@ -181,33 +197,33 @@ function showMessage(type, text) {
       <div class="bg-white dark:bg-dark-surface p-6 rounded-xl shadow-sm border border-gray-100 dark:border-dark-border space-y-6">
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
            <span class="material-symbols-outlined text-gray-500">devices</span>
-           Device Security
+           {{ $t('admin.settingsPageView.deviceSecurity') }}
         </h2>
 
         <div>
            <label class="flex items-center gap-2">
              <input type="checkbox" v-model="settings.device_registration_enabled" class="rounded border-gray-300 text-primary focus:ring-primary" true-value="true" false-value="false" />
-             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Enable Device Registration</span>
+             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('admin.settingsPageView.enableDeviceReg') }}</span>
            </label>
-           <p class="text-xs text-gray-500 mt-1 ml-6">If enabled, employees must use registered devices for attendance.</p>
+           <p class="text-xs text-gray-500 mt-1 ml-6">{{ $t('admin.settingsPageView.deviceRegDesc') }}</p>
         </div>
 
         <div v-if="settings.device_registration_enabled === 'true'" class="space-y-4 pl-6 border-l-2 border-primary/30">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registration Mode</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.regMode') }}</label>
             <select v-model="settings.device_registration_mode" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm">
-              <option value="require_approval">Require Admin Approval</option>
-              <option value="auto_approve">Auto-Approve (with limit)</option>
+              <option value="require_approval">{{ $t('admin.settingsPageView.requireAdminApprov') }}</option>
+              <option value="auto_approve">{{ $t('admin.settingsPageView.autoApprove') }}</option>
             </select>
             <p class="text-xs text-gray-500 mt-1">
               {{ settings.device_registration_mode === 'require_approval' 
-                ? 'New devices require admin approval before use.' 
-                : 'Devices are automatically approved up to the limit.' }}
+                ? $t('admin.settingsPageView.newDeviceReqDesc') 
+                : $t('admin.settingsPageView.newDeviceAutoDesc') }}
             </p>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Devices Per User</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.maxDevices') }}</label>
             <input 
               v-model="settings.max_devices_per_user" 
               type="number" 
@@ -215,7 +231,7 @@ function showMessage(type, text) {
               max="10"
               class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" 
             />
-            <p class="text-xs text-gray-500 mt-1">Maximum number of devices each employee can register (1-10).</p>
+            <p class="text-xs text-gray-500 mt-1">{{ $t('admin.settingsPageView.maxDevicesDesc') }}</p>
           </div>
         </div>
       </div>
@@ -224,21 +240,21 @@ function showMessage(type, text) {
       <div class="bg-white dark:bg-dark-surface p-6 rounded-xl shadow-sm border border-gray-100 dark:border-dark-border space-y-6">
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
            <span class="material-symbols-outlined text-gray-500">schedule</span>
-           Overtime Settings
+           {{ $t('admin.settingsPageView.overtimeSettings') }}
         </h2>
 
         <div>
            <label class="flex items-center gap-2">
              <input type="checkbox" v-model="settings.weekend_overtime_enabled" class="rounded border-gray-300 text-primary focus:ring-primary" true-value="true" false-value="false" />
-             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Enable Weekend Overtime</span>
+             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('admin.settingsPageView.enableWeekendOt') }}</span>
            </label>
-           <p class="text-xs text-gray-500 mt-1 ml-6">Treat Saturday and Sunday work as overtime with configurable multipliers.</p>
+           <p class="text-xs text-gray-500 mt-1 ml-6">{{ $t('admin.settingsPageView.weekendOtDesc') }}</p>
         </div>
 
         <div v-if="settings.weekend_overtime_enabled === 'true'" class="space-y-4 pl-6 border-l-2 border-primary/30">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Saturday Multiplier</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.satMultiplier') }}</label>
               <input 
                 v-model="settings.saturday_multiplier" 
                 type="number" 
@@ -246,10 +262,10 @@ function showMessage(type, text) {
                 min="1"
                 class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" 
               />
-              <p class="text-xs text-gray-500 mt-1">e.g., 1.5 = 150% pay rate</p>
+              <p class="text-xs text-gray-500 mt-1">{{ $t('admin.settingsPageView.multiplierDesc') }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sunday Multiplier</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.sunMultiplier') }}</label>
               <input 
                 v-model="settings.sunday_multiplier" 
                 type="number" 
@@ -257,20 +273,20 @@ function showMessage(type, text) {
                 min="1"
                 class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" 
               />
-              <p class="text-xs text-gray-500 mt-1">e.g., 2.0 = 200% pay rate</p>
+              <p class="text-xs text-gray-500 mt-1">{{ $t('admin.settingsPageView.multiplierDesc') }}</p>
             </div>
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monthly Working Hours</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.monthlyWorkingHours') }}</label>
           <input 
             v-model="settings.monthly_working_hours" 
             type="number" 
             min="1"
             class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm" 
           />
-          <p class="text-xs text-gray-500 mt-1">Divisor for hourly rate calculation (PP 35/2021 default: 173). Formula: (Base Salary + Fixed Allowances) / This Value = OT Hourly Rate</p>
+          <p class="text-xs text-gray-500 mt-1">{{ $t('admin.settingsPageView.workingHoursDesc') }}</p>
         </div>
       </div>
 
@@ -278,26 +294,26 @@ function showMessage(type, text) {
       <div class="bg-white dark:bg-dark-surface p-6 rounded-xl shadow-sm border border-gray-100 dark:border-dark-border space-y-6 lg:col-span-2">
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
            <span class="material-symbols-outlined text-gray-500">security</span>
-           IP Security
+           {{ $t('admin.settingsPageView.ipSecurity') }}
         </h2>
 
         <div>
            <label class="flex items-center gap-2">
              <input type="checkbox" v-model="settings.ip_whitelist_enabled" class="rounded border-gray-300 text-primary focus:ring-primary" true-value="true" false-value="false" />
-             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Enable IP Whitelist</span>
+             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('admin.settingsPageView.enableIpWhitelist') }}</span>
            </label>
-           <p class="text-xs text-gray-500 mt-1 ml-6">If enabled, only requests from allowed IPs can submit attendance.</p>
+           <p class="text-xs text-gray-500 mt-1 ml-6">{{ $t('admin.settingsPageView.ipWhitelistDesc') }}</p>
         </div>
 
         <div v-if="settings.ip_whitelist_enabled === 'true'">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Allowed IP Addresses</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.allowedIps') }}</label>
           <textarea 
             v-model="settings.ip_whitelist"
             rows="4"
             placeholder="Enter one IP per line, e.g.&#10;192.168.1.1&#10;10.0.0.0/24" 
             class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm text-sm font-mono"
           ></textarea>
-          <p class="text-xs text-gray-500 mt-1">Supports individual IPs and CIDR notation (e.g., 192.168.1.0/24).</p>
+          <p class="text-xs text-gray-500 mt-1">{{ $t('admin.settingsPageView.allowedIpsDesc') }}</p>
         </div>
       </div>
 

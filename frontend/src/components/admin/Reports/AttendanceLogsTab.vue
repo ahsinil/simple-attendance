@@ -185,7 +185,7 @@ async function toggleAllowancePaid(att) {
       <div class="flex flex-col gap-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">Start Date</span>
+            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">{{ $t('admin.payrollView.startDate') }}</span>
             <input
               v-model="filters.start_date"
               type="date"
@@ -193,7 +193,7 @@ async function toggleAllowancePaid(att) {
             />
           </label>
           <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">End Date</span>
+            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">{{ $t('admin.payrollView.endDate') }}</span>
             <input
               v-model="filters.end_date"
               type="date"
@@ -207,7 +207,7 @@ async function toggleAllowancePaid(att) {
             v-model="filters.location_id"
             class="w-full px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium"
           >
-            <option value="">All Locations</option>
+            <option value="">{{ $t('admin.reportsView.allLocations') }}</option>
             <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
           </select>
 
@@ -215,7 +215,7 @@ async function toggleAllowancePaid(att) {
             v-model="filters.status"
             class="w-full px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium"
           >
-            <option value="">All Statuses</option>
+            <option value="">{{ $t('admin.reportsView.allStatuses') }}</option>
             <option value="ON_TIME">On Time</option>
             <option value="LATE">Late</option>
             <option value="EARLY">Early</option>
@@ -225,9 +225,9 @@ async function toggleAllowancePaid(att) {
         </div>
 
         <div class="flex items-center gap-3 justify-end">
-          <button @click="resetFilters" class="text-sm font-medium text-gray-500 hover:text-primary transition-colors px-3">Reset</button>
+          <button @click="resetFilters" class="text-sm font-medium text-gray-500 hover:text-primary transition-colors px-3">{{ $t('admin.payrollView.reset') }}</button>
           <button @click="applyFilters" class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity">
-            Apply Filters
+            {{ $t('admin.payrollView.applyFilters') }}
           </button>
         </div>
       </div>
@@ -237,53 +237,53 @@ async function toggleAllowancePaid(att) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Present</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.reportsView.present') }}</span>
           <span class="p-1.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-md">
             <span class="material-symbols-outlined text-lg">check_circle</span>
           </span>
         </div>
         <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ summary.present_count }}</span>
-        <span class="text-xs text-gray-400">{{ summary.unique_employees }} unique employees</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.reportsView.uniqueEmployees', { count: summary.unique_employees }) }}</span>
       </div>
 
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Late Check-ins</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.reportsView.lateCheckins') }}</span>
           <span class="p-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-md">
             <span class="material-symbols-outlined text-lg">schedule</span>
           </span>
         </div>
         <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ summary.late_count }}</span>
-        <span class="text-xs text-gray-400">Avg delay: {{ summary.avg_late_minutes }} mins</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.reportsView.avgDelay', { mins: summary.avg_late_minutes }) }}</span>
       </div>
 
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Manual Overrides</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.reportsView.manualOverrides') }}</span>
           <span class="p-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-md">
             <span class="material-symbols-outlined text-lg">edit_note</span>
           </span>
         </div>
         <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ summary.manual_overrides }}</span>
-        <span class="text-xs text-gray-400">Admin approved</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.reportsView.adminApproved') }}</span>
       </div>
 
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Records</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.reportsView.totalRecords') }}</span>
           <span class="p-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-md">
             <span class="material-symbols-outlined text-lg">analytics</span>
           </span>
         </div>
         <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ summary.total_records }}</span>
-        <span class="text-xs text-gray-400">In selected period</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.reportsView.inSelectedPeriod') }}</span>
       </div>
     </div>
 
     <!-- Data Table -->
     <div class="bg-white dark:bg-dark-surface rounded-xl border border-gray-100 dark:border-dark-border shadow-sm overflow-hidden">
       <div class="p-5 border-b border-gray-100 dark:border-dark-border flex items-center justify-between">
-        <h3 class="font-bold text-gray-900 dark:text-white">Detailed Attendance Logs</h3>
+        <h3 class="font-bold text-gray-900 dark:text-white">{{ $t('admin.reportsView.detailedLogs') }}</h3>
       </div>
 
       <div v-if="loading" class="flex justify-center py-12">
@@ -294,18 +294,18 @@ async function toggleAllowancePaid(att) {
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-gray-50 dark:bg-dark-bg text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold">
-              <th class="px-6 py-4">Employee</th>
-              <th class="px-6 py-4">Date & Time</th>
-              <th class="px-6 py-4">Location</th>
-              <th class="px-6 py-4">Check Type</th>
-              <th class="px-6 py-4">Status</th>
-              <th class="px-6 py-4">Method</th>
-              <th class="px-6 py-4 text-center">Tunjangan</th>
+              <th class="px-6 py-4">{{ $t('admin.dashboardView.employee') }}</th>
+              <th class="px-6 py-4">{{ $t('admin.reportsView.dateTime') }}</th>
+              <th class="px-6 py-4">{{ $t('app.myRequestsView.location') }}</th>
+              <th class="px-6 py-4">{{ $t('admin.reportsView.checkType') }}</th>
+              <th class="px-6 py-4">{{ $t('app.schedulesView.status') }}</th>
+              <th class="px-6 py-4">{{ $t('admin.reportsView.method') }}</th>
+              <th class="px-6 py-4 text-center">{{ $t('admin.reportsView.allowance') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-dark-border text-sm">
             <tr v-if="attendances.length === 0">
-              <td colspan="6" class="px-6 py-12 text-center text-gray-500">No attendance records found for the selected criteria.</td>
+              <td colspan="6" class="px-6 py-12 text-center text-gray-500">{{ $t('admin.reportsView.noLogsData') }}</td>
             </tr>
             <tr v-for="att in attendances" :key="att.id" class="group hover:bg-gray-50 dark:hover:bg-dark-bg transition-colors">
               <td class="px-6 py-4">
@@ -358,7 +358,7 @@ async function toggleAllowancePaid(att) {
                   <span class="material-symbols-outlined text-[16px]">
                     {{ att.variable_allowance_paid ? 'payments' : 'money_off' }}
                   </span>
-                  <span>{{ att.variable_allowance_paid ? 'Dicairkan' : 'Klaim' }}</span>
+                  <span>{{ att.variable_allowance_paid ? $t('admin.reportsView.paid') : $t('admin.reportsView.claim') }}</span>
                 </button>
                 <span v-else class="text-xs text-gray-400">-</span>
               </td>
@@ -370,7 +370,7 @@ async function toggleAllowancePaid(att) {
       <!-- Pagination -->
       <div class="p-4 border-t border-gray-100 dark:border-dark-border flex items-center justify-between">
         <span class="text-sm text-gray-500 dark:text-gray-400">
-          Showing {{ attendances.length }} of {{ pagination.total }} records
+          {{ $t('admin.reportsView.showingRecords', { count: attendances.length, total: pagination.total }) }}
         </span>
         <div class="flex gap-2">
           <button
@@ -378,14 +378,14 @@ async function toggleAllowancePaid(att) {
             :disabled="pagination.current_page === 1"
             class="px-3 py-1 text-sm border border-gray-200 dark:border-dark-line rounded hover:bg-gray-50 dark:hover:bg-dark-bg disabled:opacity-50 text-gray-600 dark:text-gray-300"
           >
-            Previous
+            {{ $t('admin.reportsView.previous') }}
           </button>
           <button
             @click="changePage(pagination.current_page + 1)"
             :disabled="pagination.current_page === pagination.last_page"
             class="px-3 py-1 text-sm border border-gray-200 dark:border-dark-line rounded hover:bg-gray-50 dark:hover:bg-dark-bg disabled:opacity-50 text-gray-600 dark:text-gray-300"
           >
-            Next
+            {{ $t('admin.reportsView.next') }}
           </button>
         </div>
       </div>

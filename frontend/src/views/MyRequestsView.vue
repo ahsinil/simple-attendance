@@ -140,21 +140,21 @@ function formatDate(iso) {
     <!-- Success Alert -->
     <div v-if="submitSuccess" class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 px-4 py-3 rounded-lg flex items-center gap-2">
       <span class="material-symbols-outlined">check_circle</span>
-      Request submitted successfully!
+      {{ $t('app.myRequestsView.requestSubmitted') }}
     </div>
 
     <!-- Header -->
     <div class="flex items-center justify-between">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white">My Requests</h2>
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ $t('app.myRequestsView.myRequests') }}</h2>
       <button @click="showForm = !showForm" class="btn btn-primary">
         <span class="material-symbols-outlined text-sm">add</span>
-        New Request
+        {{ $t('app.myRequestsView.newRequest') }}
       </button>
     </div>
 
     <!-- Request Form -->
     <div v-if="showForm" class="card p-6">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Submit Manual Request</h3>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ $t('app.myRequestsView.submitManualRequest') }}</h3>
 
       <div v-if="submitError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 px-4 py-3 rounded-lg mb-4">
         {{ submitError }}
@@ -163,40 +163,40 @@ function formatDate(iso) {
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location *</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('app.myRequestsView.location') }}</label>
             <select v-model="form.location_id" class="input">
-              <option value="">Select location</option>
+              <option value="">{{ $t('app.myRequestsView.selectLocation') }}</option>
               <option v-for="loc in attendanceStore.locations" :key="loc.id" :value="loc.id">
                 {{ loc.name }}
               </option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type *</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('app.myRequestsView.type') }}</label>
             <select v-model="form.check_type" class="input">
-              <option value="IN">Check In</option>
-              <option value="OUT">Check Out</option>
+              <option value="IN">{{ $t('app.historyView.checkIn') }}</option>
+              <option value="OUT">{{ $t('app.historyView.checkOut') }}</option>
             </select>
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date & Time *</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('app.myRequestsView.dateTime') }}</label>
           <input v-model="form.request_time" type="datetime-local" class="input" />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason *</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('app.myRequestsView.reason') }}</label>
           <textarea 
             v-model="form.reason" 
             class="input min-h-[100px]" 
-            placeholder="Explain why you need this manual attendance (minimum 10 characters)..."
+            :placeholder="$t('app.myRequestsView.reasonPlaceholder')"
           />
         </div>
 
         <!-- Photo Upload -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Photo (Optional)</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('app.myRequestsView.photo') }}</label>
           <input 
             ref="fileInput"
             type="file" 
@@ -224,17 +224,17 @@ function formatDate(iso) {
             class="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 dark:border-dark-border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors"
           >
             <span class="material-symbols-outlined text-gray-400">add_a_photo</span>
-            <span class="text-gray-600 dark:text-gray-400">Add photo</span>
+            <span class="text-gray-600 dark:text-gray-400">{{ $t('app.myRequestsView.addPhoto') }}</span>
           </button>
-          <p class="text-xs text-gray-500 mt-1">Max 5MB. Supports JPG, PNG, etc.</p>
+          <p class="text-xs text-gray-500 mt-1">{{ $t('app.myRequestsView.photoMax') }}</p>
         </div>
 
         <div class="flex gap-3">
           <button type="submit" class="btn btn-primary" :disabled="submitting">
-            {{ submitting ? 'Submitting...' : 'Submit Request' }}
+            {{ submitting ? $t('app.myRequestsView.submitting') : $t('app.myRequestsView.submitRequest') }}
           </button>
           <button type="button" @click="showForm = false" class="btn btn-secondary">
-            Cancel
+            {{ $t('app.myRequestsView.cancel') }}
           </button>
         </div>
       </form>
@@ -243,7 +243,7 @@ function formatDate(iso) {
     <!-- Requests List -->
     <div class="card overflow-hidden">
       <div v-if="attendanceStore.loading" class="p-8 text-center text-gray-500">
-        Loading...
+        {{ $t('app.historyView.loading') }}
       </div>
 
       <div v-else-if="attendanceStore.myRequests?.data?.length" class="divide-y divide-gray-200 dark:divide-dark-border">
@@ -270,7 +270,7 @@ function formatDate(iso) {
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 mb-1">
                 <span class="font-medium text-gray-900 dark:text-white">
-                  {{ request.check_type === 'IN' ? 'Check In' : 'Check Out' }} Request
+                  {{ request.check_type === 'IN' ? $t('app.myRequestsView.checkInRequest') : $t('app.myRequestsView.checkOutRequest') }}
                 </span>
                 <span :class="statusBadgeClass(request.status)" class="text-xs px-2 py-0.5 rounded-full">
                   {{ request.status }}
@@ -279,7 +279,7 @@ function formatDate(iso) {
               <p class="text-sm text-gray-500">{{ formatDate(request.request_time) }} • {{ request.location?.name }}</p>
               <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ request.reason }}</p>
               <p v-if="request.admin_note" class="text-sm text-primary mt-1">
-                Note: {{ request.admin_note }}
+                {{ $t('app.myRequestsView.note', { note: request.admin_note }) }}
               </p>
             </div>
           </div>
@@ -287,7 +287,7 @@ function formatDate(iso) {
       </div>
 
       <div v-else class="p-8 text-center text-gray-500">
-        No requests yet
+        {{ $t('app.myRequestsView.noRequests') }}
       </div>
     </div>
 

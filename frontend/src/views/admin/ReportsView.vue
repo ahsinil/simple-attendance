@@ -35,8 +35,8 @@ function triggerExport() {
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Attendance Reports</h1>
-        <p class="text-gray-500 dark:text-gray-400">View and export detailed attendance data.</p>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $t('admin.reportsView.title') }}</h1>
+        <p class="text-gray-500 dark:text-gray-400">{{ $t('admin.reportsView.subtitle') }}</p>
       </div>
       <!-- Export button (context-aware) -->
       <button
@@ -47,7 +47,7 @@ function triggerExport() {
       >
         <span v-if="isExportingLogs" class="material-symbols-outlined animate-spin text-sm">progress_activity</span>
         <span v-else class="material-symbols-outlined text-sm">download</span>
-        {{ isExportingLogs ? 'Exporting...' : 'Export Report' }}
+        {{ isExportingLogs ? $t('admin.reportsView.exporting') : $t('admin.reportsView.exportReport') }}
       </button>
       <button
         v-else
@@ -57,7 +57,7 @@ function triggerExport() {
       >
         <span v-if="isExportingEmp" class="material-symbols-outlined animate-spin text-sm">progress_activity</span>
         <span v-else class="material-symbols-outlined text-sm">download</span>
-        {{ isExportingEmp ? 'Exporting...' : 'Export Employee Report' }}
+        {{ isExportingEmp ? $t('admin.reportsView.exporting') : $t('admin.reportsView.exportEmployeeReport') }}
       </button>
     </div>
 
@@ -71,7 +71,7 @@ function triggerExport() {
         class="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
       >
         <span class="material-symbols-outlined text-[18px] align-middle mr-1">list_alt</span>
-        Attendance Logs
+        {{ $t('admin.reportsView.attendanceLogs') }}
       </button>
       <button
         @click="switchTab('employee')"
@@ -81,7 +81,7 @@ function triggerExport() {
         class="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
       >
         <span class="material-symbols-outlined text-[18px] align-middle mr-1">person_search</span>
-        By Employee
+        {{ $t('admin.reportsView.byEmployee') }}
       </button>
     </div>
 

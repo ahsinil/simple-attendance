@@ -2,8 +2,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { authApi } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 
 const authStore = useAuthStore()
+const { locale, t: $t } = useI18n({ useScope: 'global' })
 const loading = ref(false)
 const devices = ref([])
 const message = ref({ type: '', text: '' })
@@ -56,6 +58,11 @@ function showMessage(type, text) {
   setTimeout(() => {
     message.value = { type: '', text: '' }
   }, 3000)
+}
+
+function updateLanguage(lang) {
+  locale.value = lang
+  localStorage.setItem('app-language', lang)
 }
 
 async function updateProfile() {
@@ -121,8 +128,8 @@ async function removeDevice(device) {
   <div class="max-w-4xl mx-auto space-y-10 pb-20">
     <!-- Page Header -->
     <div>
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Account Settings</h1>
-      <p class="text-gray-500 mt-2">Manage your profile, security preferences, and active devices.</p>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $t('app.settingsView.accountSettings') }}</h1>
+      <p class="text-gray-500 mt-2">{{ $t('app.settingsView.manageProfile') }}</p>
     </div>
 
     <!-- Feedback Message -->
@@ -168,7 +175,7 @@ async function removeDevice(device) {
         <div class="text-center sm:text-left">
           <h2 class="text-2xl font-bold">{{ authStore.user?.name }}</h2>
           <div class="flex items-center justify-center sm:justify-start gap-2 text-gray-400 mt-1 text-sm">
-            <span>{{ authStore.user?.position || 'Employee' }}</span>
+            <span>{{ authStore.user?.position || $t('app.dashboardView.employee') }}</span>
             <span>•</span>
             <span>ID: {{ authStore.user?.employee_id || 'EMP-0000' }}</span>
           </div>
@@ -176,7 +183,7 @@ async function removeDevice(device) {
           <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-4">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-500/20 text-emerald-400 text-xs font-medium">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              On Shift
+              {{ $t('app.settingsView.onShift') }}
             </span>
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-gray-700/50 text-gray-300 text-xs font-medium">
               <span class="material-symbols-outlined text-[14px]">location_on</span>
@@ -190,31 +197,31 @@ async function removeDevice(device) {
     <!-- Personal Information -->
     <div class="space-y-6">
       <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Personal Information</h3>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('app.settingsView.personalInfo') }}</h3>
 
       </div>
       
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">First Name</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ $t('app.settingsView.firstName') }}</label>
           <input 
             v-model="profileForm.firstName"
             type="text" 
             class="block w-full rounded-lg border-gray-300 dark:border-dark-line bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-white focus:border-primary focus:ring-primary sm:text-sm px-4 py-3"
-            placeholder="First Name"
+            :placeholder="$t('app.settingsView.firstName')"
           />
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Last Name</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ $t('app.settingsView.lastName') }}</label>
           <input 
             v-model="profileForm.lastName"
             type="text" 
             class="block w-full rounded-lg border-gray-300 dark:border-dark-line bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-white focus:border-primary focus:ring-primary sm:text-sm px-4 py-3"
-            placeholder="Last Name"
+            :placeholder="$t('app.settingsView.lastName')"
           />
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Email Address</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ $t('app.settingsView.email') }}</label>
           <input 
             :value="authStore.user?.email"
             readonly
@@ -222,13 +229,14 @@ async function removeDevice(device) {
             class="block w-full rounded-lg border-gray-300 dark:border-dark-line bg-gray-100 dark:bg-dark-surface text-gray-500 cursor-not-allowed sm:text-sm px-4 py-3"
           />
         </div>
+
         <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Phone Number</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ $t('app.settingsView.phone') }}</label>
           <input 
             v-model="profileForm.phone"
             type="tel" 
             class="block w-full rounded-lg border-gray-300 dark:border-dark-line bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-white focus:border-primary focus:ring-primary sm:text-sm px-4 py-3"
-            placeholder="+1 (555) 000-0000"
+            :placeholder="$t('app.settingsView.phonePlaceholder')"
           />
         </div>
       </div>
@@ -239,20 +247,41 @@ async function removeDevice(device) {
           :disabled="loading"
           class="px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap"
         >
-          {{ loading ? 'Saving...' : 'Save Changes' }}
+          {{ loading ? $t('app.settingsView.saving') : $t('app.settingsView.saveChanges') }}
         </button>
+      </div>
+    </div>
+
+    <!-- Preferences -->
+    <div class="space-y-6">
+      <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('app.settingsView.preferences') }}</h3>
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ $t('app.settingsView.language') }}</label>
+          <select 
+            :value="locale" 
+            @change="e => updateLanguage(e.target.value)" 
+            class="block w-full rounded-lg border-gray-300 dark:border-dark-line bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-white focus:border-primary focus:ring-primary sm:text-sm px-4 py-3"
+          >
+            <option value="id">Bahasa Indonesia</option>
+            <option value="en">English</option>
+          </select>
+        </div>
       </div>
     </div>
 
     <!-- Security -->
     <div class="space-y-6">
       <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Security</h3>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('app.settingsView.security') }}</h3>
       </div>
       
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Current Password</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ $t('app.settingsView.currentPassword') }}</label>
           <input 
             v-model="passwordForm.current_password"
             type="password" 
@@ -261,7 +290,7 @@ async function removeDevice(device) {
           />
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">New Password</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ $t('app.settingsView.newPassword') }}</label>
           <input 
             v-model="passwordForm.password"
             type="password" 
@@ -270,7 +299,7 @@ async function removeDevice(device) {
           />
         </div>
         <div class="space-y-2 sm:col-span-2">
-           <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Confirm New Password</label>
+           <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ $t('app.settingsView.confirmPassword') }}</label>
            <div class="flex gap-4 items-start">
              <input 
                 v-model="passwordForm.password_confirmation"
@@ -283,7 +312,7 @@ async function removeDevice(device) {
                 :disabled="loading"
                 class="px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap"
               >
-                Update Password
+                {{ $t('app.settingsView.updatePassword') }}
               </button>
            </div>
         </div>
@@ -311,8 +340,8 @@ async function removeDevice(device) {
     <!-- Registered Devices -->
     <div class="space-y-6">
       <div class="border-b border-gray-200 dark:border-gray-800 pb-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Registered Devices</h3>
-        <p class="text-sm text-gray-500 mt-1">Manage devices authorized for attendance submission via GPS and Barcode.</p>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('app.settingsView.registeredDevices') }}</h3>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('app.settingsView.manageDevices') }}</p>
       </div>
 
       <div class="space-y-4">
@@ -328,11 +357,11 @@ async function removeDevice(device) {
               </span>
             </div>
             <div>
-              <h4 class="font-medium text-gray-900 dark:text-white">{{ device.device_name || 'Unknown Device' }}</h4>
+              <h4 class="font-medium text-gray-900 dark:text-white">{{ device.device_name || $t('app.settingsView.unknownDevice') }}</h4>
               <div class="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
-                <span>{{ device.platform || 'Unknown' }} • {{ device.browser || 'Unknown' }}</span>
+                <span>{{ device.platform || $t('app.settingsView.unknown') }} • {{ device.browser || $t('app.settingsView.unknown') }}</span>
                 <span>•</span>
-                <span>{{ device.is_current ? 'This device' : `Last used ${device.last_used_at}` }}</span>
+                <span>{{ device.is_current ? $t('app.settingsView.thisDevice') : $t('app.settingsView.lastUsed', { date: device.last_used_at }) }}</span>
               </div>
             </div>
           </div>
@@ -342,19 +371,19 @@ async function removeDevice(device) {
               v-if="device.is_current"
               class="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-medium rounded-full border border-emerald-500/20"
             >
-              Current Device
+              {{ $t('app.settingsView.currentDevice') }}
             </span>
             <span 
               v-if="!device.is_approved"
               class="px-3 py-1 bg-yellow-500/10 text-yellow-600 text-xs font-medium rounded-full border border-yellow-500/20"
             >
-              Pending Approval
+              {{ $t('app.settingsView.pendingApproval') }}
             </span>
             <span 
               v-else-if="device.is_approved && !device.is_current"
               class="px-3 py-1 bg-green-500/10 text-green-600 text-xs font-medium rounded-full border border-green-500/20"
             >
-              Approved
+              {{ $t('app.settingsView.approved') }}
             </span>
             <button 
               v-if="!device.is_current" 
@@ -367,7 +396,7 @@ async function removeDevice(device) {
         </div>
 
         <div v-if="devices.length === 0" class="text-center py-8 text-gray-500">
-          No devices registered yet. Devices are auto-registered when you log in or submit attendance.
+          {{ $t('app.settingsView.noDevices') }}
         </div>
       </div>
     </div>

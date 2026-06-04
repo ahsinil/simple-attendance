@@ -117,7 +117,7 @@ function downloadBlob(data, filename) {
       <div class="flex flex-col gap-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">Start Date</span>
+            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">{{ $t('admin.payrollView.startDate') }}</span>
             <input
               v-model="filters.start_date"
               type="date"
@@ -125,7 +125,7 @@ function downloadBlob(data, filename) {
             />
           </label>
           <label class="flex flex-col gap-1.5">
-            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">End Date</span>
+            <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">{{ $t('admin.payrollView.endDate') }}</span>
             <input
               v-model="filters.end_date"
               type="date"
@@ -139,7 +139,7 @@ function downloadBlob(data, filename) {
             v-model="filters.location_id"
             class="w-full px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium"
           >
-            <option value="">All Locations</option>
+            <option value="">{{ $t('admin.reportsView.allLocations') }}</option>
             <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
           </select>
 
@@ -147,7 +147,7 @@ function downloadBlob(data, filename) {
             v-model="filters.department"
             class="w-full px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium"
           >
-            <option value="">All Departments</option>
+            <option value="">{{ $t('admin.payrollView.allDepartments') }}</option>
             <option v-for="dept in departments" :key="dept" :value="dept">{{ dept }}</option>
           </select>
 
@@ -155,7 +155,7 @@ function downloadBlob(data, filename) {
             v-model="filters.user_id"
             class="w-full px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium"
           >
-            <option value="">All Employees</option>
+            <option value="">{{ $t('admin.reportsView.allEmployees') }}</option>
             <option v-for="emp in employeeList" :key="emp.id" :value="emp.id">
               {{ emp.name }} ({{ emp.employee_id || emp.id }})
             </option>
@@ -163,9 +163,9 @@ function downloadBlob(data, filename) {
         </div>
 
         <div class="flex items-center gap-3 justify-end">
-          <button @click="resetFilters" class="text-sm font-medium text-gray-500 hover:text-primary transition-colors px-3">Reset</button>
+          <button @click="resetFilters" class="text-sm font-medium text-gray-500 hover:text-primary transition-colors px-3">{{ $t('admin.payrollView.reset') }}</button>
           <button @click="applyFilters" class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity">
-            Apply Filters
+            {{ $t('admin.payrollView.applyFilters') }}
           </button>
         </div>
       </div>
@@ -175,53 +175,53 @@ function downloadBlob(data, filename) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Employees</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.payrollView.employees') }}</span>
           <span class="p-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-md">
             <span class="material-symbols-outlined text-lg">groups</span>
           </span>
         </div>
         <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ kpis.total_employees }}</span>
-        <span class="text-xs text-gray-400">With attendance data</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.reportsView.withAttendanceData') }}</span>
       </div>
 
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Avg Attendance</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.reportsView.avgAttendance') }}</span>
           <span class="p-1.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-md">
             <span class="material-symbols-outlined text-lg">trending_up</span>
           </span>
         </div>
         <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ kpis.avg_attendance_rate }}%</span>
-        <span class="text-xs text-gray-400">Average attendance rate</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.reportsView.avgAttendanceRate') }}</span>
       </div>
 
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Late</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.reportsView.totalLate') }}</span>
           <span class="p-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-md">
             <span class="material-symbols-outlined text-lg">schedule</span>
           </span>
         </div>
         <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ kpis.total_late }}</span>
-        <span class="text-xs text-gray-400">Total late check-ins</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.reportsView.totalLateCheckins') }}</span>
       </div>
 
       <div class="bg-white dark:bg-dark-surface p-5 rounded-xl border border-gray-100 dark:border-dark-border shadow-sm flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">Overtime Hours</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ $t('admin.reportsView.overtimeHours') }}</span>
           <span class="p-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-md">
             <span class="material-symbols-outlined text-lg">more_time</span>
           </span>
         </div>
         <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ kpis.total_overtime_hours }}h</span>
-        <span class="text-xs text-gray-400">Combined OT hours</span>
+        <span class="text-xs text-gray-400">{{ $t('admin.reportsView.combinedOtHours') }}</span>
       </div>
     </div>
 
     <!-- Employee Data Table -->
     <div class="bg-white dark:bg-dark-surface rounded-xl border border-gray-100 dark:border-dark-border shadow-sm overflow-hidden">
       <div class="p-5 border-b border-gray-100 dark:border-dark-border">
-        <h3 class="font-bold text-gray-900 dark:text-white">Employee Attendance Summary</h3>
+        <h3 class="font-bold text-gray-900 dark:text-white">{{ $t('admin.reportsView.empSummary') }}</h3>
       </div>
 
       <div v-if="loading" class="flex justify-center py-12">
@@ -232,21 +232,21 @@ function downloadBlob(data, filename) {
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-gray-50 dark:bg-dark-bg text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold">
-              <th class="px-5 py-4">Employee</th>
-              <th class="px-5 py-4">Department</th>
-              <th class="px-5 py-4 text-center">Days Present</th>
-              <th class="px-5 py-4 text-center">On Time</th>
-              <th class="px-5 py-4 text-center">Late</th>
-              <th class="px-5 py-4 text-center">Absent</th>
-              <th class="px-5 py-4 text-center">Leave</th>
-              <th class="px-5 py-4 text-center">Work Hours</th>
-              <th class="px-5 py-4 text-center">OT Hours</th>
-              <th class="px-5 py-4 text-center">Rate</th>
+              <th class="px-5 py-4">{{ $t('admin.dashboardView.employee') }}</th>
+              <th class="px-5 py-4">{{ $t('admin.payrollView.department') }}</th>
+              <th class="px-5 py-4 text-center">{{ $t('admin.reportsView.daysPresent') }}</th>
+              <th class="px-5 py-4 text-center">{{ $t('admin.dashboardView.onTime') }}</th>
+              <th class="px-5 py-4 text-center">{{ $t('admin.reportsView.late') }}</th>
+              <th class="px-5 py-4 text-center">{{ $t('admin.reportsView.absent') }}</th>
+              <th class="px-5 py-4 text-center">{{ $t('admin.reportsView.leave') }}</th>
+              <th class="px-5 py-4 text-center">{{ $t('admin.reportsView.workHours') }}</th>
+              <th class="px-5 py-4 text-center">{{ $t('admin.payrollView.otHrs') }}</th>
+              <th class="px-5 py-4 text-center">{{ $t('admin.reportsView.rate') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-dark-border text-sm">
             <tr v-if="employees.length === 0">
-              <td colspan="10" class="px-6 py-12 text-center text-gray-500">No employee data found for the selected criteria.</td>
+              <td colspan="10" class="px-6 py-12 text-center text-gray-500">{{ $t('admin.reportsView.noEmpData') }}</td>
             </tr>
             <tr v-for="emp in employees" :key="emp.user_id" class="group hover:bg-gray-50 dark:hover:bg-dark-bg transition-colors">
               <td class="px-5 py-4">

@@ -155,7 +155,7 @@ function formatTime(iso) {
 
     <!-- Requests List -->
     <div class="card overflow-hidden">
-      <div v-if="loading" class="p-8 text-center text-gray-500">Loading...</div>
+      <div v-if="loading" class="p-8 text-center text-gray-500">{{ $t('app.historyView.loading') }}</div>
 
       <div v-else-if="requests.length" class="divide-y divide-gray-200 dark:divide-dark-border">
         <div v-for="request in requests" :key="request.id" class="p-4">
@@ -178,14 +178,14 @@ function formatTime(iso) {
               <div class="flex items-center gap-2 mb-1">
                 <span class="font-medium text-gray-900 dark:text-white">{{ request.user?.name }}</span>
                 <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-dark-border text-gray-600 dark:text-gray-400">
-                  {{ request.check_type }}
+                  {{ request.check_type === 'IN' ? $t('app.historyView.checkIn') : $t('app.historyView.checkOut') }}
                 </span>
               </div>
               <p class="text-sm text-gray-500">
-                Requested for: {{ formatDateTime(request.request_time) }} • {{ request.location?.name }}
+                {{ $t('admin.requestsView.requestedFor', { time: formatDateTime(request.request_time), location: request.location?.name }) }}
               </p>
               <p class="text-xs text-gray-400 mt-0.5">
-                Submitted: {{ formatDateTime(request.created_at) }}
+                {{ $t('admin.requestsView.submitted', { time: formatDateTime(request.created_at) }) }}
               </p>
               <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ request.reason }}</p>
             </div>
@@ -199,7 +199,7 @@ function formatTime(iso) {
                 class="btn btn-primary"
               >
                 <span class="material-symbols-outlined text-sm">check</span>
-                Approve
+                {{ $t('admin.dashboardView.approve') }}
               </button>
               <button 
                 v-if="canReject"
@@ -208,36 +208,35 @@ function formatTime(iso) {
                 class="btn btn-danger"
               >
                 <span class="material-symbols-outlined text-sm">close</span>
-                Reject
+                {{ $t('admin.dashboardView.reject') }}
               </button>
             </div>
             <div v-else class="text-right flex-shrink-0">
-              <p class="text-sm text-gray-500">Reviewed by {{ request.reviewer?.name }}</p>
+              <p class="text-sm text-gray-500">{{ $t('admin.requestsView.reviewedBy', { name: request.reviewer?.name }) }}</p>
               <p v-if="request.admin_note" class="text-sm text-primary">{{ request.admin_note }}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div v-else class="p-8 text-center text-gray-500">No {{ statusFilter.toLowerCase() }} requests</div>
+      <div v-else class="p-8 text-center text-gray-500">{{ $t('admin.requestsView.noRequests', { status: statusFilter.toLowerCase() }) }}</div>
     </div>
 
     <!-- Approve Modal -->
     <div v-if="showApproveModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div class="card p-6 w-full max-w-md">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Approve Request</h3>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ $t('admin.requestsView.approveRequest') }}</h3>
         
         <div class="space-y-4">
           <div>
             <p class="text-sm text-gray-500 mb-2">
-              <span class="font-medium text-gray-900 dark:text-white">{{ selectedRequest?.user?.name }}</span>
-              is requesting {{ selectedRequest?.check_type === 'IN' ? 'Check In' : 'Check Out' }}
+              {{ $t('admin.requestsView.isRequesting', { name: selectedRequest?.user?.name, type: selectedRequest?.check_type === 'IN' ? $t('app.historyView.checkIn') : $t('app.historyView.checkOut') }) }}
             </p>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Adjust Time (if needed)
+              {{ $t('admin.requestsView.adjustTime') }}
             </label>
             <input 
               v-model="adjustedTime" 
@@ -245,27 +244,27 @@ function formatTime(iso) {
               class="input"
             />
             <p class="text-xs text-gray-400 mt-1">
-              Original: {{ formatDateTime(selectedRequest?.request_time) }}
+              {{ $t('admin.requestsView.originalTime', { time: formatDateTime(selectedRequest?.request_time) }) }}
             </p>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Note (optional)
+              {{ $t('admin.requestsView.noteOptional') }}
             </label>
             <textarea 
               v-model="adminNote"
               class="input min-h-[80px]"
-              placeholder="Add a note..."
+              :placeholder="$t('admin.requestsView.addNote')"
             />
           </div>
         </div>
 
         <div class="flex gap-3 mt-4">
           <button @click="confirmApprove" class="btn btn-primary flex-1" :disabled="processingId">
-            {{ processingId ? 'Approving...' : 'Approve' }}
+            {{ processingId ? $t('admin.requestsView.approving') : $t('admin.dashboardView.approve') }}
           </button>
-          <button @click="showApproveModal = false" class="btn btn-secondary flex-1">Cancel</button>
+          <button @click="showApproveModal = false" class="btn btn-secondary flex-1">{{ $t('app.myLeavesView.cancel') }}</button>
         </div>
       </div>
     </div>
@@ -273,17 +272,17 @@ function formatTime(iso) {
     <!-- Reject Modal -->
     <div v-if="showRejectModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div class="card p-6 w-full max-w-md">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Reject Request</h3>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ $t('admin.requestsView.rejectRequest') }}</h3>
         <textarea 
           v-model="adminNote"
           class="input min-h-[100px]"
-          placeholder="Provide a reason for rejection..."
+          :placeholder="$t('admin.requestsView.rejectReason')"
         />
         <div class="flex gap-3 mt-4">
           <button @click="confirmReject" class="btn btn-danger flex-1" :disabled="processingId">
-            {{ processingId ? 'Rejecting...' : 'Reject' }}
+            {{ processingId ? $t('admin.requestsView.rejecting') : $t('admin.dashboardView.reject') }}
           </button>
-          <button @click="showRejectModal = false" class="btn btn-secondary flex-1">Cancel</button>
+          <button @click="showRejectModal = false" class="btn btn-secondary flex-1">{{ $t('app.myLeavesView.cancel') }}</button>
         </div>
       </div>
     </div>

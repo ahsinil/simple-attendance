@@ -197,7 +197,7 @@ function dismissResult() {
                 {{ result.message }}
               </h3>
               <p v-if="result.attendance" class="text-gray-600 dark:text-gray-300">
-                {{ result.attendance.check_type }} at {{ new Date(result.attendance.scan_time).toLocaleTimeString() }}
+                {{ $t('app.attendanceView.checkType', { type: result.attendance.check_type, time: new Date(result.attendance.scan_time).toLocaleTimeString() }) }}
               </p>
             </div>
             
@@ -206,7 +206,7 @@ function dismissResult() {
               @click="dismissResult"
               class="mt-6 w-full btn btn-primary py-3"
             >
-              OK
+              {{ $t('app.attendanceView.ok') }}
             </button>
           </div>
         </div>
@@ -242,10 +242,10 @@ function dismissResult() {
         </div>
         <div>
           <p class="font-medium text-gray-900 dark:text-white">
-            {{ gpsLocation ? 'GPS Ready' : 'Acquiring GPS...' }}
+            {{ gpsLocation ? $t('app.attendanceView.gpsReady') : $t('app.attendanceView.acquiringGps') }}
           </p>
           <p v-if="gpsLocation" class="text-xs text-gray-500">
-            Accuracy: {{ Math.round(gpsAccuracy) }}m
+            {{ $t('app.attendanceView.accuracy', { acc: Math.round(gpsAccuracy) }) }}
           </p>
           <p v-if="gpsError" class="text-xs text-red-500">{{ gpsError }}</p>
         </div>
@@ -255,7 +255,7 @@ function dismissResult() {
     <!-- QR Scanner -->
     <div class="card p-6">
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
-        Scan QR Code
+        {{ $t('app.attendanceView.scanQrCode') }}
       </h3>
 
       <div class="aspect-square bg-gray-100 dark:bg-dark-bg rounded-lg overflow-hidden mb-4 relative">
@@ -266,7 +266,7 @@ function dismissResult() {
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            <p class="text-gray-500">Starting camera...</p>
+            <p class="text-gray-500">{{ $t('app.attendanceView.startingCamera') }}</p>
           </div>
         </div>
 
@@ -300,13 +300,13 @@ function dismissResult() {
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Or enter barcode manually:
+            {{ $t('app.attendanceView.orEnterBarcode') }}
           </label>
           <input
             v-model="scannedCode"
             type="text"
             class="input"
-            placeholder="Enter barcode data..."
+            :placeholder="$t('app.attendanceView.enterBarcodeData')"
             @keyup.enter="handleScan"
           />
         </div>
@@ -321,11 +321,11 @@ function dismissResult() {
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            Processing...
+            {{ $t('app.attendanceView.processing') }}
           </span>
           <span v-else class="flex items-center justify-center gap-2">
             <span class="material-symbols-outlined">fingerprint</span>
-            Submit Attendance
+            {{ $t('app.attendanceView.submitAttendance') }}
           </span>
         </button>
       </div>
@@ -333,7 +333,7 @@ function dismissResult() {
 
     <!-- Note -->
     <p class="text-center text-sm text-gray-500">
-      Make sure you're within the office area before scanning
+      {{ $t('app.attendanceView.makeSureWithinOffice') }}
     </p>
   </div>
 </template>

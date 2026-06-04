@@ -154,12 +154,12 @@ function formatRoleName(name) {
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Roles & Permissions</h2>
-        <p class="text-sm text-gray-500 mt-1">Manage user roles and their permissions</p>
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $t('admin.rolesView.title') }}</h2>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('admin.rolesView.subtitle') }}</p>
       </div>
       <button v-if="canCreate" @click="openCreate" class="btn btn-primary">
         <span class="material-symbols-outlined text-sm">add</span>
-        Add Role
+        {{ $t('admin.rolesView.addRole') }}
       </button>
     </div>
 
@@ -183,7 +183,7 @@ function formatRoleName(name) {
             </div>
             <div>
               <h3 class="font-medium text-gray-900 dark:text-white">{{ formatRoleName(role.name) }}</h3>
-              <span v-if="role.is_system" class="text-xs text-blue-500 font-medium">System Role</span>
+              <span v-if="role.is_system" class="text-xs text-blue-500 font-medium">{{ $t('admin.rolesView.systemRole') }}</span>
             </div>
           </div>
           <div v-if="canUpdate || canDelete" class="flex gap-1">
@@ -205,11 +205,11 @@ function formatRoleName(name) {
         <div class="flex items-center gap-4 text-sm text-gray-500">
           <div class="flex items-center gap-1">
             <span class="material-symbols-outlined text-base">security</span>
-            {{ role.permissions_count }} permissions
+            {{ $t('admin.rolesView.permissionsCount', { count: role.permissions_count }) }}
           </div>
           <div class="flex items-center gap-1">
             <span class="material-symbols-outlined text-base">group</span>
-            {{ role.users_count }} users
+            {{ $t('admin.rolesView.usersCount', { count: role.users_count }) }}
           </div>
         </div>
 
@@ -226,7 +226,7 @@ function formatRoleName(name) {
             v-if="role.permissions.length > 4"
             class="px-2 py-0.5 text-xs bg-primary/10 text-primary rounded-full"
           >
-            +{{ role.permissions.length - 4 }} more
+            {{ $t('admin.rolesView.more', { count: role.permissions.length - 4 }) }}
           </span>
         </div>
       </div>
@@ -237,7 +237,7 @@ function formatRoleName(name) {
       <div class="card p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ editingRole ? 'Edit Role' : 'Create New Role' }}
+            {{ editingRole ? $t('admin.rolesView.editRole') : $t('admin.rolesView.createRole') }}
           </h3>
           <button @click="showForm = false" class="p-1 hover:bg-gray-100 dark:hover:bg-dark-border rounded">
             <span class="material-symbols-outlined">close</span>
@@ -248,7 +248,7 @@ function formatRoleName(name) {
           <!-- Role Name -->
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Role Name *
+              {{ $t('admin.rolesView.roleName') }}
             </label>
             <input 
               v-model="form.name" 
@@ -259,13 +259,13 @@ function formatRoleName(name) {
               title="Lowercase letters and underscores only"
               required 
             />
-            <p class="text-xs text-gray-500 mt-1">Use lowercase letters and underscores only</p>
+            <p class="text-xs text-gray-500 mt-1">{{ $t('admin.rolesView.roleNameDesc') }}</p>
           </div>
 
           <!-- Permissions -->
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Permissions
+              {{ $t('admin.rolesView.permissions') }}
             </label>
             
             <div class="space-y-4">
@@ -326,10 +326,10 @@ function formatRoleName(name) {
           <!-- Actions -->
           <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-dark-border">
             <button type="submit" class="btn btn-primary flex-1">
-              {{ editingRole ? 'Update Role' : 'Create Role' }}
+              {{ editingRole ? $t('admin.leaveTypesView.update') : $t('admin.leaveTypesView.create') }}
             </button>
             <button type="button" @click="showForm = false" class="btn btn-secondary flex-1">
-              Cancel
+              {{ $t('admin.locationsView.cancel') }}
             </button>
           </div>
         </form>

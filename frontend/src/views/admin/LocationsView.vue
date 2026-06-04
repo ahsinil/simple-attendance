@@ -96,7 +96,7 @@ async function getCurrentLocation() {
     <div class="flex justify-end">
       <button v-if="canCreate" @click="openCreate" class="btn btn-primary">
         <span class="material-symbols-outlined text-sm">add</span>
-        Add Location
+        {{ $t('admin.locationsView.addLocation') }}
       </button>
     </div>
 
@@ -118,11 +118,11 @@ async function getCurrentLocation() {
         </div>
         <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
           <div class="flex justify-between">
-            <span>Radius</span>
+            <span>{{ $t('admin.locationsView.radius') }}</span>
             <span class="font-medium">{{ location.allowed_radius_m }}m</span>
           </div>
           <div class="flex justify-between">
-            <span>Timezone</span>
+            <span>{{ $t('admin.locationsView.timezone') }}</span>
             <span class="font-medium">{{ location.timezone }}</span>
           </div>
           <div class="pt-3">
@@ -142,7 +142,7 @@ async function getCurrentLocation() {
         </div>
         <div class="mt-4 pt-4 border-t border-gray-200 dark:border-dark-border">
           <span :class="location.is_active ? 'text-green-500' : 'text-gray-400'" class="text-sm">
-            {{ location.is_active ? '● Active' : '○ Inactive' }}
+            {{ location.is_active ? '● ' + $t('admin.locationsView.active') : '○ ' + $t('admin.locationsView.inactive') }}
           </span>
         </div>
       </div>
@@ -152,24 +152,24 @@ async function getCurrentLocation() {
     <div v-if="showForm" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div class="card p-6 w-full max-w-md">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {{ editingLocation ? 'Edit Location' : 'Add Location' }}
+          {{ editingLocation ? $t('admin.locationsView.editLocation') : $t('admin.locationsView.addLocation') }}
         </h3>
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Code *</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.locationsView.code') }}</label>
               <input v-model="form.code" class="input" placeholder="HQ-01" required />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.locationsView.name') }}</label>
               <input v-model="form.name" class="input" placeholder="Headquarters" required />
             </div>
           </div>
           <div>
             <div class="flex justify-between items-center mb-1">
-              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Coordinates *</label>
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('admin.locationsView.coordinates') }}</label>
               <button type="button" @click="getCurrentLocation" class="text-xs text-primary hover:underline">
-                Use Current Location
+                {{ $t('admin.locationsView.useCurrent') }}
               </button>
             </div>
             <div class="grid grid-cols-2 gap-4">
@@ -179,17 +179,17 @@ async function getCurrentLocation() {
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Radius (m)</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.locationsView.radiusM') }}</label>
               <input v-model.number="form.allowed_radius_m" type="number" class="input" min="10" max="5000" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Timezone</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.locationsView.timezone') }}</label>
               <input v-model="form.timezone" class="input" placeholder="Asia/Jakarta" />
             </div>
           </div>
           <div class="flex gap-3 pt-4">
-            <button type="submit" class="btn btn-primary flex-1">Save</button>
-            <button type="button" @click="showForm = false" class="btn btn-secondary flex-1">Cancel</button>
+            <button type="submit" class="btn btn-primary flex-1">{{ $t('admin.locationsView.save') }}</button>
+            <button type="button" @click="showForm = false" class="btn btn-secondary flex-1">{{ $t('admin.locationsView.cancel') }}</button>
           </div>
         </form>
       </div>

@@ -209,8 +209,8 @@ function getScheduleColor(schedule) {
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">My Schedule</h1>
-        <p class="text-gray-500 mt-1">View and manage your upcoming shifts and work hours.</p>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $t('app.schedulesView.mySchedule') }}</h1>
+        <p class="text-gray-500 mt-1">{{ $t('app.schedulesView.viewAndManage') }}</p>
       </div>
       
       <!-- View Toggle -->
@@ -224,7 +224,7 @@ function getScheduleColor(schedule) {
             ? 'bg-primary text-white shadow-sm' 
             : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
         >
-          {{ view }}
+          {{ view === 'Month' ? $t('app.schedulesView.month') : view === 'Week' ? $t('app.schedulesView.week') : $t('app.schedulesView.day') }}
         </button>
       </div>
     </div>
@@ -242,7 +242,7 @@ function getScheduleColor(schedule) {
           @click="goToToday"
           class="px-4 py-2 text-sm font-medium bg-gray-100 dark:bg-dark-bg rounded-lg hover:bg-gray-200 dark:hover:bg-dark-border transition-colors"
         >
-          Today
+          {{ $t('app.schedulesView.today') }}
         </button>
         <button 
           @click="navigateMonth(1)"
@@ -259,11 +259,11 @@ function getScheduleColor(schedule) {
       <div class="hidden sm:flex items-center gap-4">
         <div class="flex items-center gap-2">
           <span class="w-3 h-3 rounded-full bg-primary"></span>
-          <span class="text-sm text-gray-500">Scheduled</span>
+          <span class="text-sm text-gray-500">{{ $t('app.schedulesView.scheduled') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-          <span class="text-sm text-gray-500">Completed</span>
+          <span class="text-sm text-gray-500">{{ $t('app.schedulesView.completed') }}</span>
         </div>
       </div>
     </div>
@@ -275,7 +275,7 @@ function getScheduleColor(schedule) {
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        Loading schedules...
+        {{ $t('app.schedulesView.loadingSchedules') }}
       </div>
     </div>
 
@@ -336,7 +336,7 @@ function getScheduleColor(schedule) {
                 v-if="isToday(day)" 
                 class="text-xs font-medium text-primary uppercase"
               >
-                Today
+                {{ $t('app.schedulesView.today') }}
               </span>
             </div>
 
@@ -405,7 +405,7 @@ function getScheduleColor(schedule) {
           <!-- Content -->
           <div class="p-6 pt-10">
             <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-              {{ selectedSchedule?.shift?.name || 'Regular Shift' }}
+              {{ selectedSchedule?.shift?.name || $t('app.schedulesView.regularShift') }}
             </h3>
             <p class="text-gray-500 mt-1">{{ selectedSchedule?.shift?.code }}</p>
 
@@ -429,10 +429,10 @@ function getScheduleColor(schedule) {
                 <span class="material-symbols-outlined text-gray-400 mt-0.5">timer</span>
                 <div>
                   <p class="font-medium text-gray-900 dark:text-white">
-                    Grace Period
+                    {{ $t('app.schedulesView.gracePeriod') }}
                   </p>
                   <p class="text-sm text-gray-500">
-                    {{ selectedSchedule.shift.late_after_min }} minutes allowed
+                    {{ $t('app.schedulesView.minutesAllowed', { min: selectedSchedule.shift.late_after_min }) }}
                   </p>
                 </div>
               </div>
@@ -442,7 +442,7 @@ function getScheduleColor(schedule) {
                 <span class="material-symbols-outlined text-gray-400 mt-0.5">date_range</span>
                 <div>
                   <p class="font-medium text-gray-900 dark:text-white">
-                    Shift Hours
+                    {{ $t('app.schedulesView.shiftHours') }}
                   </p>
                   <p class="text-sm text-gray-500">
                     {{ formatTime12(selectedSchedule?.shift?.start_time) }} — {{ formatTime12(selectedSchedule?.shift?.end_time) }}
@@ -454,7 +454,7 @@ function getScheduleColor(schedule) {
               <div class="flex items-start gap-3">
                 <span class="material-symbols-outlined text-gray-400 mt-0.5">info</span>
                 <div>
-                  <p class="font-medium text-gray-900 dark:text-white">Status</p>
+                  <p class="font-medium text-gray-900 dark:text-white">{{ $t('app.schedulesView.status') }}</p>
                   <span 
                     class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium"
                     :class="{
@@ -474,7 +474,7 @@ function getScheduleColor(schedule) {
               @click="closeModal"
               class="w-full mt-6 py-3 bg-gray-100 dark:bg-dark-bg text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-dark-border transition-colors"
             >
-              Close
+              {{ $t('app.schedulesView.close') }}
             </button>
           </div>
         </div>

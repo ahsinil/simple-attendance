@@ -129,8 +129,8 @@ function getPlatformIcon(platform) {
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Device Management</h1>
-        <p class="text-sm text-gray-500 mt-1">Manage registered devices for employee attendance</p>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $t('admin.devicesView.title') }}</h1>
+        <p class="text-sm text-gray-500 mt-1">{{ $t('admin.devicesView.subtitle') }}</p>
       </div>
     </div>
 
@@ -149,7 +149,7 @@ function getPlatformIcon(platform) {
           </div>
           <div>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.total }}</p>
-            <p class="text-sm text-gray-500">Total Devices</p>
+            <p class="text-sm text-gray-500">{{ $t('admin.devicesView.totalDevices') }}</p>
           </div>
         </div>
       </div>
@@ -161,7 +161,7 @@ function getPlatformIcon(platform) {
           </div>
           <div>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.pending }}</p>
-            <p class="text-sm text-gray-500">Pending Approval</p>
+            <p class="text-sm text-gray-500">{{ $t('admin.devicesView.pendingApproval') }}</p>
           </div>
         </div>
       </div>
@@ -173,7 +173,7 @@ function getPlatformIcon(platform) {
           </div>
           <div>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.approved }}</p>
-            <p class="text-sm text-gray-500">Approved Devices</p>
+            <p class="text-sm text-gray-500">{{ $t('admin.devicesView.approvedDevices') }}</p>
           </div>
         </div>
       </div>
@@ -185,7 +185,7 @@ function getPlatformIcon(platform) {
           </div>
           <div>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.users_with_devices }}</p>
-            <p class="text-sm text-gray-500">Users with Devices</p>
+            <p class="text-sm text-gray-500">{{ $t('admin.devicesView.usersWithDevices') }}</p>
           </div>
         </div>
       </div>
@@ -195,9 +195,9 @@ function getPlatformIcon(platform) {
     <div v-if="stats?.settings" class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg flex items-start gap-3">
       <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">info</span>
       <div class="text-sm text-blue-700 dark:text-blue-300">
-        <p class="font-medium">Device Registration: {{ stats.settings.device_registration_enabled ? 'Enabled' : 'Disabled' }}</p>
+        <p class="font-medium">{{ $t('admin.devicesView.deviceReg', { status: stats.settings.device_registration_enabled ? $t('admin.devicesView.enabled') : $t('admin.devicesView.disabled') }) }}</p>
         <p v-if="stats.settings.device_registration_enabled">
-          Mode: <span class="font-medium">{{ stats.settings.device_registration_mode === 'require_approval' ? 'Require Approval' : 'Auto-Approve' }}</span>
+          Mode: <span class="font-medium">{{ stats.settings.device_registration_mode === 'require_approval' ? $t('admin.devicesView.requireApprov') : $t('admin.devicesView.autoApprov') }}</span>
           • Max devices: <span class="font-medium">{{ stats.settings.max_devices_per_user }}</span> per user
         </p>
       </div>
@@ -210,9 +210,9 @@ function getPlatformIcon(platform) {
         @change="fetchDevices"
         class="rounded-lg border-gray-300 dark:border-dark-line bg-white dark:bg-dark-surface text-gray-900 dark:text-white focus:ring-primary focus:border-primary px-4 py-2"
       >
-        <option value="all">All Devices</option>
-        <option value="pending">Pending Approval</option>
-        <option value="approved">Approved</option>
+        <option value="all">{{ $t('admin.devicesView.allDevices') }}</option>
+        <option value="pending">{{ $t('admin.devicesView.pendingApprov') }}</option>
+        <option value="approved">{{ $t('admin.devicesView.approved') }}</option>
       </select>
       
       <button 
@@ -220,7 +220,7 @@ function getPlatformIcon(platform) {
         class="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-primary"
       >
         <span class="material-symbols-outlined text-sm">refresh</span>
-        Refresh
+        {{ $t('admin.devicesView.refresh') }}
       </button>
     </div>
 
@@ -234,11 +234,11 @@ function getPlatformIcon(platform) {
       <table class="w-full">
         <thead class="bg-gray-50 dark:bg-dark-bg">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Used</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('admin.devicesView.headers.device') }}</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('admin.devicesView.headers.user') }}</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('admin.devicesView.headers.status') }}</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('admin.devicesView.headers.lastUsed') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('admin.devicesView.headers.actions') }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
@@ -249,8 +249,8 @@ function getPlatformIcon(platform) {
                   <span class="material-symbols-outlined text-gray-500">{{ getPlatformIcon(device.device_info?.platform) }}</span>
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900 dark:text-white">{{ device.device_name || 'Unknown Device' }}</p>
-                  <p class="text-sm text-gray-500">{{ device.device_info?.platform || 'Unknown' }} • {{ device.device_info?.browser || 'Unknown' }}</p>
+                  <p class="font-medium text-gray-900 dark:text-white">{{ device.device_name || $t('admin.devicesView.unknownDevice') }}</p>
+                  <p class="text-sm text-gray-500">{{ device.device_info?.platform || $t('admin.devicesView.unknown') }} • {{ device.device_info?.browser || $t('admin.devicesView.unknown') }}</p>
                 </div>
               </div>
             </td>
@@ -262,11 +262,11 @@ function getPlatformIcon(platform) {
             </td>
             <td class="px-6 py-4">
               <span :class="`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(device)}`">
-                {{ device.is_approved ? 'Approved' : 'Pending' }}
+                {{ device.is_approved ? $t('admin.devicesView.approvedStatus') : $t('admin.devicesView.pending') }}
               </span>
             </td>
             <td class="px-6 py-4 text-sm text-gray-500">
-              {{ device.last_used_at || 'Never' }}
+              {{ device.last_used_at || $t('admin.devicesView.never') }}
             </td>
             <td class="px-6 py-4 text-right">
               <div class="flex items-center justify-end gap-2">
@@ -307,8 +307,8 @@ function getPlatformIcon(platform) {
     <!-- Empty State -->
     <div v-else class="bg-white dark:bg-dark-surface rounded-xl border border-gray-100 dark:border-dark-border p-12 text-center">
       <span class="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600">devices</span>
-      <p class="mt-4 text-gray-500">No devices found</p>
-      <p class="text-sm text-gray-400">Devices will appear here when employees register them for attendance</p>
+      <p class="mt-4 text-gray-500">{{ $t('admin.devicesView.noDevices') }}</p>
+      <p class="text-sm text-gray-400">{{ $t('admin.devicesView.noDevicesDesc') }}</p>
     </div>
   </div>
 </template>

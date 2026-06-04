@@ -13,9 +13,9 @@ onMounted(() => {
 
 const greeting = computed(() => {
   const hour = new Date().getHours()
-  if (hour < 12) return 'Good morning'
-  if (hour < 17) return 'Good afternoon'
-  return 'Good evening'
+  if (hour < 12) return 'app.dashboardView.goodMorning'
+  if (hour < 17) return 'app.dashboardView.goodAfternoon'
+  return 'app.dashboardView.goodEvening'
 })
 
 const statusColor = computed(() => {
@@ -80,17 +80,17 @@ function formatMinutes(min) {
   <div class="space-y-6">
     <!-- Welcome Card -->
     <div class="card p-6 bg-gradient-to-r from-primary to-primary-600 text-white">
-      <p class="text-primary-100">{{ greeting }},</p>
+      <p class="text-primary-100">{{ $t(greeting) }},</p>
       <h2 class="text-2xl font-bold">{{ authStore.user?.name }}</h2>
-      <p class="text-sm text-primary-200 mt-1">{{ authStore.user?.position || 'Employee' }}</p>
+      <p class="text-sm text-primary-200 mt-1">{{ authStore.user?.position || $t('app.dashboardView.employee') }}</p>
     </div>
 
     <!-- Today's Status -->
     <div class="card p-6">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Today's Attendance</h3>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ $t('app.dashboardView.todaysAttendance') }}</h3>
       
       <div v-if="attendanceStore.loading" class="text-center py-8 text-gray-500">
-        Loading...
+        {{ $t('app.dashboardView.loading') }}
       </div>
 
       <div v-else-if="attendanceStore.todaySummary" class="space-y-4">
@@ -109,22 +109,22 @@ function formatMinutes(min) {
           </div>
           <div>
             <p class="font-semibold" :class="statusColor">
-              {{ attendanceStore.todaySummary.status || 'Not Checked In' }}
+              {{ attendanceStore.todaySummary.status === 'ON_TIME' ? $t('admin.dashboardView.onTime') : attendanceStore.todaySummary.status === 'LATE' ? $t('app.dashboardView.late') : attendanceStore.todaySummary.status === 'ABSENT' ? $t('app.dashboardView.absent') : (attendanceStore.todaySummary.status || $t('app.dashboardView.notCheckedIn')) }}
             </p>
-            <p class="text-sm text-gray-500">{{ attendanceStore.todaySummary.shift || 'No shift assigned' }}</p>
+            <p class="text-sm text-gray-500">{{ attendanceStore.todaySummary.shift || $t('app.dashboardView.noShift') }}</p>
           </div>
         </div>
 
         <!-- Time Details -->
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-gray-50 dark:bg-dark-bg rounded-lg p-4">
-            <p class="text-sm text-gray-500 mb-1">Check In</p>
+            <p class="text-sm text-gray-500 mb-1">{{ $t('app.dashboardView.checkIn') }}</p>
             <p class="text-xl font-bold text-gray-900 dark:text-white">
               {{ formatTime(attendanceStore.todaySummary.check_in_time) }}
             </p>
           </div>
           <div class="bg-gray-50 dark:bg-dark-bg rounded-lg p-4">
-            <p class="text-sm text-gray-500 mb-1">Check Out</p>
+            <p class="text-sm text-gray-500 mb-1">{{ $t('app.dashboardView.checkOut') }}</p>
             <p class="text-xl font-bold text-gray-900 dark:text-white">
               {{ formatTime(attendanceStore.todaySummary.check_out_time) }}
             </p>
@@ -133,43 +133,43 @@ function formatMinutes(min) {
 
         <!-- Work Hours -->
         <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-dark-border">
-          <span class="text-gray-500">Work Duration</span>
+          <span class="text-gray-500">{{ $t('app.dashboardView.workDuration') }}</span>
           <span class="font-semibold text-gray-900 dark:text-white">
             {{ workDuration }}
           </span>
         </div>
 
         <div v-if="attendanceStore.todaySummary.late_min > 0" class="flex items-center justify-between text-amber-600">
-          <span>Late</span>
-          <span class="font-semibold">{{ attendanceStore.todaySummary.late_min }} min</span>
+          <span>{{ $t('app.dashboardView.late') }}</span>
+          <span class="font-semibold">{{ attendanceStore.todaySummary.late_min }} {{ $t('app.dashboardView.min') }}</span>
         </div>
       </div>
 
       <div v-else class="text-center py-8 text-gray-500">
-        No attendance data for today
+        {{ $t('app.dashboardView.noAttendanceData') }}
       </div>
     </div>
 
     <!-- Monthly Summary -->
     <div class="card p-6">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">This Month</h3>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ $t('app.dashboardView.thisMonth') }}</h3>
 
       <div v-if="attendanceStore.monthlySummary" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="text-center p-4">
           <p class="text-3xl font-bold text-green-500">{{ attendanceStore.monthlySummary.present_days }}</p>
-          <p class="text-sm text-gray-500">Present</p>
+          <p class="text-sm text-gray-500">{{ $t('app.dashboardView.present') }}</p>
         </div>
         <div class="text-center p-4">
           <p class="text-3xl font-bold text-red-500">{{ attendanceStore.monthlySummary.absent_days }}</p>
-          <p class="text-sm text-gray-500">Absent</p>
+          <p class="text-sm text-gray-500">{{ $t('app.dashboardView.absent') }}</p>
         </div>
         <div class="text-center p-4">
           <p class="text-3xl font-bold text-amber-500">{{ attendanceStore.monthlySummary.late_days }}</p>
-          <p class="text-sm text-gray-500">Late</p>
+          <p class="text-sm text-gray-500">{{ $t('app.dashboardView.late') }}</p>
         </div>
         <div class="text-center p-4">
           <p class="text-3xl font-bold text-primary">{{ formatMinutes(attendanceStore.monthlySummary.total_work_minutes) }}</p>
-          <p class="text-sm text-gray-500">Total Hours</p>
+          <p class="text-sm text-gray-500">{{ $t('app.dashboardView.totalHours') }}</p>
         </div>
       </div>
     </div>
@@ -178,13 +178,13 @@ function formatMinutes(min) {
     <div class="grid grid-cols-2 gap-4">
       <RouterLink to="/attendance" class="card p-6 hover:border-primary transition-colors group">
         <span class="material-symbols-outlined text-3xl text-primary group-hover:scale-110 transition-transform">qr_code_scanner</span>
-        <p class="mt-2 font-medium text-gray-900 dark:text-white">Scan Attendance</p>
-        <p class="text-sm text-gray-500">Check in or out</p>
+        <p class="mt-2 font-medium text-gray-900 dark:text-white">{{ $t('app.dashboardView.scanAttendance') }}</p>
+        <p class="text-sm text-gray-500">{{ $t('app.dashboardView.checkInOut') }}</p>
       </RouterLink>
       <RouterLink to="/requests" class="card p-6 hover:border-primary transition-colors group">
         <span class="material-symbols-outlined text-3xl text-primary group-hover:scale-110 transition-transform">edit_note</span>
-        <p class="mt-2 font-medium text-gray-900 dark:text-white">Manual Request</p>
-        <p class="text-sm text-gray-500">Submit correction</p>
+        <p class="mt-2 font-medium text-gray-900 dark:text-white">{{ $t('app.dashboardView.manualRequest') }}</p>
+        <p class="text-sm text-gray-500">{{ $t('app.dashboardView.submitCorrection') }}</p>
       </RouterLink>
     </div>
   </div>

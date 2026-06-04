@@ -141,25 +141,25 @@ onMounted(() => {
   <div class="space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white">Leave Requests</h2>
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ $t('admin.leaveRequests') }}</h2>
     </div>
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="card p-4">
-        <div class="text-sm text-gray-500 mb-1">Pending</div>
+        <div class="text-sm text-gray-500 mb-1">{{ $t('admin.leaveRequestsView.pending') }}</div>
         <div class="text-2xl font-bold text-amber-600">{{ stats.pending || 0 }}</div>
       </div>
       <div class="card p-4">
-        <div class="text-sm text-gray-500 mb-1">Approved Today</div>
+        <div class="text-sm text-gray-500 mb-1">{{ $t('admin.leaveRequestsView.approvedToday') }}</div>
         <div class="text-2xl font-bold text-green-600">{{ stats.approved_today || 0 }}</div>
       </div>
       <div class="card p-4">
-        <div class="text-sm text-gray-500 mb-1">Rejected Today</div>
+        <div class="text-sm text-gray-500 mb-1">{{ $t('admin.leaveRequestsView.rejectedToday') }}</div>
         <div class="text-2xl font-bold text-red-600">{{ stats.rejected_today || 0 }}</div>
       </div>
       <div class="card p-4">
-        <div class="text-sm text-gray-500 mb-1">This Month</div>
+        <div class="text-sm text-gray-500 mb-1">{{ $t('admin.dashboardView.thisMonth') }}</div>
         <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.total_this_month || 0 }}</div>
       </div>
     </div>
@@ -167,19 +167,19 @@ onMounted(() => {
     <!-- Filters -->
     <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
       <div class="flex items-center gap-2">
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Status:</label>
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{{ $t('admin.leaveRequestsView.status') }}</label>
         <select v-model="filters.status" @change="fetchRequests" class="input flex-1 sm:w-auto">
-          <option value="">All</option>
-          <option value="PENDING">Pending</option>
-          <option value="APPROVED">Approved</option>
-          <option value="REJECTED">Rejected</option>
-          <option value="CANCELLED">Cancelled</option>
+          <option value="">{{ $t('admin.leaveRequestsView.all') }}</option>
+          <option value="PENDING">{{ $t('app.myLeavesView.pendingFilter') }}</option>
+          <option value="APPROVED">{{ $t('app.myLeavesView.approvedFilter') }}</option>
+          <option value="REJECTED">{{ $t('app.myLeavesView.rejectedFilter') }}</option>
+          <option value="CANCELLED">{{ $t('app.myLeavesView.cancelledFilter') }}</option>
         </select>
       </div>
       <div class="flex items-center gap-2">
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Type:</label>
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{{ $t('admin.leaveRequestsView.type') }}</label>
         <select v-model="filters.leave_type_id" @change="fetchRequests" class="input flex-1 sm:w-auto">
-          <option value="">All Types</option>
+          <option value="">{{ $t('admin.leaveRequestsView.allTypes') }}</option>
           <option v-for="type in leaveTypes" :key="type.id" :value="type.id">{{ type.name }}</option>
         </select>
       </div>
@@ -191,21 +191,21 @@ onMounted(() => {
       <table class="w-full min-w-[700px]">
         <thead class="bg-gray-50 dark:bg-dark-surface">
           <tr>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Leave Type</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dates</th>
-            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Days</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
-            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('admin.dashboardView.employee') }}</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('admin.leaveRequestsView.leaveType') }}</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('admin.leaveRequestsView.dates') }}</th>
+            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">{{ $t('admin.leaveRequestsView.days') }}</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('app.myRequestsView.reason') }}</th>
+            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">{{ $t('app.schedulesView.status') }}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ $t('admin.leaveRequestsView.actions') }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-dark-border">
           <tr v-if="loading">
-            <td colspan="7" class="px-4 py-8 text-center text-gray-500">Loading...</td>
+            <td colspan="7" class="px-4 py-8 text-center text-gray-500">{{ $t('app.historyView.loading') }}</td>
           </tr>
           <tr v-else-if="!requests.data?.length">
-            <td colspan="7" class="px-4 py-8 text-center text-gray-500">No leave requests found</td>
+            <td colspan="7" class="px-4 py-8 text-center text-gray-500">{{ $t('admin.leaveRequestsView.notFound') }}</td>
           </tr>
           <tr v-else v-for="request in requests.data" :key="request.id" class="hover:bg-gray-50 dark:hover:bg-dark-surface/50">
             <td class="px-4 py-3">
@@ -243,7 +243,7 @@ onMounted(() => {
                   v-if="canApprove"
                   @click="quickApprove(request)"
                   class="text-green-600 hover:text-green-700 flex items-center gap-1"
-                  title="Approve"
+                  :title="$t('admin.dashboardView.approve')"
                 >
                   <span class="material-symbols-outlined text-sm">check_circle</span>
                 </button>
@@ -251,13 +251,13 @@ onMounted(() => {
                   v-if="canReject"
                   @click="openModal(request, 'reject')"
                   class="text-red-500 hover:text-red-700 flex items-center gap-1"
-                  title="Reject"
+                  :title="$t('admin.dashboardView.reject')"
                 >
                   <span class="material-symbols-outlined text-sm">cancel</span>
                 </button>
               </div>
               <div v-else class="text-xs text-gray-400">
-                <span v-if="request.reviewer">by {{ request.reviewer.name }}</span>
+                <span v-if="request.reviewer">{{ $t('admin.requestsView.reviewedBy', { name: request.reviewer.name }) }}</span>
               </div>
             </td>
           </tr>
@@ -270,13 +270,13 @@ onMounted(() => {
     <div v-if="showModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div class="bg-white dark:bg-dark-surface rounded-xl shadow-xl max-w-md w-full p-6" @click.stop>
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {{ modalAction === 'approve' ? 'Approve' : 'Reject' }} Leave Request
+          {{ modalAction === 'approve' ? $t('admin.leaveRequestsView.approveLeave') : $t('admin.leaveRequestsView.rejectLeave') }}
         </h3>
 
         <div class="mb-4 p-4 bg-gray-50 dark:bg-dark-surface/50 rounded-lg">
           <div class="font-medium text-gray-900 dark:text-white">{{ selectedRequest?.user?.name }}</div>
           <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            {{ selectedRequest?.leave_type?.name }} • {{ selectedRequest?.days_requested }} days
+            {{ selectedRequest?.leave_type?.name }} • {{ $t('admin.dashboardView.days', { count: selectedRequest?.days_requested }) }}
           </div>
           <div class="text-sm text-gray-500 mt-1">
             {{ formatDateRange(selectedRequest?.start_date, selectedRequest?.end_date) }}
@@ -288,12 +288,12 @@ onMounted(() => {
 
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Note {{ modalAction === 'reject' ? '*' : '(optional)' }}
+            {{ modalAction === 'reject' ? $t('admin.leaveRequestsView.noteRequired') : $t('admin.leaveRequestsView.noteOptional') }}
           </label>
           <textarea
             v-model="adminNote"
             class="input min-h-[80px]"
-            :placeholder="modalAction === 'reject' ? 'Please provide a reason for rejection...' : 'Add a note (optional)'"
+            :placeholder="modalAction === 'reject' ? $t('admin.requestsView.rejectReason') : $t('admin.requestsView.addNote')"
           />
         </div>
 
@@ -304,9 +304,9 @@ onMounted(() => {
             class="flex-1 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             :disabled="processing"
           >
-            {{ processing ? 'Processing...' : (modalAction === 'approve' ? 'Approve' : 'Reject') }}
+            {{ processing ? $t('admin.leaveRequestsView.processing') : (modalAction === 'approve' ? $t('admin.dashboardView.approve') : $t('admin.dashboardView.reject')) }}
           </button>
-          <button @click="closeModal" class="btn btn-secondary">Cancel</button>
+          <button @click="closeModal" class="btn btn-secondary">{{ $t('app.myLeavesView.cancel') }}</button>
         </div>
       </div>
     </div>

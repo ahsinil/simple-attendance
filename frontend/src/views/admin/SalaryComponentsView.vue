@@ -111,7 +111,7 @@ async function deleteComponent(component) {
         class="flex items-center gap-2 bg-primary hover:bg-primary-600 text-white px-5 py-2.5 rounded-lg shadow-md transition-all font-semibold text-sm"
       >
         <span class="material-symbols-outlined text-sm">add</span>
-        Add Component
+        {{ $t('admin.salaryComponentsView.addComponent') }}
       </button>
     </div>
 
@@ -123,8 +123,8 @@ async function deleteComponent(component) {
             <span class="material-symbols-outlined">lock</span>
           </span>
           <div>
-            <h3 class="font-bold text-gray-900 dark:text-white">Fixed (Tunjangan Tetap)</h3>
-            <p class="text-xs text-gray-500">Dibayar penuh setiap bulan tanpa syarat kehadiran. Termasuk dalam kalkulasi lembur (OT).</p>
+            <h3 class="font-bold text-gray-900 dark:text-white">{{ $t('admin.salaryComponentsView.fixed') }}</h3>
+            <p class="text-xs text-gray-500">{{ $t('admin.salaryComponentsView.fixedDesc') }}</p>
           </div>
         </div>
         <p class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -137,8 +137,8 @@ async function deleteComponent(component) {
             <span class="material-symbols-outlined">sync_alt</span>
           </span>
           <div>
-            <h3 class="font-bold text-gray-900 dark:text-white">Variable (Tunjangan Tidak Tetap)</h3>
-            <p class="text-xs text-gray-500">Bersifat opsional. Dibayar per hari karyawan hadir. Tidak diberikan jika absen. Tidak termasuk dalam kalkulasi lembur.</p>
+            <h3 class="font-bold text-gray-900 dark:text-white">{{ $t('admin.salaryComponentsView.variable') }}</h3>
+            <p class="text-xs text-gray-500">{{ $t('admin.salaryComponentsView.variableDesc') }}</p>
           </div>
         </div>
         <p class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -155,7 +155,7 @@ async function deleteComponent(component) {
 
       <div v-else class="divide-y divide-gray-100 dark:divide-dark-border">
         <div v-if="components.length === 0" class="px-6 py-12 text-center text-gray-500">
-          No salary components defined yet. Click "Add Component" to create one.
+          {{ $t('admin.salaryComponentsView.noData') }}
         </div>
 
         <div
@@ -212,12 +212,12 @@ async function deleteComponent(component) {
         <div class="fixed inset-0 bg-black/50" @click="showModal = false" />
         <div class="relative bg-white dark:bg-dark-surface rounded-2xl shadow-xl w-full max-w-md p-6 space-y-5">
           <h2 class="text-lg font-bold text-gray-900 dark:text-white">
-            {{ editingId ? 'Edit' : 'Add' }} Salary Component
+            {{ editingId ? $t('admin.salaryComponentsView.editComp') : $t('admin.salaryComponentsView.addComp') }}
           </h2>
 
           <div class="space-y-4">
             <label class="flex flex-col gap-1.5">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Name</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('admin.locationsView.name') }}</span>
               <input
                 v-model="form.name"
                 type="text"
@@ -227,24 +227,24 @@ async function deleteComponent(component) {
             </label>
 
             <label class="flex flex-col gap-1.5">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Type</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('admin.salaryComponentsView.type') }}</span>
               <select
                 v-model="form.type"
                 class="w-full px-3 py-2.5 bg-gray-50 dark:bg-dark-bg border border-gray-200 dark:border-dark-line rounded-lg text-gray-700 dark:text-gray-300 text-sm"
               >
-                <option value="FIXED">Fixed (Tunjangan Tetap)</option>
-                <option value="VARIABLE">Variable (Tunjangan Tidak Tetap)</option>
+                <option value="FIXED">{{ $t('admin.salaryComponentsView.fixed') }}</option>
+                <option value="VARIABLE">{{ $t('admin.salaryComponentsView.variable') }}</option>
               </select>
               <p class="text-xs text-gray-400">
                 {{ form.type === 'FIXED'
-                  ? 'Dibayar penuh setiap bulan. Termasuk dalam kalkulasi rate lembur.'
-                  : 'Opsional. Dibayar per hari karyawan hadir. Tidak diberikan jika absen. Tidak termasuk dalam lembur.'
+                  ? $t('admin.salaryComponentsView.fixedDesc')
+                  : $t('admin.salaryComponentsView.variableDesc')
                 }}
               </p>
             </label>
 
             <label class="flex flex-col gap-1.5">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Description (optional)</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('admin.salaryComponentsView.description') }}</span>
               <textarea
                 v-model="form.description"
                 rows="2"
@@ -256,14 +256,14 @@ async function deleteComponent(component) {
 
           <div class="flex justify-end gap-3 pt-2">
             <button @click="showModal = false" class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">
-              Cancel
+              {{ $t('admin.locationsView.cancel') }}
             </button>
             <button
               @click="saveComponent"
               :disabled="!form.name.trim()"
               class="bg-primary hover:bg-primary-600 text-white px-5 py-2 rounded-lg text-sm font-bold disabled:opacity-50 transition-all"
             >
-              {{ editingId ? 'Update' : 'Create' }}
+              {{ editingId ? $t('admin.leaveTypesView.update') : $t('admin.leaveTypesView.create') }}
             </button>
           </div>
         </div>

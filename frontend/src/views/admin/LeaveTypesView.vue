@@ -147,7 +147,7 @@ onMounted(() => {
       <h2 class="text-xl font-bold text-gray-900 dark:text-white">Leave Types</h2>
       <button v-if="canCreate" @click="openModal()" class="btn btn-primary w-full sm:w-auto">
         <span class="material-symbols-outlined text-sm">add</span>
-        Add Leave Type
+        {{ $t('admin.leaveTypesView.addLeaveType') }}
       </button>
     </div>
 
@@ -157,21 +157,21 @@ onMounted(() => {
       <table class="w-full min-w-[700px]">
         <thead class="bg-gray-50 dark:bg-dark-surface">
           <tr>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
-            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Default Days</th>
-            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Paid</th>
-            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Approval</th>
-            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('admin.leaveTypesView.headers.name') }}</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ $t('admin.leaveTypesView.headers.code') }}</th>
+            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">{{ $t('admin.leaveTypesView.headers.defaultDays') }}</th>
+            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">{{ $t('admin.leaveTypesView.headers.paid') }}</th>
+            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">{{ $t('admin.leaveTypesView.headers.approval') }}</th>
+            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">{{ $t('admin.leaveTypesView.headers.status') }}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ $t('admin.leaveTypesView.headers.actions') }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-dark-border">
           <tr v-if="loading">
-            <td colspan="7" class="px-4 py-8 text-center text-gray-500">Loading...</td>
+            <td colspan="7" class="px-4 py-8 text-center text-gray-500">{{ $t('admin.leaveTypesView.loading') }}</td>
           </tr>
           <tr v-else-if="!leaveTypes.length">
-            <td colspan="7" class="px-4 py-8 text-center text-gray-500">No leave types found</td>
+            <td colspan="7" class="px-4 py-8 text-center text-gray-500">{{ $t('admin.leaveTypesView.noData') }}</td>
           </tr>
           <tr v-else v-for="type in leaveTypes" :key="type.id" class="hover:bg-gray-50 dark:hover:bg-dark-surface/50">
             <td class="px-4 py-3">
@@ -191,8 +191,8 @@ onMounted(() => {
               </span>
             </td>
             <td class="px-4 py-3 text-center">
-              <span v-if="type.requires_approval" class="text-amber-600 text-xs">Required</span>
-              <span v-else class="text-gray-400 text-xs">Auto</span>
+              <span v-if="type.requires_approval" class="text-amber-600 text-xs">{{ $t('admin.leaveTypesView.required') }}</span>
+              <span v-else class="text-gray-400 text-xs">{{ $t('admin.leaveTypesView.auto') }}</span>
             </td>
             <td class="px-4 py-3 text-center">
               <button
@@ -200,7 +200,7 @@ onMounted(() => {
                 :class="type.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'"
                 class="text-xs px-2 py-1 rounded-full"
               >
-                {{ type.is_active ? 'Active' : 'Inactive' }}
+                {{ type.is_active ? $t('admin.locationsView.active') : $t('admin.locationsView.inactive') }}
               </button>
             </td>
             <td class="px-4 py-3 text-right">
@@ -223,7 +223,7 @@ onMounted(() => {
     <div v-if="showModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div class="bg-white dark:bg-dark-surface rounded-xl shadow-xl max-w-md w-full p-6" @click.stop>
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {{ isEditing ? 'Edit Leave Type' : 'Add Leave Type' }}
+          {{ isEditing ? $t('admin.leaveTypesView.editLeaveType') : $t('admin.leaveTypesView.addLeaveType') }}
         </h3>
 
         <div v-if="formError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
@@ -232,22 +232,22 @@ onMounted(() => {
 
         <form @submit.prevent="save" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.locationsView.name') }}</label>
             <input v-model="form.name" @input="generateCode" type="text" class="input" placeholder="e.g., Annual Leave" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Code *</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.locationsView.code') }}</label>
             <input v-model="form.code" type="text" class="input" placeholder="e.g., ANNUAL" :disabled="isEditing" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Default Days Per Year</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.leaveTypesView.defaultDaysPerYear') }}</label>
             <input v-model.number="form.default_days" type="number" class="input" min="0" max="365" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Color</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.leaveTypesView.color') }}</label>
             <div class="flex items-center gap-2 flex-wrap">
               <button
                 v-for="color in presetColors"
@@ -264,24 +264,25 @@ onMounted(() => {
           <div class="flex items-center gap-6">
             <label class="flex items-center gap-2 cursor-pointer">
               <input v-model="form.is_paid" type="checkbox" class="w-4 h-4 rounded text-primary" />
-              <span class="text-sm text-gray-700 dark:text-gray-300">Paid Leave</span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ $t('admin.leaveTypesView.paidLeave') }}</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
               <input v-model="form.requires_approval" type="checkbox" class="w-4 h-4 rounded text-primary" />
-              <span class="text-sm text-gray-700 dark:text-gray-300">Requires Approval</span>
+              <span class="text-sm text-gray-700 dark:text-gray-300">{{ $t('admin.leaveTypesView.requiresApproval') }}</span>
             </label>
           </div>
 
           <label class="flex items-center gap-2 cursor-pointer">
             <input v-model="form.is_active" type="checkbox" class="w-4 h-4 rounded text-primary" />
-            <span class="text-sm text-gray-700 dark:text-gray-300">Active</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300">{{ $t('admin.locationsView.active') }}</span>
           </label>
 
           <div class="flex gap-3 pt-4">
             <button type="submit" class="btn btn-primary flex-1" :disabled="saving">
-              {{ saving ? 'Saving...' : (isEditing ? 'Update' : 'Create') }}
+              <span v-if="saving">{{ $t('admin.settingsPageView.saving') }}</span>
+              <span v-else>{{ isEditing ? $t('admin.leaveTypesView.update') : $t('admin.leaveTypesView.create') }}</span>
             </button>
-            <button type="button" @click="closeModal" class="btn btn-secondary">Cancel</button>
+            <button type="button" @click="closeModal" class="btn btn-secondary">{{ $t('admin.locationsView.cancel') }}</button>
           </div>
         </form>
       </div>

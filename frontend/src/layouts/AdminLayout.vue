@@ -10,24 +10,24 @@ const sidebarOpen = ref(false)
 
 // Admin navigation items with required permissions
 const allNavItems = [
-  { name: 'Dashboard', icon: 'dashboard', to: '/admin', permission: 'admin.dashboard.view' },
-  { name: 'Requests', icon: 'pending_actions', to: '/admin/requests', permission: 'admin.requests.view' },
-  { name: 'Leave Requests', icon: 'event_busy', to: '/admin/leave-requests', permission: 'admin.leaves.view' },
-  { name: 'Reports', icon: 'analytics', to: '/admin/reports', permission: 'admin.reports.view' },
-  { name: 'Payroll', icon: 'payments', to: '/admin/payroll', permission: 'admin.payroll.view' },
-  { name: 'Users', icon: 'group', to: '/admin/users', permission: 'admin.users.view' },
+  { name: 'admin.dashboard', icon: 'dashboard', to: '/admin', permission: 'admin.dashboard.view' },
+  { name: 'admin.requests', icon: 'pending_actions', to: '/admin/requests', permission: 'admin.requests.view' },
+  { name: 'admin.leaveRequests', icon: 'event_busy', to: '/admin/leave-requests', permission: 'admin.leaves.view' },
+  { name: 'admin.reports', icon: 'analytics', to: '/admin/reports', permission: 'admin.reports.view' },
+  { name: 'admin.payroll', icon: 'payments', to: '/admin/payroll', permission: 'admin.payroll.view' },
+  { name: 'admin.users', icon: 'group', to: '/admin/users', permission: 'admin.users.view' },
   {
-    name: 'Settings',
+    name: 'admin.settings.title',
     icon: 'settings_applications',
     children: [
-      { name: 'General Settings', to: '/admin/settings', permission: 'admin.settings.view' },
-      { name: 'Locations', to: '/admin/locations', permission: 'admin.locations.view' },
-      { name: 'Shifts', to: '/admin/shifts', permission: 'admin.shifts.view' },
-      { name: 'Leave Types', to: '/admin/leave-types', permission: 'admin.leave-types.view' },
-      { name: 'Holidays', to: '/admin/holidays', permission: 'admin.settings.view' },
-      { name: 'Salary Components', to: '/admin/salary-components', permission: 'admin.salary.view' },
-      { name: 'Roles', to: '/admin/roles', permission: 'admin.roles.view' },
-      { name: 'Devices', to: '/admin/devices', permission: 'admin.devices.view' },
+      { name: 'admin.settings.general', to: '/admin/settings', permission: 'admin.settings.view' },
+      { name: 'admin.settings.locations', to: '/admin/locations', permission: 'admin.locations.view' },
+      { name: 'admin.settings.shifts', to: '/admin/shifts', permission: 'admin.shifts.view' },
+      { name: 'admin.settings.leaveTypes', to: '/admin/leave-types', permission: 'admin.leave-types.view' },
+      { name: 'admin.settings.holidays', to: '/admin/holidays', permission: 'admin.settings.view' },
+      { name: 'admin.settings.salaryComponents', to: '/admin/salary-components', permission: 'admin.salary.view' },
+      { name: 'admin.settings.roles', to: '/admin/roles', permission: 'admin.roles.view' },
+      { name: 'admin.settings.devices', to: '/admin/devices', permission: 'admin.devices.view' },
     ]
   }
 ]
@@ -57,6 +57,36 @@ async function handleLogout() {
   await authStore.logout()
   router.push('/login')
 }
+
+// Compute the page title from nav items matching current route
+import { useI18n } from 'vue-i18n'
+const { t: $t } = useI18n({ useScope: 'global' })
+const route = useRouter().currentRoute
+
+const pageTitle = computed(() => {
+  if (!route.value.path) return $t('admin.dashboard')
+  
+  for (const item of allNavItems) {
+    if (item.to === route.value.path) {
+      return $t(item.name)
+    }
+    if (item.children) {
+      for (const child of item.children) {
+        if (child.to === route.value.path) {
+          return $t(child.name)
+        }
+      }
+    }
+  }
+  
+  // Fallback
+  if (route.value.name) {
+    const routeName = route.value.name.replace('Admin', '')
+    const key = routeName.charAt(0).toLowerCase() + routeName.slice(1)
+    return $t('admin.' + key)
+  }
+  return ''
+})
 </script>
 
 
@@ -82,8 +112,8 @@ async function handleLogout() {
             <span class="material-symbols-outlined text-red-500">admin_panel_settings</span>
           </div>
           <div>
-            <h1 class="font-bold text-gray-900 dark:text-white">Admin Panel</h1>
-            <p class="text-xs text-gray-500">Attendance System</p>
+            <h1 class="font-bold text-gray-900 dark:text-white">{{ $t('admin.adminPanel') }}</h1>
+            <p class="text-xs text-gray-500">{{ $t('admin.attendanceSystem') }}</p>
           </div>
         </div>
       </div>
@@ -100,7 +130,7 @@ async function handleLogout() {
             @click="sidebarOpen = false"
           >
             <span class="material-symbols-outlined">{{ item.icon }}</span>
-            {{ item.name }}
+            {{ $t(item.name) }}
           </RouterLink>
 
           <!-- Submenu -->
@@ -112,7 +142,7 @@ async function handleLogout() {
             <summary class="sidebar-link flex items-center justify-between cursor-pointer list-none [&::-webkit-details-marker]:hidden select-none hover:bg-gray-100 dark:hover:bg-dark-border">
               <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined">{{ item.icon }}</span>
-                {{ item.name }}
+                {{ $t(item.name) }}
               </div>
               <span class="material-symbols-outlined transition-transform group-open:-rotate-180 text-gray-400">expand_more</span>
             </summary>
@@ -125,7 +155,7 @@ async function handleLogout() {
                 active-class="text-primary font-bold bg-red-50 dark:text-red-400 dark:bg-red-900/10"
                 @click="sidebarOpen = false"
               >
-                {{ child.name }}
+                {{ $t(child.name) }}
               </RouterLink>
             </div>
           </details>
@@ -140,7 +170,7 @@ async function handleLogout() {
           @click="sidebarOpen = false"
         >
           <span class="material-symbols-outlined">arrow_back</span>
-          Back to App
+          {{ $t('admin.backToApp') }}
         </RouterLink>
       </nav>
 
@@ -152,7 +182,7 @@ async function handleLogout() {
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-medium text-gray-900 dark:text-white truncate">{{ authStore.user?.name }}</p>
-            <p class="text-xs text-gray-500 truncate">Administrator</p>
+            <p class="text-xs text-gray-500 truncate">{{ $t('admin.administrator') }}</p>
           </div>
         </div>
         <button 
@@ -160,7 +190,7 @@ async function handleLogout() {
           class="sidebar-link w-full text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
         >
           <span class="material-symbols-outlined">logout</span>
-          Logout
+          {{ $t('admin.logout') }}
         </button>
       </div>
     </aside>
@@ -179,7 +209,7 @@ async function handleLogout() {
           
           <div class="flex-1 lg:pl-0">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ $route.name?.replace('Admin', '') }}
+              {{ pageTitle }}
             </h2>
           </div>
 

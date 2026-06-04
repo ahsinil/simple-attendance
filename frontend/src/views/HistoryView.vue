@@ -66,16 +66,16 @@ function statusBadgeClass(status) {
     <div class="card p-4">
       <div class="flex flex-wrap gap-4 items-end">
         <div class="flex-1 min-w-[200px]">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('app.historyView.from') }}</label>
           <input v-model="startDate" type="date" class="input" />
         </div>
         <div class="flex-1 min-w-[200px]">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('app.historyView.to') }}</label>
           <input v-model="endDate" type="date" class="input" />
         </div>
         <button @click="fetchHistory" class="btn btn-primary">
           <span class="material-symbols-outlined text-sm">search</span>
-          Search
+          {{ $t('app.historyView.search') }}
         </button>
       </div>
     </div>
@@ -83,11 +83,11 @@ function statusBadgeClass(status) {
     <!-- History List -->
     <div class="card overflow-hidden">
       <div class="p-4 border-b border-gray-200 dark:border-dark-border">
-        <h3 class="font-semibold text-gray-900 dark:text-white">Attendance History</h3>
+        <h3 class="font-semibold text-gray-900 dark:text-white">{{ $t('app.historyView.attendanceHistory') }}</h3>
       </div>
 
       <div v-if="attendanceStore.loading" class="p-8 text-center text-gray-500">
-        Loading...
+        {{ $t('app.historyView.loading') }}
       </div>
 
       <div v-else-if="attendanceStore.history?.data?.length" class="divide-y divide-gray-200 dark:divide-dark-border">
@@ -112,7 +112,7 @@ function statusBadgeClass(status) {
               <div>
                 <div class="flex items-center gap-2">
                   <span class="font-medium text-gray-900 dark:text-white">
-                    {{ record.check_type === 'IN' ? 'Check In' : 'Check Out' }}
+                    {{ record.check_type === 'IN' ? $t('app.historyView.checkIn') : $t('app.historyView.checkOut') }}
                   </span>
                   <span 
                     class="text-xs px-2 py-0.5 rounded-full"
@@ -128,7 +128,7 @@ function statusBadgeClass(status) {
             </div>
             <div class="text-right">
               <p class="font-semibold text-gray-900 dark:text-white">{{ formatTime(record.scan_time) }}</p>
-              <p v-if="record.late_min > 0" class="text-sm text-amber-500">{{ record.late_min }}m late</p>
+              <p v-if="record.late_min > 0" class="text-sm text-amber-500">{{ $t('app.historyView.late', { min: record.late_min }) }}</p>
               <p v-if="record.work_minutes" class="text-sm text-gray-500">{{ Math.floor(record.work_minutes / 60) }}h {{ record.work_minutes % 60 }}m</p>
             </div>
           </div>
@@ -136,7 +136,7 @@ function statusBadgeClass(status) {
       </div>
 
       <div v-else class="p-8 text-center text-gray-500">
-        No attendance records found
+        {{ $t('app.historyView.noRecords') }}
       </div>
     </div>
   </div>

@@ -113,9 +113,9 @@ const maxChartValue = computed(() => {
         <div class="card p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-500">Present Today</p>
+              <p class="text-sm text-gray-500">{{ $t('admin.dashboardView.presentToday') }}</p>
               <p class="text-3xl font-bold text-green-500">{{ data.realtime.present_today }}</p>
-              <p class="text-xs text-gray-400">of {{ data.realtime.total_employees }} employees</p>
+              <p class="text-xs text-gray-400">{{ $t('admin.dashboardView.ofEmployees', { total: data.realtime.total_employees }) }}</p>
             </div>
             <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
               <span class="material-symbols-outlined text-green-500">groups</span>
@@ -126,9 +126,9 @@ const maxChartValue = computed(() => {
         <div class="card p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-500">Late Today</p>
+              <p class="text-sm text-gray-500">{{ $t('admin.dashboardView.lateToday') }}</p>
               <p class="text-3xl font-bold text-amber-500">{{ data.realtime.late_today }}</p>
-              <p class="text-xs text-gray-400">avg {{ data.realtime.avg_late_minutes }}min late</p>
+              <p class="text-xs text-gray-400">{{ $t('admin.dashboardView.avgLate', { min: data.realtime.avg_late_minutes }) }}</p>
             </div>
             <div class="w-12 h-12 bg-amber-100 dark:bg-amber-900/20 rounded-full flex items-center justify-center">
               <span class="material-symbols-outlined text-amber-500">schedule</span>
@@ -139,9 +139,9 @@ const maxChartValue = computed(() => {
         <div class="card p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-500">On Time</p>
+              <p class="text-sm text-gray-500">{{ $t('admin.dashboardView.onTime') }}</p>
               <p class="text-3xl font-bold text-blue-500">{{ data.realtime.on_time_today }}</p>
-              <p class="text-xs text-gray-400">{{ data.realtime.attendance_rate }}% rate</p>
+              <p class="text-xs text-gray-400">{{ $t('admin.dashboardView.rate', { rate: data.realtime.attendance_rate }) }}</p>
             </div>
             <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
               <span class="material-symbols-outlined text-blue-500">verified</span>
@@ -152,9 +152,9 @@ const maxChartValue = computed(() => {
         <div class="card p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-500">Not Checked In</p>
+              <p class="text-sm text-gray-500">{{ $t('admin.dashboardView.notCheckedIn') }}</p>
               <p class="text-3xl font-bold text-gray-500">{{ data.realtime.not_checked_in }}</p>
-              <p class="text-xs text-gray-400">pending</p>
+              <p class="text-xs text-gray-400">{{ $t('admin.dashboardView.pending') }}</p>
             </div>
             <div class="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
               <span class="material-symbols-outlined text-gray-500">person_off</span>
@@ -167,7 +167,7 @@ const maxChartValue = computed(() => {
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <!-- Attendance Rate Chart -->
         <div class="card p-6 lg:col-span-2">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Attendance This Month</h3>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ $t('admin.dashboardView.attendanceThisMonth') }}</h3>
           <div class="h-48 flex items-end gap-1" v-if="chartData.length">
             <div 
               v-for="day in chartData" 
@@ -190,21 +190,21 @@ const maxChartValue = computed(() => {
             </div>
           </div>
           <div v-else class="h-48 flex items-center justify-center text-gray-500">
-            No data available
+            {{ $t('admin.dashboardView.noData') }}
           </div>
           <div class="flex items-center gap-4 mt-4 text-xs text-gray-500">
             <span class="flex items-center gap-1">
-              <span class="w-3 h-3 bg-green-400 rounded"></span> On Time
+              <span class="w-3 h-3 bg-green-400 rounded"></span> {{ $t('admin.dashboardView.onTime') }}
             </span>
             <span class="flex items-center gap-1">
-              <span class="w-3 h-3 bg-amber-400 rounded"></span> Late
+              <span class="w-3 h-3 bg-amber-400 rounded"></span> {{ $t('app.dashboardView.late') }}
             </span>
           </div>
         </div>
 
         <!-- Late vs On-Time Ratio -->
         <div class="card p-6">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Late vs On-Time</h3>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ $t('admin.dashboardView.lateVsOnTime') }}</h3>
           <div class="flex items-center justify-center h-32">
             <div class="relative w-32 h-32">
               <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
@@ -220,18 +220,18 @@ const maxChartValue = computed(() => {
                 <span class="text-2xl font-bold text-gray-900 dark:text-white">
                   {{ 100 - (data.monthly.late_vs_ontime.late_percentage || 0) }}%
                 </span>
-                <span class="text-xs text-gray-500">On Time</span>
+                <span class="text-xs text-gray-500">{{ $t('admin.dashboardView.onTime') }}</span>
               </div>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4 mt-4 text-center">
             <div>
               <p class="text-2xl font-bold text-green-500">{{ data.monthly.late_vs_ontime.on_time }}</p>
-              <p class="text-xs text-gray-500">On Time</p>
+              <p class="text-xs text-gray-500">{{ $t('admin.dashboardView.onTime') }}</p>
             </div>
             <div>
               <p class="text-2xl font-bold text-amber-500">{{ data.monthly.late_vs_ontime.late }}</p>
-              <p class="text-xs text-gray-500">Late</p>
+              <p class="text-xs text-gray-500">{{ $t('app.dashboardView.late') }}</p>
             </div>
           </div>
         </div>
@@ -241,8 +241,8 @@ const maxChartValue = computed(() => {
       <div class="card p-6">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Average Work Duration</h3>
-            <p class="text-sm text-gray-500">This month</p>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $t('admin.dashboardView.avgWorkDuration') }}</h3>
+            <p class="text-sm text-gray-500">{{ $t('admin.dashboardView.thisMonth') }}</p>
           </div>
           <div class="text-right">
             <p class="text-3xl font-bold text-primary">{{ data.monthly.avg_work_duration.hours }}h</p>
@@ -259,7 +259,7 @@ const maxChartValue = computed(() => {
           <div class="card p-6">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
               <span class="material-symbols-outlined text-amber-500">trending_down</span>
-              Top Late Employees
+              {{ $t('admin.dashboardView.topLateEmployees') }}
             </h3>
             <div v-if="data.employee_insights.top_late.length" class="space-y-3">
               <div v-for="(emp, idx) in data.employee_insights.top_late" :key="emp.user?.id" class="flex items-center gap-3">
@@ -271,19 +271,19 @@ const maxChartValue = computed(() => {
                   <p class="text-xs text-gray-500">{{ emp.user?.employee_id }}</p>
                 </div>
                 <div class="text-right">
-                  <p class="font-semibold text-amber-500">{{ emp.late_count }}x late</p>
-                  <p class="text-xs text-gray-400">{{ emp.total_late_minutes }}min total</p>
+                  <p class="font-semibold text-amber-500">{{ $t('admin.dashboardView.xLate', { count: emp.late_count }) }}</p>
+                  <p class="text-xs text-gray-400">{{ $t('admin.dashboardView.minTotal', { min: emp.total_late_minutes }) }}</p>
                 </div>
               </div>
             </div>
-            <p v-else class="text-gray-500 text-sm">No late employees this month 🎉</p>
+            <p v-else class="text-gray-500 text-sm">{{ $t('admin.dashboardView.noLateEmployees') }}</p>
           </div>
 
           <!-- Perfect Attendance -->
           <div class="card p-6">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
               <span class="material-symbols-outlined text-green-500">emoji_events</span>
-              Perfect Attendance
+              {{ $t('admin.dashboardView.perfectAttendance') }}
             </h3>
             <div v-if="data.employee_insights.perfect_attendance.length" class="space-y-3">
               <div v-for="emp in data.employee_insights.perfect_attendance" :key="emp.user?.id" class="flex items-center gap-3">
@@ -294,17 +294,17 @@ const maxChartValue = computed(() => {
                   <p class="font-medium text-gray-900 dark:text-white">{{ emp.user?.name }}</p>
                   <p class="text-xs text-gray-500">{{ emp.user?.employee_id }}</p>
                 </div>
-                <span class="text-sm text-green-500 font-medium">{{ emp.days_present }} days</span>
+                <span class="text-sm text-green-500 font-medium">{{ $t('admin.dashboardView.days', { count: emp.days_present }) }}</span>
               </div>
             </div>
-            <p v-else class="text-gray-500 text-sm">No perfect attendance yet</p>
+            <p v-else class="text-gray-500 text-sm">{{ $t('admin.dashboardView.noPerfectAttendance') }}</p>
           </div>
 
           <!-- Missing Checkout -->
           <div class="card p-6">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
               <span class="material-symbols-outlined text-red-500">logout</span>
-              Missing Checkout Today
+              {{ $t('admin.dashboardView.missingCheckout') }}
             </h3>
             <div v-if="data.employee_insights.missing_checkout.length" class="space-y-2">
               <div v-for="emp in data.employee_insights.missing_checkout" :key="emp.id" class="flex items-center gap-2 text-sm">
@@ -313,7 +313,7 @@ const maxChartValue = computed(() => {
                 <span class="text-gray-400">{{ emp.employee_id }}</span>
               </div>
             </div>
-            <p v-else class="text-gray-500 text-sm">All checked out ✓</p>
+            <p v-else class="text-gray-500 text-sm">{{ $t('admin.dashboardView.allCheckedOut') }}</p>
           </div>
         </div>
 
@@ -324,9 +324,9 @@ const maxChartValue = computed(() => {
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center justify-between">
               <span class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary">pending_actions</span>
-                Pending Requests
+                {{ $t('admin.dashboardView.pendingRequests') }}
               </span>
-              <RouterLink to="/admin/requests" class="text-sm text-primary hover:underline">View all</RouterLink>
+              <RouterLink to="/admin/requests" class="text-sm text-primary hover:underline">{{ $t('admin.dashboardView.viewAll') }}</RouterLink>
             </h3>
             <div v-if="data.pending_requests.length" class="space-y-3">
               <div v-for="req in data.pending_requests" :key="req.id" class="p-3 bg-gray-50 dark:bg-dark-border rounded-lg">
@@ -344,26 +344,26 @@ const maxChartValue = computed(() => {
                     :disabled="processingId === req.id"
                     class="flex-1 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-sm rounded-lg transition-colors disabled:opacity-50"
                   >
-                    Approve
+                    {{ $t('admin.dashboardView.approve') }}
                   </button>
                   <button 
                     @click="quickReject(req.id)"
                     :disabled="processingId === req.id"
                     class="flex-1 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg transition-colors disabled:opacity-50"
                   >
-                    Reject
+                    {{ $t('admin.dashboardView.reject') }}
                   </button>
                 </div>
               </div>
             </div>
-            <p v-else class="text-gray-500 text-sm text-center py-4">No pending requests</p>
+            <p v-else class="text-gray-500 text-sm text-center py-4">{{ $t('admin.dashboardView.noPendingRequests') }}</p>
           </div>
 
           <!-- Recent Activity -->
           <div class="card p-6">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
               <span class="material-symbols-outlined text-blue-500">history</span>
-              Recent Activity
+              {{ $t('admin.dashboardView.recentActivity') }}
             </h3>
             <div v-if="data.recent_activity.length" class="space-y-3 max-h-80 overflow-y-auto">
               <div v-for="activity in data.recent_activity" :key="activity.id" class="flex items-center gap-3">
@@ -393,7 +393,7 @@ const maxChartValue = computed(() => {
                 </div>
               </div>
             </div>
-            <p v-else class="text-gray-500 text-sm text-center py-4">No recent activity</p>
+            <p v-else class="text-gray-500 text-sm text-center py-4">{{ $t('admin.dashboardView.noRecentActivity') }}</p>
           </div>
         </div>
       </div>

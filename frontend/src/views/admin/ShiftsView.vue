@@ -83,7 +83,7 @@ async function deleteShift(shift) {
     <div class="flex justify-end">
       <button v-if="canCreate" @click="openCreate" class="btn btn-primary">
         <span class="material-symbols-outlined text-sm">add</span>
-        Add Shift
+        {{ $t('admin.shiftsView.addShift') }}
       </button>
     </div>
 
@@ -107,7 +107,7 @@ async function deleteShift(shift) {
           <p class="text-3xl font-bold text-primary">{{ shift.start_time }} - {{ shift.end_time }}</p>
         </div>
         <div class="text-sm text-gray-500 text-center">
-          Late after {{ shift.late_after_min }} min
+          {{ $t('admin.shiftsView.lateAfter', { min: shift.late_after_min }) }}
         </div>
       </div>
     </div>
@@ -116,36 +116,36 @@ async function deleteShift(shift) {
     <div v-if="showForm" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div class="card p-6 w-full max-w-md">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {{ editingShift ? 'Edit Shift' : 'Add Shift' }}
+          {{ editingShift ? $t('admin.shiftsView.editShift') : $t('admin.shiftsView.addShift') }}
         </h3>
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Code *</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.locationsView.code') }}</label>
               <input v-model="form.code" class="input" placeholder="SHIFT-01" required />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.locationsView.name') }}</label>
               <input v-model="form.name" class="input" placeholder="Morning Shift" required />
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Time *</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.shiftsView.startTime') }}</label>
               <input v-model="form.start_time" type="time" class="input" required />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Time *</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.shiftsView.endTime') }}</label>
               <input v-model="form.end_time" type="time" class="input" required />
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Late After (min)</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.shiftsView.lateAfterMin') }}</label>
             <input v-model.number="form.late_after_min" type="number" class="input" min="0" max="120" />
           </div>
           <div class="flex gap-3 pt-4">
-            <button type="submit" class="btn btn-primary flex-1">Save</button>
-            <button type="button" @click="showForm = false" class="btn btn-secondary flex-1">Cancel</button>
+            <button type="submit" class="btn btn-primary flex-1">{{ $t('admin.locationsView.save') }}</button>
+            <button type="button" @click="showForm = false" class="btn btn-secondary flex-1">{{ $t('admin.locationsView.cancel') }}</button>
           </div>
         </form>
       </div>
