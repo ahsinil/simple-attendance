@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             LatePenaltyTierSeeder::class,
             ShiftSeeder::class,
             LeaveTypeSeeder::class,
-            DummyDataSeeder::class,
+            ProductionDummyDataSeeder::class,
         ]);
     }
 }
