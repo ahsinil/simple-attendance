@@ -2,6 +2,7 @@
 import { ref, watch, computed } from 'vue'
 import { adminApi } from '@/services/api'
 import { useToast } from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 
 const props = defineProps({
   show: {
@@ -16,6 +17,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'saved'])
 const toast = useToast()
+const { confirm } = useConfirm()
 
 const loadingSalary = ref(false)
 const salaryData = ref({ base_salary: 0, components: [], total_fixed: 0, total_variable: 0, hourly_rate: 0 })
@@ -25,9 +27,33 @@ const salaryForm = ref({ base_salary: 0, components: [] })
 // Monthly working days for daily rate preview (approximate)
 const MONTHLY_WORK_DAYS = 22
 
+// ─── Additional (Custom) Allowances ───
+const additionalAllowances = ref([])
+const loadingAdditional = ref(false)
+const showAddForm = ref(false)
+const editingAllowance = ref(null)
+
+// Default period = current month/year
+const now = new Date()
+const additionalForm = ref({
+  name: '',
+  amount: 0,
+  description: '',
+  period_year: now.getFullYear(),
+  period_month: now.getMonth() + 1,
+})
+
+const MONTHS = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+]
+
 watch(() => props.show, (newVal) => {
   if (newVal && props.user) {
     loadSalaryData()
+    loadAdditionalAllowances()
+  } else {
+    resetAddForm()
   }
 })
 
@@ -57,6 +83,83 @@ async function loadSalaryData() {
     console.error('Failed to load salary data:', error)
   } finally {
     loadingSalary.value = false
+  }
+}
+
+async function loadAdditionalAllowances() {
+  if (!props.user) return
+  loadingAdditional.value = true
+  try {
+    const res = await adminApi.getUserAdditionalAllowances(props.user.id)
+    if (res.data.success) {
+      additionalAllowances.value = res.data.data
+    }
+  } catch (error) {
+    console.error('Failed to load additional allowances:', error)
+  } finally {
+    loadingAdditional.value = false
+  }
+}
+
+function resetAddForm() {
+  const d = new Date()
+  additionalForm.value = {
+    name: '',
+    amount: 0,
+    description: '',
+    period_year: d.getFullYear(),
+    period_month: d.getMonth() + 1,
+  }
+  editingAllowance.value = null
+  showAddForm.value = false
+}
+
+function openEditAllowance(allowance) {
+  editingAllowance.value = allowance
+  additionalForm.value = {
+    name: allowance.name,
+    amount: parseFloat(allowance.amount),
+    description: allowance.description || '',
+    period_year: allowance.period_year,
+    period_month: allowance.period_month,
+  }
+  showAddForm.value = true
+}
+
+async function saveAdditionalAllowance() {
+  if (!additionalForm.value.name.trim() || additionalForm.value.amount <= 0) {
+    toast.error('Nama dan nominal harus diisi')
+    return
+  }
+  try {
+    if (editingAllowance.value) {
+      await adminApi.updateUserAdditionalAllowance(props.user.id, editingAllowance.value.id, additionalForm.value)
+      toast.success('Tunjangan tambahan berhasil diperbarui')
+    } else {
+      await adminApi.addUserAdditionalAllowance(props.user.id, additionalForm.value)
+      toast.success('Tunjangan tambahan berhasil ditambahkan')
+    }
+    resetAddForm()
+    loadAdditionalAllowances()
+  } catch (error) {
+    toast.error(error.response?.data?.message || 'Gagal menyimpan tunjangan tambahan')
+  }
+}
+
+async function deleteAdditionalAllowance(allowance) {
+  const ok = await confirm({
+    title: 'Hapus Tunjangan Tambahan',
+    message: `Hapus "${allowance.name}" (${formatPeriod(allowance.period_year, allowance.period_month)})?`,
+    confirmText: 'Hapus',
+    type: 'danger',
+  })
+  if (!ok) return
+  try {
+    await adminApi.deleteUserAdditionalAllowance(props.user.id, allowance.id)
+    toast.success('Tunjangan tambahan dihapus')
+    loadAdditionalAllowances()
+  } catch {
+    toast.error('Gagal menghapus')
   }
 }
 
@@ -96,7 +199,12 @@ function formatCurrency(amount) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount)
 }
 
+function formatPeriod(year, month) {
+  return `${MONTHS[month - 1]} ${year}`
+}
+
 function closeModal() {
+  resetAddForm()
   emit('close')
 }
 
@@ -119,6 +227,7 @@ const availableVariable = computed(() =>
 // Totals
 const totalFixed = computed(() => fixedComponents.value.reduce((s, c) => s + (parseFloat(c.amount) || 0), 0))
 const totalVariable = computed(() => variableComponents.value.reduce((s, c) => s + (parseFloat(c.amount) || 0), 0))
+const totalAdditional = computed(() => additionalAllowances.value.reduce((s, a) => s + (parseFloat(a.amount) || 0), 0))
 const baseSalary = computed(() => parseFloat(salaryForm.value.base_salary) || 0)
 const otRate = computed(() => (baseSalary.value + totalFixed.value) / 173)
 const dailyVariableRate = computed(() => totalVariable.value / MONTHLY_WORK_DAYS)
@@ -311,6 +420,147 @@ function getComponentIndex(comp) {
             </div>
           </div>
 
+          <!-- ───── TUNJANGAN TAMBAHAN CUSTOM ───── -->
+          <div class="rounded-xl border border-purple-100 dark:border-purple-900/40 overflow-hidden">
+            <!-- Section header -->
+            <div class="flex items-center gap-3 px-4 py-3 bg-purple-50 dark:bg-purple-900/20">
+              <span class="p-1.5 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-lg">
+                <span class="material-symbols-outlined text-base">add_circle</span>
+              </span>
+              <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-purple-800 dark:text-purple-300 text-sm">Tunjangan Tambahan (Custom)</h4>
+                <p class="text-xs text-purple-600 dark:text-purple-400">Ad-hoc per periode bulan, langsung dijumlahkan ke total payroll</p>
+              </div>
+              <span class="text-sm font-bold text-purple-700 dark:text-purple-300 whitespace-nowrap">
+                {{ formatCurrency(totalAdditional) }}
+              </span>
+            </div>
+
+            <div class="p-4 space-y-3">
+              <!-- Loading state -->
+              <div v-if="loadingAdditional" class="flex justify-center py-4">
+                <span class="material-symbols-outlined animate-spin text-2xl text-purple-400">progress_activity</span>
+              </div>
+
+              <template v-else>
+                <!-- List of existing additional allowances -->
+                <div v-if="additionalAllowances.length === 0 && !showAddForm" class="text-sm text-gray-400 py-1">
+                  Belum ada tunjangan tambahan.
+                </div>
+
+                <div
+                  v-for="allowance in additionalAllowances"
+                  :key="allowance.id"
+                  class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-dark-bg rounded-lg"
+                >
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <p class="font-medium text-gray-900 dark:text-white text-sm truncate">{{ allowance.name }}</p>
+                      <span class="text-xs px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-medium whitespace-nowrap">
+                        {{ formatPeriod(allowance.period_year, allowance.period_month) }}
+                      </span>
+                    </div>
+                    <p v-if="allowance.description" class="text-xs text-gray-400 mt-0.5 truncate">{{ allowance.description }}</p>
+                  </div>
+                  <span class="font-semibold text-purple-700 dark:text-purple-300 text-sm whitespace-nowrap">
+                    {{ formatCurrency(allowance.amount) }}
+                  </span>
+                  <div class="flex items-center gap-1 flex-shrink-0">
+                    <button
+                      @click="openEditAllowance(allowance)"
+                      class="p-1.5 hover:bg-purple-100 dark:hover:bg-purple-900/20 rounded-lg text-purple-500 transition-colors"
+                      title="Edit"
+                    >
+                      <span class="material-symbols-outlined text-sm">edit</span>
+                    </button>
+                    <button
+                      @click="deleteAdditionalAllowance(allowance)"
+                      class="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg text-red-500 transition-colors"
+                      title="Hapus"
+                    >
+                      <span class="material-symbols-outlined text-sm">delete</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Inline Add/Edit Form -->
+                <div v-if="showAddForm" class="border border-purple-200 dark:border-purple-800 rounded-xl p-4 space-y-3 bg-purple-50/50 dark:bg-purple-900/10">
+                  <h5 class="text-sm font-semibold text-purple-800 dark:text-purple-300">
+                    {{ editingAllowance ? 'Edit Tunjangan Tambahan' : 'Tambah Tunjangan Baru' }}
+                  </h5>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="col-span-2">
+                      <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Nama Tunjangan *</label>
+                      <input
+                        v-model="additionalForm.name"
+                        type="text"
+                        placeholder="Contoh: Bonus Proyek, THR, Insentif"
+                        class="input w-full text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Nominal (Rp) *</label>
+                      <input
+                        v-model.number="additionalForm.amount"
+                        type="number"
+                        placeholder="0"
+                        min="0"
+                        class="input w-full text-sm text-right"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Periode *</label>
+                      <div class="flex gap-1.5">
+                        <select v-model.number="additionalForm.period_month" class="input flex-1 text-sm">
+                          <option v-for="(m, i) in MONTHS" :key="i" :value="i + 1">{{ m }}</option>
+                        </select>
+                        <input
+                          v-model.number="additionalForm.period_year"
+                          type="number"
+                          placeholder="2026"
+                          min="2020"
+                          max="2100"
+                          class="input w-20 text-sm"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-span-2">
+                      <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Keterangan (opsional)</label>
+                      <input
+                        v-model="additionalForm.description"
+                        type="text"
+                        placeholder="Keterangan tambahan..."
+                        class="input w-full text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div class="flex justify-end gap-2 pt-1">
+                    <button @click="resetAddForm" class="text-xs px-3 py-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-dark-border transition-colors">
+                      Batal
+                    </button>
+                    <button
+                      @click="saveAdditionalAllowance"
+                      :disabled="!additionalForm.name.trim() || additionalForm.amount <= 0"
+                      class="text-xs px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 transition-colors"
+                    >
+                      {{ editingAllowance ? 'Perbarui' : 'Tambahkan' }}
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Add Button -->
+                <button
+                  v-if="!showAddForm"
+                  @click="showAddForm = true"
+                  class="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-dashed border-purple-300 dark:border-purple-700 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 text-xs font-medium transition-colors"
+                >
+                  <span class="material-symbols-outlined text-sm">add</span>
+                  Tambah Tunjangan Custom
+                </button>
+              </template>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -329,6 +579,10 @@ function getComponentIndex(comp) {
           <div class="flex items-center justify-between text-amber-600 dark:text-amber-400">
             <span>Tunjangan Tidak Tetap <span class="text-xs">(maks/bln)</span></span>
             <span>{{ formatCurrency(totalVariable) }}</span>
+          </div>
+          <div v-if="totalAdditional > 0" class="flex items-center justify-between text-purple-600 dark:text-purple-400">
+            <span>Tunjangan Tambahan <span class="text-xs">(semua periode)</span></span>
+            <span>{{ formatCurrency(totalAdditional) }}</span>
           </div>
           <div class="flex items-center justify-between font-bold text-gray-900 dark:text-white pt-1.5 border-t border-gray-100 dark:border-dark-border">
             <span>Total Gaji Maks.</span>

@@ -231,6 +231,7 @@ function formatNumber(num, decimals = 1) {
               <th class="px-4 py-3 text-right">Base Salary</th>
               <th class="px-4 py-3 text-right">Fixed Allow.</th>
               <th class="px-4 py-3 text-right" title="Dibayar hanya untuk hari hadir">Var. Allow. <span class="text-gray-400 font-normal">(Hadir)</span></th>
+              <th class="px-4 py-3 text-right" title="Tunjangan tambahan custom per bulan">Custom Allow.</th>
               <th class="px-4 py-3 text-right">Total Salary</th>
               <th class="px-4 py-3 text-right">OT Pay</th>
               <th class="px-4 py-3 text-right">Deductions</th>
@@ -239,7 +240,7 @@ function formatNumber(num, decimals = 1) {
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-dark-border text-sm">
             <tr v-if="payrollData.length === 0">
-              <td colspan="11" class="px-4 py-12 text-center text-gray-500">No payroll data found for the selected period.</td>
+              <td colspan="12" class="px-4 py-12 text-center text-gray-500">No payroll data found for the selected period.</td>
             </tr>
             <tr v-for="row in payrollData" :key="row.user_id" class="group hover:bg-gray-50 dark:hover:bg-dark-bg transition-colors">
               <td class="px-4 py-3 sticky left-0 bg-white dark:bg-dark-surface group-hover:bg-gray-50 dark:group-hover:bg-dark-bg z-10">
@@ -280,7 +281,17 @@ function formatNumber(num, decimals = 1) {
                   </span>
                 </div>
               </td>
-              <td class="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{{ formatCurrency(row.base_salary + row.fixed_allowances + row.variable_allowances) }}</td>
+              <!-- Custom (additional) allowances -->
+              <td class="px-4 py-3 text-right">
+                <span
+                  v-if="row.additional_allowances > 0"
+                  class="font-medium text-purple-600 dark:text-purple-400"
+                >
+                  {{ formatCurrency(row.additional_allowances) }}
+                </span>
+                <span v-else class="text-gray-400">-</span>
+              </td>
+              <td class="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">{{ formatCurrency(row.base_salary + row.fixed_allowances + row.variable_allowances + (row.additional_allowances || 0)) }}</td>
               <td class="px-4 py-3 text-right font-medium text-green-600 dark:text-green-400">{{ formatCurrency(row.overtime_pay) }}</td>
               <td class="px-4 py-3 text-right font-medium text-red-600 dark:text-red-400">
                 <div class="flex flex-col items-end">
@@ -301,6 +312,7 @@ function formatNumber(num, decimals = 1) {
               <td class="px-4 py-3"></td>
               <td class="px-4 py-3"></td>
               <td class="px-4 py-3"></td>
+              <td class="px-4 py-3 text-right text-purple-600 dark:text-purple-400">{{ formatCurrency(payrollData.reduce((s, r) => s + (r.additional_allowances || 0), 0)) }}</td>
               <td class="px-4 py-3"></td>
               <td class="px-4 py-3 text-right text-green-600 dark:text-green-400">{{ formatCurrency(kpis.total_overtime_pay) }}</td>
               <td class="px-4 py-3 text-right text-red-600 dark:text-red-400">-{{ formatCurrency(kpis.total_variable_deductions) }}</td>

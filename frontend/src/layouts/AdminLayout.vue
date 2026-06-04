@@ -13,21 +13,35 @@ const allNavItems = [
   { name: 'Dashboard', icon: 'dashboard', to: '/admin', permission: 'admin.dashboard.view' },
   { name: 'Requests', icon: 'pending_actions', to: '/admin/requests', permission: 'admin.requests.view' },
   { name: 'Leave Requests', icon: 'event_busy', to: '/admin/leave-requests', permission: 'admin.leaves.view' },
-  { name: 'Users', icon: 'group', to: '/admin/users', permission: 'admin.users.view' },
-  { name: 'Roles', icon: 'admin_panel_settings', to: '/admin/roles', permission: 'admin.roles.view' },
-  { name: 'Shifts', icon: 'schedule', to: '/admin/shifts', permission: 'admin.shifts.view' },
-  { name: 'Leave Types', icon: 'beach_access', to: '/admin/leave-types', permission: 'admin.leave-types.view' },
-  { name: 'Locations', icon: 'location_on', to: '/admin/locations', permission: 'admin.locations.view' },
-  { name: 'Payroll', icon: 'payments', to: '/admin/payroll', permission: 'admin.payroll.view' },
-  { name: 'Salary Components', icon: 'account_balance', to: '/admin/salary-components', permission: 'admin.salary.view' },
   { name: 'Reports', icon: 'analytics', to: '/admin/reports', permission: 'admin.reports.view' },
-  { name: 'Devices', icon: 'devices', to: '/admin/devices', permission: 'admin.devices.view' },
-  { name: 'Settings', icon: 'settings_applications', to: '/admin/settings', permission: 'admin.settings.view' },
+  { name: 'Payroll', icon: 'payments', to: '/admin/payroll', permission: 'admin.payroll.view' },
+  { name: 'Users', icon: 'group', to: '/admin/users', permission: 'admin.users.view' },
+  {
+    name: 'Settings',
+    icon: 'settings_applications',
+    children: [
+      { name: 'General Settings', to: '/admin/settings', permission: 'admin.settings.view' },
+      { name: 'Locations', to: '/admin/locations', permission: 'admin.locations.view' },
+      { name: 'Shifts', to: '/admin/shifts', permission: 'admin.shifts.view' },
+      { name: 'Leave Types', to: '/admin/leave-types', permission: 'admin.leave-types.view' },
+      { name: 'Holidays', to: '/admin/holidays', permission: 'admin.settings.view' },
+      { name: 'Salary Components', to: '/admin/salary-components', permission: 'admin.salary.view' },
+      { name: 'Roles', to: '/admin/roles', permission: 'admin.roles.view' },
+      { name: 'Devices', to: '/admin/devices', permission: 'admin.devices.view' },
+    ]
+  }
 ]
 
 // Filter nav items based on user permissions
 const navItems = computed(() => {
   return allNavItems.filter(item => {
+    if (item.children) {
+      item.children = item.children.filter(child => {
+        if (!child.permission) return true
+        return authStore.user?.permissions?.includes(child.permission)
+      })
+      return item.children.length > 0
+    }
     if (!item.permission) return true
     return authStore.user?.permissions?.includes(item.permission)
   })
@@ -76,17 +90,46 @@ async function handleLogout() {
 
       <!-- Navigation -->
       <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-        <RouterLink
-          v-for="item in navItems"
-          :key="item.to"
-          :to="item.to"
-          class="sidebar-link"
-          :class="{ 'active': item.to === '/admin' ? $route.path === '/admin' : $route.path.startsWith(item.to + '/') || $route.path === item.to }"
-          @click="sidebarOpen = false"
-        >
-          <span class="material-symbols-outlined">{{ item.icon }}</span>
-          {{ item.name }}
-        </RouterLink>
+        <template v-for="item in navItems" :key="item.name">
+          <!-- Normal Link -->
+          <RouterLink
+            v-if="!item.children"
+            :to="item.to"
+            class="sidebar-link"
+            :class="{ 'active': item.to === '/admin' ? $route.path === '/admin' : $route.path.startsWith(item.to + '/') || $route.path === item.to }"
+            @click="sidebarOpen = false"
+          >
+            <span class="material-symbols-outlined">{{ item.icon }}</span>
+            {{ item.name }}
+          </RouterLink>
+
+          <!-- Submenu -->
+          <details 
+            v-else 
+            class="group"
+            :open="item.children.some(child => $route.path.startsWith(child.to) || $route.path === child.to)"
+          >
+            <summary class="sidebar-link flex items-center justify-between cursor-pointer list-none [&::-webkit-details-marker]:hidden select-none hover:bg-gray-100 dark:hover:bg-dark-border">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined">{{ item.icon }}</span>
+                {{ item.name }}
+              </div>
+              <span class="material-symbols-outlined transition-transform group-open:-rotate-180 text-gray-400">expand_more</span>
+            </summary>
+            <div class="mt-1 ml-4 pl-4 border-l-2 border-gray-100 dark:border-dark-border space-y-1">
+              <RouterLink
+                v-for="child in item.children"
+                :key="child.to"
+                :to="child.to"
+                class="block px-3 py-2 text-sm rounded-lg text-gray-600 hover:text-primary hover:bg-red-50 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/10 transition-colors"
+                active-class="text-primary font-bold bg-red-50 dark:text-red-400 dark:bg-red-900/10"
+                @click="sidebarOpen = false"
+              >
+                {{ child.name }}
+              </RouterLink>
+            </div>
+          </details>
+        </template>
 
         <div v-if="canAccessApp" class="my-4 border-t border-gray-200 dark:border-dark-border" />
 

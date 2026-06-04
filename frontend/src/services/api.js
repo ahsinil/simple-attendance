@@ -179,5 +179,18 @@ export const adminApi = {
     // User Salary
     getUserSalary: (userId) => api.get(`/admin/users/${userId}/salary`),
     updateUserSalary: (userId, data) => api.post(`/admin/users/${userId}/salary`, data),
+
+    // User Additional (Custom) Allowances
+    getUserAdditionalAllowances: (userId, params) => api.get(`/admin/users/${userId}/additional-allowances`, { params }),
+    addUserAdditionalAllowance: (userId, data) => api.post(`/admin/users/${userId}/additional-allowances`, data),
+    updateUserAdditionalAllowance: (userId, allowanceId, data) => api.put(`/admin/users/${userId}/additional-allowances/${allowanceId}`, data),
+    deleteUserAdditionalAllowance: (userId, allowanceId) => api.delete(`/admin/users/${userId}/additional-allowances/${allowanceId}`),
+
+    // Holidays
+    getHolidays: (params) => api.get('/admin/holidays', { params }),
+    createHoliday: (data) => api.post('/admin/holidays', data),
+    updateHoliday: (id, data) => api.put(`/admin/holidays/${id}`, data),
+    deleteHoliday: (id) => api.delete(`/admin/holidays/${id}`),
+    syncHolidays: (year) => api.post('/admin/holidays/sync', { year }),
 }
 

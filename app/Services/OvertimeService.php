@@ -247,6 +247,17 @@ class OvertimeService
         $variableAllowancesPerMonth = $user->totalVariableAllowances();
         $hourlyRate = $user->overtimeHourlyRate();
 
+        // Additional (custom) allowances: dijumlahkan semua yang period-nya termasuk dalam range tanggal
+        // Ambil semua bulan unik dalam range, lalu sum additional allowances per bulan tersebut
+        $additionalAllowances = 0.0;
+        $periodStart = Carbon::parse($startDate);
+        $periodEnd   = Carbon::parse($endDate);
+        $current = $periodStart->copy()->startOfMonth();
+        while ($current->lte($periodEnd)) {
+            $additionalAllowances += $user->totalAdditionalAllowances($current->year, $current->month);
+            $current->addMonth();
+        }
+
         // Tunjangan tidak tetap: hanya dibayar per hari hadir yang belum dicairkan
         $variableEarned = $this->calculateVariableEarned($variableAllowancesPerMonth, $presentDays, $paidDays, $totalWorkDays);
 
@@ -272,8 +283,8 @@ class OvertimeService
             }
         }
 
-        // Estimated total: base + fixed + variable earned + overtime
-        $estimatedTotal = $baseSalary + $fixedAllowances + $variableEarned + $overtimePay;
+        // Estimated total: base + fixed + variable earned + additional custom + overtime
+        $estimatedTotal = $baseSalary + $fixedAllowances + $variableEarned + $additionalAllowances + $overtimePay;
 
         return [
             'user_id' => $user->id,
@@ -297,19 +308,21 @@ class OvertimeService
             'normal_ot_hours' => round($normalOvertimeMinutes / 60, 1),
 
             // Salary
-            'base_salary' => $baseSalary,
-            'fixed_allowances' => $fixedAllowances,
+            'base_salary'              => $baseSalary,
+            'fixed_allowances'         => $fixedAllowances,
             // Variable: jumlah yang DITERIMA (hanya untuk hari hadir)
-            'variable_allowances' => $variableEarned,
+            'variable_allowances'      => $variableEarned,
             // Full monthly amount jika hadir penuh (untuk referensi)
             'variable_allowances_full' => $variableAllowancesPerMonth,
             // Daily rate untuk tunjangan tidak tetap
-            'variable_daily_rate' => $dailyVariableRate,
-            'hourly_rate' => round($hourlyRate, 2),
-            'overtime_pay' => round($overtimePay, 2),
+            'variable_daily_rate'      => $dailyVariableRate,
+            // Tunjangan tambahan custom (ad-hoc per bulan)
+            'additional_allowances'    => round($additionalAllowances, 2),
+            'hourly_rate'              => round($hourlyRate, 2),
+            'overtime_pay'             => round($overtimePay, 2),
             // Selisih (tidak diterima karena absen)
-            'variable_deduction' => round($variableDeduction, 2),
-            'estimated_total' => round($estimatedTotal, 2),
+            'variable_deduction'       => round($variableDeduction, 2),
+            'estimated_total'          => round($estimatedTotal, 2),
         ];
     }
 

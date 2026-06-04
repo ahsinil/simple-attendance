@@ -93,6 +93,12 @@ const routes = [
                 meta: { permission: 'admin.settings.view' },
             },
             {
+                path: 'holidays',
+                name: 'AdminHolidays',
+                component: () => import('@/views/admin/HolidaysView.vue'),
+                meta: { permission: 'admin.settings.view' },
+            },
+            {
                 path: 'shifts',
                 name: 'AdminShifts',
                 component: () => import('@/views/admin/ShiftsView.vue'),

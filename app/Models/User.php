@@ -122,6 +122,25 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all additional (custom) allowances for this user.
+     */
+    public function additionalAllowances(): HasMany
+    {
+        return $this->hasMany(UserAdditionalAllowance::class);
+    }
+
+    /**
+     * Get total additional allowances for a specific month/year.
+     */
+    public function totalAdditionalAllowances(int $year, int $month): float
+    {
+        return (float) $this->additionalAllowances()
+            ->where('period_year', $year)
+            ->where('period_month', $month)
+            ->sum('amount');
+    }
+
+    /**
      * Get all salary component assignments for this user.
      */
     public function salaryComponents(): HasMany

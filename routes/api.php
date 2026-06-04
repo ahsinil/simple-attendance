@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\LeaveTypeController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\ShiftController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserAdditionalAllowanceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -161,5 +162,15 @@ Route::middleware('auth:sanctum')->group(function () {
         // User Salary
         Route::get('/users/{user}/salary', [App\Http\Controllers\Admin\SalaryComponentController::class, 'getUserSalary']);
         Route::post('/users/{user}/salary', [App\Http\Controllers\Admin\SalaryComponentController::class, 'updateUserSalary']);
+
+        // User Additional (Custom) Allowances
+        Route::get('/users/{user}/additional-allowances', [UserAdditionalAllowanceController::class, 'index']);
+        Route::post('/users/{user}/additional-allowances', [UserAdditionalAllowanceController::class, 'store']);
+        Route::put('/users/{user}/additional-allowances/{allowance}', [UserAdditionalAllowanceController::class, 'update']);
+        Route::delete('/users/{user}/additional-allowances/{allowance}', [UserAdditionalAllowanceController::class, 'destroy']);
+
+        // Holidays
+        Route::post('/holidays/sync', [App\Http\Controllers\Admin\HolidayController::class, 'sync']);
+        Route::apiResource('holidays', App\Http\Controllers\Admin\HolidayController::class);
     });
 });

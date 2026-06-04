@@ -43,6 +43,7 @@ class PayrollExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'Base Salary',
             'Fixed Allowances',
             'Variable Allowances',
+            'Additional Allowances',
             'Hourly Rate (OT)',
             'Overtime Pay',
             'Variable Deductions',
@@ -68,6 +69,7 @@ class PayrollExport implements FromCollection, WithHeadings, WithMapping, WithSt
             $row['base_salary'],
             $row['fixed_allowances'],
             $row['variable_allowances'],
+            $row['additional_allowances'] ?? 0,
             $row['hourly_rate'],
             $row['overtime_pay'],
             $row['variable_deduction'],
@@ -85,6 +87,7 @@ class PayrollExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'Q' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
             'R' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
             'S' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'T' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
         ];
     }
 
