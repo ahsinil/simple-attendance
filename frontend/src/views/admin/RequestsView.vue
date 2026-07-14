@@ -24,7 +24,7 @@ const selectedRequest = ref(null)
 const selectedPhoto = ref('')
 
 // Base URL for photo storage
-const storageUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000'
+const storageUrl = import.meta.env.VITE_API_URL?.replace('/api', '') ?? 'http://localhost:8000'
 
 function getPhotoUrl(path) {
   if (!path) return null
@@ -159,35 +159,38 @@ function formatTime(iso) {
 
       <div v-else-if="requests.length" class="divide-y divide-gray-200 dark:divide-dark-border">
         <div v-for="request in requests" :key="request.id" class="p-4">
-          <div class="flex items-center gap-4">
-            <!-- Photo thumbnail (left column) -->
-            <div v-if="request.photo_path" class="flex-shrink-0">
-              <img 
-                :src="getPhotoUrl(request.photo_path)" 
-                alt="Attached photo" 
-                class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-dark-border cursor-pointer hover:opacity-80 transition-opacity"
-                @click="openPhotoModal(request.photo_path)"
-              />
-            </div>
-            <div v-else class="flex-shrink-0 w-16 h-16 rounded-lg bg-gray-100 dark:bg-dark-border flex items-center justify-center">
-              <span class="material-symbols-outlined text-gray-400">image</span>
-            </div>
-
-            <!-- Text content (middle column) -->
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-1">
-                <span class="font-medium text-gray-900 dark:text-white">{{ request.user?.name }}</span>
-                <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-dark-border text-gray-600 dark:text-gray-400">
-                  {{ request.check_type === 'IN' ? $t('app.historyView.checkIn') : $t('app.historyView.checkOut') }}
-                </span>
+          <div class="flex flex-col md:flex-row md:items-center gap-4">
+            <!-- Photo and Text Wrapper -->
+            <div class="flex items-start md:items-center gap-4 flex-1 min-w-0">
+              <!-- Photo thumbnail (left column) -->
+              <div v-if="request.photo_path" class="flex-shrink-0">
+                <img 
+                  :src="getPhotoUrl(request.photo_path)" 
+                  alt="Attached photo" 
+                  class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-dark-border cursor-pointer hover:opacity-80 transition-opacity"
+                  @click="openPhotoModal(request.photo_path)"
+                />
               </div>
-              <p class="text-sm text-gray-500">
-                {{ $t('admin.requestsView.requestedFor', { time: formatDateTime(request.request_time), location: request.location?.name }) }}
-              </p>
-              <p class="text-xs text-gray-400 mt-0.5">
-                {{ $t('admin.requestsView.submitted', { time: formatDateTime(request.created_at) }) }}
-              </p>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ request.reason }}</p>
+              <div v-else class="flex-shrink-0 w-16 h-16 rounded-lg bg-gray-100 dark:bg-dark-border flex items-center justify-center">
+                <span class="material-symbols-outlined text-gray-400">image</span>
+              </div>
+
+              <!-- Text content (middle column) -->
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                  <span class="font-medium text-gray-900 dark:text-white">{{ request.user?.name }}</span>
+                  <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-dark-border text-gray-600 dark:text-gray-400">
+                    {{ request.check_type === 'IN' ? $t('app.historyView.checkIn') : $t('app.historyView.checkOut') }}
+                  </span>
+                </div>
+                <p class="text-sm text-gray-500">
+                  {{ $t('admin.requestsView.requestedFor', { time: formatDateTime(request.request_time), location: request.location?.name }) }}
+                </p>
+                <p class="text-xs text-gray-400 mt-0.5">
+                  {{ $t('admin.requestsView.submitted', { time: formatDateTime(request.created_at) }) }}
+                </p>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 break-words">{{ request.reason }}</p>
+              </div>
             </div>
 
             <!-- Actions (right column) -->
@@ -196,7 +199,7 @@ function formatTime(iso) {
                 v-if="canApprove"
                 @click="openApproveModal(request)"
                 :disabled="processingId === request.id"
-                class="btn btn-primary"
+                class="btn btn-primary flex-1 md:flex-none justify-center"
               >
                 <span class="material-symbols-outlined text-sm">check</span>
                 {{ $t('admin.dashboardView.approve') }}
@@ -205,13 +208,13 @@ function formatTime(iso) {
                 v-if="canReject"
                 @click="openRejectModal(request)"
                 :disabled="processingId === request.id"
-                class="btn btn-danger"
+                class="btn btn-danger flex-1 md:flex-none justify-center"
               >
                 <span class="material-symbols-outlined text-sm">close</span>
                 {{ $t('admin.dashboardView.reject') }}
               </button>
             </div>
-            <div v-else class="text-right flex-shrink-0">
+            <div v-else class="text-left md:text-right flex-shrink-0">
               <p class="text-sm text-gray-500">{{ $t('admin.requestsView.reviewedBy', { name: request.reviewer?.name }) }}</p>
               <p v-if="request.admin_note" class="text-sm text-primary">{{ request.admin_note }}</p>
             </div>

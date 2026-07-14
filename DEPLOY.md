@@ -1,98 +1,155 @@
 # Deployment Guide
 
-## Quick Deploy with Docker Compose
+## Architecture
 
-### 1. Clone on your VPS
+Single monolith container — Laravel (PHP-FPM) + Vue.js SPA + Nginx + Supervisor in one Docker image.
+
+```
+┌─────────────────────────────────────┐
+│           attendance-app            │
+│                                     │
+│   Nginx :80  ──►  /api  ──►  PHP   │
+│              ──►  /*    ──►  Vue    │
+└─────────────────────────────────────┘
+         Your External Database
+```
+
+---
+
+## Quick Deploy
+
+### 1. Clone on your server
+
 ```bash
 git clone https://github.com/YOUR_USERNAME/simple-attendance.git
 cd simple-attendance
 ```
 
-### 2. Create environment file
+### 2. Create your environment file
+
 ```bash
 cp env.production.example .env
-
-# Generate APP_KEY
-docker run --rm -v $(pwd):/app -w /app php:8.2-cli php artisan key:generate --show
-# Copy the output and paste it as APP_KEY in .env
-
-# Generate BARCODE_SECRET_KEY (random 32 characters)
-openssl rand -base64 32 | tr -d '/+=' | head -c 32
-
-# Edit .env with your settings
-nano .env
+nano .env   # fill in the required values below
 ```
 
-**Required settings to change:**
-- `APP_KEY` - Generated key from above
-- `APP_URL` - Your domain (e.g., `https://attendance.yourdomain.com`)
-- `DB_PASSWORD` - Secure database password
-- `DB_ROOT_PASSWORD` - Secure root password
-- `BARCODE_SECRET_KEY` - Random 32-character string
+**Required values to set in `.env`:**
+
+| Variable | Description | Example |
+|---|---|---|
+| `APP_KEY` | Laravel encryption key | `base64:xxxx...` |
+| `APP_URL` | Your domain | `https://attendance.example.com` |
+| `DB_HOST` | Database host IP | `host.docker.internal` (for local host DB) |
+| `DB_DATABASE` | Database name | `simple_attendance` |
+| `DB_USERNAME` | Database user | `attendance_user` |
+| `DB_PASSWORD` | Database password | `a_secure_password` |
+| `BARCODE_SECRET_KEY` | Random 32-char string | see below |
+
+**Generate `APP_KEY`:**
+```bash
+docker run --rm php:8.2-cli php -r "echo 'base64:'.base64_encode(random_bytes(32)).PHP_EOL;"
+```
+
+**Generate `BARCODE_SECRET_KEY`:**
+```bash
+openssl rand -base64 32 | tr -d '/+=' | head -c 32
+```
 
 ### 3. Deploy
+
 ```bash
 docker compose up -d --build
 ```
 
 ### 4. Access
-- **App**: http://your-server-ip
-- **Login**: admin@example.com / password
 
-> ⚠️ **Important**: Change the default admin password immediately after first login!
+- **App**: `http://your-server-ip`
+- **Login**: `admin@example.com` / `password`
 
----
-
-## Environment Variables
-
-| Variable | Required | Description | Example |
-|----------|----------|-------------|---------|
-| `APP_KEY` | ✅ | Laravel encryption key | `base64:xxxx...` |
-| `APP_URL` | ✅ | Your domain | `https://attendance.example.com` |
-| `DB_DATABASE` | ✅ | Database name | `simple_attendance` |
-| `DB_USERNAME` | ✅ | Database user | `attendance_user` |
-| `DB_PASSWORD` | ✅ | Database password | `secure_password` |
-| `DB_ROOT_PASSWORD` | ✅ | MySQL root password | `root_password` |
-| `BARCODE_SECRET_KEY` | ✅ | Barcode signing key | `random_32_char_string` |
-| `CORS_ALLOWED_ORIGINS` | ❌ | Allowed CORS origins | `https://app.example.com` |
+> ⚠️ **Change the default admin password immediately after first login!**
 
 ---
 
-## Commands
+## Updating the App
 
-### View logs
-```bash
-docker compose logs -f app
-```
-
-### Run migrations manually
-```bash
-docker compose exec app php artisan migrate
-```
-
-### Clear cache
-```bash
-docker compose exec app php artisan cache:clear
-docker compose exec app php artisan config:cache
-docker compose exec app php artisan route:cache
-```
-
-### Rebuild after code changes
 ```bash
 git pull
 docker compose up -d --build
 ```
 
-### Access container shell
-```bash
-docker compose exec app sh
+Docker layer caching makes this fast:
+- Only changed layers are rebuilt (e.g., PHP-only changes skip `npm install`)
+- Migrations run automatically on startup
+- Downtime is ~5–15 seconds during container swap
+
+---
+
+## File Structure
+
+```
+simple-attendance/
+├── docker/
+│   ├── app.Dockerfile    ← Multi-stage build (Vue → Laravel+Nginx)
+│   ├── entrypoint.sh     ← Runs migrations, seeds, cache on startup
+│   ├── nginx.conf        ← Nginx config inside the container
+│   └── supervisord.conf  ← Manages php-fpm, nginx, queue, scheduler
+├── frontend/             ← Vue.js source (built into public/ during Docker build)
+├── docker-compose.yml    ← Orchestrates the app service
+├── .env                  ← Your secrets (never commit this)
+└── env.production.example ← Template for .env
 ```
 
 ---
 
-## With HTTPS (Traefik or Nginx Proxy)
+## Common Commands
 
-If you're using Traefik or nginx-proxy, add labels to docker-compose.yml:
+```bash
+# View live logs
+docker compose logs -f app
+
+# Run a migration manually
+docker compose exec app php artisan migrate
+
+# Clear and rebuild cache
+docker compose exec app php artisan config:cache
+docker compose exec app php artisan route:cache
+
+# Open a shell inside the container
+docker compose exec app sh
+
+# Check all containers are healthy
+docker compose ps
+
+# Stop everything
+docker compose down
+
+# Stop and wipe the database (⚠️ destructive)
+docker compose down -v
+```
+
+---
+
+## Optional: Enable Redis
+
+For better performance on high-traffic deployments, enable Redis for caching and sessions:
+
+1. In your `.env`, set:
+```bash
+CACHE_STORE=redis
+SESSION_DRIVER=redis
+QUEUE_CONNECTION=redis
+REDIS_HOST=redis
+```
+
+2. Start with the redis profile:
+```bash
+docker compose --profile redis up -d --build
+```
+
+---
+
+## HTTPS with a Reverse Proxy
+
+If you're behind Traefik or Nginx Proxy Manager, add labels to `docker-compose.yml`:
 
 ```yaml
 services:
@@ -106,67 +163,32 @@ services:
 
 ---
 
-## Optional: Using Redis
-
-For better performance, enable Redis for caching and sessions:
-
-1. Uncomment Redis settings in your `.env`:
-```bash
-CACHE_STORE=redis
-SESSION_DRIVER=redis
-QUEUE_CONNECTION=redis
-REDIS_HOST=redis
-```
-
-2. The Redis service is already included in docker-compose.yml.
-
----
-
-## Health Check
-
-The application includes a health endpoint at `/api/health` (if implemented) or you can check:
-
-```bash
-# Check if containers are running
-docker compose ps
-
-# Check app logs for errors
-docker compose logs app --tail=50
-
-# Test database connection
-docker compose exec app php artisan migrate:status
-```
-
----
-
 ## Troubleshooting
 
-### Database connection error
+### Database won't connect
+Make sure your host database allows connections from Docker.
+If using a local database on your machine, set `DB_HOST=host.docker.internal` in your `.env`.
 ```bash
 docker compose exec app php artisan migrate:status
-docker compose logs db
 ```
 
-### Permission issues
+### Permission errors
 ```bash
 docker compose exec app chown -R www-data:www-data storage bootstrap/cache
 docker compose exec app chmod -R 775 storage bootstrap/cache
 ```
 
-### Frontend not loading
+### Frontend not loading (blank page)
 ```bash
-# Check if assets were built correctly
+# Check if Vue assets were built into the image
 docker compose exec app ls -la public/assets
 
-# Rebuild the container
-docker compose up -d --build --force-recreate app
+# Rebuild from scratch (no cache)
+docker compose up -d --build --force-recreate
 ```
 
 ### Queue jobs not processing
 ```bash
-# Check queue worker status
 docker compose exec app supervisorctl status
-
-# Restart queue worker
 docker compose exec app supervisorctl restart queue-worker
 ```

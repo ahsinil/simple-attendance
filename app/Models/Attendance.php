@@ -31,10 +31,12 @@ class Attendance extends Model
         'is_holiday',
         'overtime_min',
         'overtime_multiplier',
+        'overtime_reason',
         'method',
         'approved_by',
         'approved_at',
         'variable_allowance_paid',
+        'claimed_variable_components',
     ];
 
     protected $casts = [
@@ -47,7 +49,35 @@ class Attendance extends Model
         'overtime_multiplier' => 'decimal:1',
         'approved_at' => 'datetime',
         'variable_allowance_paid' => 'boolean',
+        'claimed_variable_components' => 'array',
     ];
+
+    /**
+     * Check if a specific variable component is claimed.
+     */
+    public function isComponentClaimed($componentId): bool
+    {
+        $claimed = $this->claimed_variable_components ?? [];
+        return in_array($componentId, $claimed);
+    }
+
+    /**
+     * Toggle the claim status of a specific variable component.
+     */
+    public function toggleComponentClaim($componentId): void
+    {
+        $claimed = $this->claimed_variable_components ?? [];
+        
+        if (($key = array_search($componentId, $claimed)) !== false) {
+            unset($claimed[$key]);
+        } else {
+            $claimed[] = $componentId;
+        }
+        
+        $this->claimed_variable_components = array_values($claimed);
+        $this->save();
+    }
+
 
     /**
      * Get the user for this attendance.

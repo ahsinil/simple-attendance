@@ -353,4 +353,33 @@ class AttendanceController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Submit overtime reason for a specific attendance.
+     */
+    public function submitOvertimeReason(Request $request, Attendance $attendance): JsonResponse
+    {
+        $request->validate([
+            'overtime_reason' => 'required|string|max:1000',
+        ]);
+
+        $user = $request->user();
+
+        // Ensure the attendance belongs to the user
+        if ($attendance->user_id !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Unauthorized access to this attendance record',
+            ], 403);
+        }
+
+        $attendance->update([
+            'overtime_reason' => $request->input('overtime_reason'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Overtime reason submitted successfully',
+        ]);
+    }
 }

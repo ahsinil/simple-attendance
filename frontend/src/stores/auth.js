@@ -62,7 +62,12 @@ export const useAuthStore = defineStore('auth', {
 
                 return { success: true }
             } catch (error) {
-                this.error = error.response?.data?.message || 'Login failed'
+                if (error.response?.data?.errors) {
+                    // Extract the first validation error message
+                    this.error = Object.values(error.response.data.errors).flat()[0]
+                } else {
+                    this.error = error.response?.data?.message || 'Login failed'
+                }
                 return { success: false, error: this.error }
             } finally {
                 this.loading = false

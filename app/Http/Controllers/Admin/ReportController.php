@@ -47,7 +47,7 @@ class ReportController extends Controller
         $endDate = $request->input('end_date', now()->toDateString());
         $perPage = $request->input('per_page', 20);
 
-        $query = Attendance::with(['user', 'location'])
+        $query = Attendance::with(['user.salaryComponents.salaryComponent', 'location'])
             ->whereDate('scan_time', '>=', $startDate)
             ->whereDate('scan_time', '<=', $endDate)
             ->orderBy('scan_time', 'desc');
@@ -256,7 +256,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Toggle variable allowance paid status for a specific attendance record.
+     * Toggle variable allowance paid status for a specific attendance record and component.
      */
     public function toggleAllowancePaid(Request $request, Attendance $attendance): JsonResponse
     {
@@ -265,9 +265,11 @@ class ReportController extends Controller
             return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
         }
 
-        $attendance->update([
-            'variable_allowance_paid' => !$attendance->variable_allowance_paid
+        $request->validate([
+            'component_id' => 'required|exists:salary_components,id'
         ]);
+
+        $attendance->toggleComponentClaim($request->component_id);
 
         return response()->json([
             'success' => true,

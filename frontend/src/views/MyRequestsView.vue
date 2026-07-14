@@ -21,7 +21,7 @@ const showPhotoModal = ref(false)
 const selectedPhoto = ref('')
 
 // Base URL for photo storage
-const storageUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000'
+const storageUrl = import.meta.env.VITE_API_URL?.replace('/api', '') ?? 'http://localhost:8000'
 
 function getPhotoUrl(path) {
   if (!path) return null
@@ -252,7 +252,7 @@ function formatDate(iso) {
           :key="request.id"
           class="p-4"
         >
-          <div class="flex items-center gap-4">
+          <div class="flex items-start md:items-center gap-4">
             <!-- Photo thumbnail (left column) -->
             <div v-if="request.photo_path" class="flex-shrink-0">
               <img 
@@ -268,7 +268,7 @@ function formatDate(iso) {
             
             <!-- Text content (right column) -->
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-1">
+              <div class="flex flex-wrap items-center gap-2 mb-1">
                 <span class="font-medium text-gray-900 dark:text-white">
                   {{ request.check_type === 'IN' ? $t('app.myRequestsView.checkInRequest') : $t('app.myRequestsView.checkOutRequest') }}
                 </span>
@@ -277,8 +277,8 @@ function formatDate(iso) {
                 </span>
               </div>
               <p class="text-sm text-gray-500">{{ formatDate(request.request_time) }} • {{ request.location?.name }}</p>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ request.reason }}</p>
-              <p v-if="request.admin_note" class="text-sm text-primary mt-1">
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 break-words">{{ request.reason }}</p>
+              <p v-if="request.admin_note" class="text-sm text-primary mt-1 break-words">
                 {{ $t('app.myRequestsView.note', { note: request.admin_note }) }}
               </p>
             </div>

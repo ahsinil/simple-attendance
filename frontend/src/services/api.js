@@ -65,6 +65,7 @@ export const attendanceApi = {
     myRequests: (params) => api.get('/attendance/my-requests', { params }),
     mySchedules: () => api.get('/attendance/my-schedules'),
     locations: () => api.get('/attendance/locations'),
+    submitOvertimeReason: (id, reason) => api.post(`/attendance/${id}/overtime-reason`, { overtime_reason: reason }),
 }
 
 // Barcode API
@@ -130,7 +131,7 @@ export const adminApi = {
 
     // Reports
     getReports: (params) => api.get('/admin/reports', { params }),
-    toggleAllowancePaid: (id) => api.put(`/admin/reports/attendances/${id}/toggle-allowance-paid`),
+    toggleAllowancePaid: (id, componentId) => api.put(`/admin/reports/attendances/${id}/toggle-allowance-paid`, { component_id: componentId }),
     getReportsSummary: (params) => api.get('/admin/reports/summary', { params }),
     getReportsLocations: () => api.get('/admin/reports/locations'),
     exportReports: (params) => api.get('/admin/reports/export', {

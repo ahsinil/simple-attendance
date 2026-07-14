@@ -119,5 +119,19 @@ export const useAttendanceStore = defineStore('attendance', {
                 this.loading = false
             }
         },
+
+        async submitOvertimeReason(id, reason) {
+            this.loading = true
+            this.error = null
+            try {
+                const response = await attendanceApi.submitOvertimeReason(id, reason)
+                return { success: true, data: response.data }
+            } catch (error) {
+                this.error = error.response?.data?.error || 'Failed to submit overtime reason'
+                return { success: false, error: this.error }
+            } finally {
+                this.loading = false
+            }
+        },
     },
 })

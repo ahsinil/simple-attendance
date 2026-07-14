@@ -54,6 +54,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
             'Location',
             'Status',
             'Late (min)',
+            'Overtime Reason',
             'Method',
             'IP Address',
         ];
@@ -71,6 +72,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
             $attendance->location?->name ?? 'Unknown',
             $attendance->status,
             $attendance->late_min,
+            $attendance->overtime_reason,
             $attendance->method,
             $attendance->ip_address,
         ];

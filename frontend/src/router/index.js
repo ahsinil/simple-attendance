@@ -232,8 +232,8 @@ router.beforeEach((to, from, next) => {
         return
     }
 
-    // Restrict barcode page to only display_screen role
-    if (to.name === 'BarcodeDisplay' && !isDisplayScreen) {
+    // Restrict barcode page to display_screen role OR users with barcode.display permission OR admins
+    if (to.name === 'BarcodeDisplay' && !isDisplayScreen && !hasPermission('barcode.display')) {
         const firstAccessible = findFirstAccessibleRoute(userPermissions)
         next({ name: firstAccessible })
         return

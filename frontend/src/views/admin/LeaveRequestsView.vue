@@ -120,17 +120,7 @@ async function processRequest() {
   }
 }
 
-// Quick approve
-async function quickApprove(request) {
-  if (!confirm(`Approve leave request from ${request.user.name}?`)) return
-
-  try {
-    await adminApi.approveLeaveRequest(request.id, {})
-    fetchData()
-  } catch (error) {
-    alert(error.response?.data?.error || 'Failed to approve')
-  }
-}
+// Quick approve removed in favor of modal
 
 onMounted(() => {
   fetchData()
@@ -241,7 +231,7 @@ onMounted(() => {
               <div v-if="request.status === 'PENDING' && (canApprove || canReject)" class="flex items-center justify-end gap-2">
                 <button
                   v-if="canApprove"
-                  @click="quickApprove(request)"
+                  @click="openModal(request, 'approve')"
                   class="text-green-600 hover:text-green-700 flex items-center gap-1"
                   :title="$t('admin.dashboardView.approve')"
                 >

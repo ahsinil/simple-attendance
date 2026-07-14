@@ -45,6 +45,11 @@ const result = ref(null)
 const cameraError = ref('')
 const cameraLoading = ref(true)
 
+const showOvertimePrompt = ref(false)
+const isOvertime = ref(false)
+const overtimeReason = ref('')
+const submittingOvertime = ref(false)
+
 let watchId = null
 
 onMounted(async () => {
@@ -160,12 +165,36 @@ async function handleScan() {
     ...deviceData.value,
   })
 
-  result.value = response.success 
-    ? { success: true, message: response.data.message, attendance: response.data.attendance }
-    : { success: false, error: response.error }
+  if (response.success) {
+    if (response.data.attendance.check_type === 'OUT' && response.data.attendance.overtime_min > 60) {
+      result.value = { success: true, message: response.data.message, attendance: response.data.attendance }
+      showOvertimePrompt.value = true
+    } else {
+      result.value = { success: true, message: response.data.message, attendance: response.data.attendance }
+    }
+  } else {
+    result.value = { success: false, error: response.error }
+  }
 
   scanning.value = false
   scannedCode.value = ''
+}
+
+async function submitOvertimeReason() {
+  if (!isOvertime.value || !overtimeReason.value.trim()) {
+    showOvertimePrompt.value = false
+    return
+  }
+  
+  submittingOvertime.value = true
+  const res = await attendanceStore.submitOvertimeReason(result.value.attendance.id, overtimeReason.value)
+  submittingOvertime.value = false
+  
+  showOvertimePrompt.value = false
+}
+
+function dismissOvertimePrompt() {
+  showOvertimePrompt.value = false
 }
 
 function dismissResult() {
@@ -178,7 +207,7 @@ function dismissResult() {
     <!-- Success Popup Modal -->
     <Teleport to="body">
       <Transition name="popup">
-        <div v-if="result && result.success" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div v-if="result && result.success && !showOvertimePrompt" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <!-- Backdrop -->
           <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="dismissResult"></div>
           
@@ -208,6 +237,62 @@ function dismissResult() {
             >
               {{ $t('app.attendanceView.ok') }}
             </button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Overtime Prompt Modal -->
+    <Teleport to="body">
+      <Transition name="popup">
+        <div v-if="showOvertimePrompt" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="dismissOvertimePrompt"></div>
+          
+          <div class="relative bg-white dark:bg-dark-card rounded-2xl shadow-2xl p-8 max-w-sm w-full transform animate-bounce-in">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+              Apakah kamu lembur hari ini?
+            </h3>
+            
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-gray-700 dark:text-gray-300 font-medium">Ya, saya lembur</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" v-model="isOvertime" class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+              </label>
+            </div>
+            
+            <div v-if="isOvertime" class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Alasan Lembur
+              </label>
+              <textarea 
+                v-model="overtimeReason"
+                class="input w-full h-24 resize-none"
+                placeholder="Tuliskan alasan lembur..."
+              ></textarea>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+              <button 
+                @click="dismissOvertimePrompt"
+                class="flex-1 btn bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 py-3"
+              >
+                Lewati
+              </button>
+              <button 
+                @click="submitOvertimeReason"
+                class="flex-1 btn btn-primary py-3"
+                :disabled="isOvertime && !overtimeReason.trim() || submittingOvertime"
+              >
+                <span v-if="submittingOvertime" class="flex items-center justify-center gap-2">
+                  <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                </span>
+                <span v-else>Simpan</span>
+              </button>
+            </div>
           </div>
         </div>
       </Transition>

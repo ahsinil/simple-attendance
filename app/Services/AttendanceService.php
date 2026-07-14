@@ -206,7 +206,8 @@ class AttendanceService
                 ->first();
             
             if ($checkIn) {
-                $workMinutes = $now->diffInMinutes($checkIn->scan_time);
+                // Use absolute=true to prevent negative minutes
+                $workMinutes = (int) abs($now->diffInMinutes($checkIn->scan_time, false));
                 
                 // Calculate overtime if applicable
                 if ($schedule && $schedule->shift) {
@@ -276,6 +277,7 @@ class AttendanceService
                     'status' => $statusData['status'],
                     'late_min' => $statusData['late_min'],
                     'work_minutes' => $workMinutes,
+                    'overtime_min' => $overtimeMin,
                 ],
             ];
         });

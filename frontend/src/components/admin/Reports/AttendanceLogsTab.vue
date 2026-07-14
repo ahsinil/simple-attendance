@@ -164,12 +164,12 @@ function getStatusClass(status) {
 import { useToast } from '@/composables/useToast'
 const toast = useToast()
 
-async function toggleAllowancePaid(att) {
+async function toggleAllowancePaid(att, componentId) {
   try {
-    const res = await adminApi.toggleAllowancePaid(att.id)
+    const res = await adminApi.toggleAllowancePaid(att.id, componentId)
     if (res.data.success) {
-      att.variable_allowance_paid = res.data.data.variable_allowance_paid
-      toast.success(att.variable_allowance_paid ? 'Ditandai sudah dicairkan' : 'Status pencairan dibatalkan')
+      att.claimed_variable_components = res.data.data.claimed_variable_components
+      toast.success('Status pencairan tunjangan berhasil diperbarui')
     }
   } catch (error) {
     toast.error('Gagal memperbarui status tunjangan')
@@ -335,6 +335,9 @@ async function toggleAllowancePaid(att) {
                 <span :class="att.check_type === 'IN' ? 'text-green-600' : 'text-red-600'" class="font-medium">
                   {{ att.check_type }}
                 </span>
+                <div v-if="att.overtime_reason" class="mt-1 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded max-w-[150px] truncate" :title="att.overtime_reason">
+                  <span class="font-semibold">Lembur:</span> {{ att.overtime_reason }}
+                </div>
               </td>
               <td class="px-6 py-4">
                 <span :class="getStatusClass(att.status)" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium">
@@ -345,22 +348,25 @@ async function toggleAllowancePaid(att) {
               <td class="px-6 py-4">
                 <span class="text-xs text-gray-500 uppercase">{{ att.method }}</span>
               </td>
-              <td class="px-6 py-4 text-center">
-                <button
-                  v-if="att.check_type === 'IN'"
-                  @click="toggleAllowancePaid(att)"
-                  class="p-1.5 rounded-lg transition-colors border text-xs font-medium inline-flex items-center gap-1"
-                  :class="att.variable_allowance_paid 
-                    ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50' 
-                    : 'bg-white dark:bg-dark-surface border-gray-200 dark:border-dark-line text-gray-500 hover:bg-gray-50 dark:hover:bg-dark-bg'"
-                  :title="att.variable_allowance_paid ? 'Tunjangan sudah dicairkan. Klik untuk membatalkan.' : 'Tandai tunjangan sudah dicairkan untuk hari ini.'"
-                >
-                  <span class="material-symbols-outlined text-[16px]">
-                    {{ att.variable_allowance_paid ? 'payments' : 'money_off' }}
-                  </span>
-                  <span>{{ att.variable_allowance_paid ? $t('admin.reportsView.paid') : $t('admin.reportsView.claim') }}</span>
-                </button>
-                <span v-else class="text-xs text-gray-400">-</span>
+              <td class="px-6 py-4">
+                <div v-if="att.check_type === 'IN' && att.user?.salary_components?.filter(c => c.salary_component?.type === 'VARIABLE' && c.salary_component?.is_active).length > 0" class="flex flex-col gap-1.5">
+                  <div v-for="comp in att.user.salary_components.filter(c => c.salary_component?.type === 'VARIABLE' && c.salary_component?.is_active)" :key="comp.id" class="flex items-center justify-between gap-2 border border-gray-100 dark:border-dark-border p-1.5 rounded-lg bg-gray-50/50 dark:bg-dark-bg/50 hover:bg-gray-50 dark:hover:bg-dark-bg transition-colors">
+                    <span class="text-xs text-gray-700 dark:text-gray-300 font-medium truncate max-w-[130px]" :title="comp.salary_component?.name">{{ comp.salary_component?.name }}</span>
+                    <button
+                      @click="toggleAllowancePaid(att, comp.salary_component_id)"
+                      class="px-2 py-1 rounded-md transition-colors border text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1 flex-shrink-0"
+                      :class="(att.claimed_variable_components || []).includes(comp.salary_component_id)
+                        ? 'bg-amber-100 dark:bg-amber-900/40 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/60' 
+                        : 'bg-white dark:bg-dark-surface border-gray-200 dark:border-dark-line text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-bg hover:text-primary'"
+                    >
+                      <span class="material-symbols-outlined text-[12px]">
+                        {{ (att.claimed_variable_components || []).includes(comp.salary_component_id) ? 'check' : 'add' }}
+                      </span>
+                      <span>{{ (att.claimed_variable_components || []).includes(comp.salary_component_id) ? $t('admin.reportsView.paid') : $t('admin.reportsView.claim') }}</span>
+                    </button>
+                  </div>
+                </div>
+                <div v-else class="text-xs text-gray-400 text-center">-</div>
               </td>
             </tr>
           </tbody>

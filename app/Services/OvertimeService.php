@@ -200,11 +200,32 @@ class OvertimeService
             ->groupBy(fn ($att) => Carbon::parse($att->scan_time)->toDateString())
             ->count();
 
-        // Hitung hari hadir yang tunjangan tidak tetapnya sudah dicairkan
-        $paidDays = $checkIns->where('variable_allowance_paid', true)
-            ->groupBy(fn ($att) => Carbon::parse($att->scan_time)->toDateString())
-            ->count();
+        // Calculate individual variable allowance earnings based on components
+        $variableComponents = $user->salaryComponents->filter(fn($c) => $c->salaryComponent->type === 'VARIABLE' && $c->salaryComponent->is_active);
+        
+        $variableEarned = 0.0;
+        $variableAllowancesPerMonth = 0.0;
+        $dailyVariableRate = 0.0;
+        $paidDays = 0;
 
+        foreach ($variableComponents as $comp) {
+            $componentTotal = (float) $comp->amount;
+            $variableAllowancesPerMonth += $componentTotal;
+            
+            $componentDailyRate = $totalWorkDays > 0 ? round($componentTotal / $totalWorkDays, 2) : 0;
+            $dailyVariableRate += $componentDailyRate;
+            
+            // Count unique days where this specific component was claimed (paid)
+            $paidDays = $checkIns->filter(fn($att) => $att->isComponentClaimed($comp->salary_component_id))
+                ->groupBy(fn ($att) => Carbon::parse($att->scan_time)->toDateString())
+                ->count();
+            
+            $eligibleDays = max(0, $presentDays - $paidDays);
+            $variableEarned += round($componentDailyRate * $eligibleDays, 2);
+        }
+
+        // Selisih antara full amount dan yang diterima (untuk referensi/display)
+        $variableDeduction = round($variableAllowancesPerMonth - $variableEarned, 2);
         // Count absent days (marked by system)
         $absentDays = Attendance::where('user_id', $user->id)
             ->where('check_type', 'IN')
@@ -243,8 +264,6 @@ class OvertimeService
         // Salary calculations
         $baseSalary = (float) ($user->base_salary ?? 0);
         $fixedAllowances = $user->totalFixedAllowances();
-        // Total variable allowance per bulan (batas maksimum jika hadir penuh)
-        $variableAllowancesPerMonth = $user->totalVariableAllowances();
         $hourlyRate = $user->overtimeHourlyRate();
 
         // Additional (custom) allowances: dijumlahkan semua yang period-nya termasuk dalam range tanggal
@@ -258,14 +277,6 @@ class OvertimeService
             $current->addMonth();
         }
 
-        // Tunjangan tidak tetap: hanya dibayar per hari hadir yang belum dicairkan
-        $variableEarned = $this->calculateVariableEarned($variableAllowancesPerMonth, $presentDays, $paidDays, $totalWorkDays);
-
-        // Selisih antara full amount dan yang diterima (untuk referensi/display)
-        $variableDeduction = round($variableAllowancesPerMonth - $variableEarned, 2);
-
-        // Daily variable rate (untuk info)
-        $dailyVariableRate = $this->calculateDailyVariableRate($variableAllowancesPerMonth, $totalWorkDays);
 
         // Calculate OT pay
         $overtimePay = 0;

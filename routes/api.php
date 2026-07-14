@@ -57,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/my-requests', [AttendanceController::class, 'myRequests']);
         Route::get('/my-schedules', [AttendanceController::class, 'mySchedules']);
         Route::get('/locations', [AttendanceController::class, 'locations']);
+        Route::post('/{attendance}/overtime-reason', [AttendanceController::class, 'submitOvertimeReason']);
     });
 
     // Barcode (for display screens)
