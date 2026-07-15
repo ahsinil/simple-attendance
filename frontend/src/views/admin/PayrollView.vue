@@ -235,6 +235,7 @@ function formatNumber(num, decimals = 1) {
               <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.totalSalary') }}</th>
               <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.otPay') }}</th>
               <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.deductions') }}</th>
+              <th class="px-4 py-3 text-right">Kasbon</th>
               <th class="px-4 py-3 text-right">{{ $t('admin.payrollView.estTotal') }}</th>
             </tr>
           </thead>
@@ -299,7 +300,10 @@ function formatNumber(num, decimals = 1) {
                   <span v-if="row.variable_deduction > 0" class="text-xs text-gray-400">{{ $t('admin.payrollView.hariTidakHadir', { days: row.absent_days + row.leave_days }) }}</span>
                 </div>
               </td>
-              <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">{{ formatCurrency(row.estimated_total) }}</td>
+              <td class="px-4 py-3 text-right text-red-600 dark:text-red-400 font-medium">
+                {{ row.cash_advances > 0 ? '-' + formatCurrency(row.cash_advances) : '-' }}
+              </td>
+              <td class="px-4 py-3 text-right text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(row.estimated_total) }}</td>
             </tr>
           </tbody>
           <!-- Totals Row -->
@@ -316,6 +320,7 @@ function formatNumber(num, decimals = 1) {
               <td class="px-4 py-3"></td>
               <td class="px-4 py-3 text-right text-green-600 dark:text-green-400">{{ formatCurrency(kpis.total_overtime_pay) }}</td>
               <td class="px-4 py-3 text-right text-red-600 dark:text-red-400">-{{ formatCurrency(kpis.total_variable_deductions) }}</td>
+              <td class="px-4 py-3 text-right text-red-600 dark:text-red-400">-{{ formatCurrency(payrollData.reduce((s, r) => s + (r.cash_advances || 0), 0)) }}</td>
               <td class="px-4 py-3 text-right text-gray-900 dark:text-white">{{ formatCurrency(kpis.total_estimated_payroll) }}</td>
             </tr>
           </tfoot>

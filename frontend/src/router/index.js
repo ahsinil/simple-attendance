@@ -141,6 +141,12 @@ const routes = [
                 meta: { permission: 'admin.payroll.view' },
             },
             {
+                path: 'cash-advances',
+                name: 'AdminCashAdvances',
+                component: () => import('@/views/admin/CashAdvancesView.vue'),
+                meta: { permission: 'admin.payroll.view' },
+            },
+            {
                 path: 'salary-components',
                 name: 'AdminSalaryComponents',
                 component: () => import('@/views/admin/SalaryComponentsView.vue'),

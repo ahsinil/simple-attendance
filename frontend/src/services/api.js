@@ -193,5 +193,11 @@ export const adminApi = {
     updateHoliday: (id, data) => api.put(`/admin/holidays/${id}`, data),
     deleteHoliday: (id) => api.delete(`/admin/holidays/${id}`),
     syncHolidays: (year) => api.post('/admin/holidays/sync', { year }),
+
+    // Cash Advances
+    getCashAdvances: (params) => api.get('/admin/cash-advances', { params }),
+    createCashAdvance: (data) => api.post('/admin/cash-advances', data),
+    updateCashAdvance: (id, data) => api.put(`/admin/cash-advances/${id}`, data),
+    deleteCashAdvance: (id) => api.delete(`/admin/cash-advances/${id}`),
 }
 

@@ -15,6 +15,7 @@ const allNavItems = [
   { name: 'admin.leaveRequests', icon: 'event_busy', to: '/admin/leave-requests', permission: 'admin.leaves.view' },
   { name: 'admin.reports', icon: 'analytics', to: '/admin/reports', permission: 'admin.reports.view' },
   { name: 'admin.payroll', icon: 'payments', to: '/admin/payroll', permission: 'admin.payroll.view' },
+  { name: 'Kasbon / Advance', icon: 'credit_score', to: '/admin/cash-advances', permission: 'admin.payroll.view' },
   { name: 'admin.users', icon: 'group', to: '/admin/users', permission: 'admin.users.view' },
   {
     name: 'admin.settings.title',

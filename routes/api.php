@@ -171,6 +171,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/users/{user}/additional-allowances/{allowance}', [UserAdditionalAllowanceController::class, 'destroy']);
 
         // Holidays
+        Route::apiResource('cash-advances', App\Http\Controllers\Admin\CashAdvanceController::class);
+
         Route::post('/holidays/sync', [App\Http\Controllers\Admin\HolidayController::class, 'sync']);
         Route::apiResource('holidays', App\Http\Controllers\Admin\HolidayController::class);
     });

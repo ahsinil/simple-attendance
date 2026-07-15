@@ -294,8 +294,13 @@ class OvertimeService
             }
         }
 
-        // Estimated total: base + fixed + variable earned + additional custom + overtime
-        $estimatedTotal = $baseSalary + $fixedAllowances + $variableEarned + $additionalAllowances + $overtimePay;
+        // Calculate Cash Advances
+        $cashAdvances = \App\Models\CashAdvance::where('user_id', $user->id)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('amount');
+
+        // Estimated total: base + fixed + variable earned + additional custom + overtime - cash advances
+        $estimatedTotal = $baseSalary + $fixedAllowances + $variableEarned + $additionalAllowances + $overtimePay - $cashAdvances;
 
         return [
             'user_id' => $user->id,
@@ -333,6 +338,8 @@ class OvertimeService
             'overtime_pay'             => round($overtimePay, 2),
             // Selisih (tidak diterima karena absen)
             'variable_deduction'       => round($variableDeduction, 2),
+            // Total kasbon yang dipotong
+            'cash_advances'            => round($cashAdvances, 2),
             'estimated_total'          => round($estimatedTotal, 2),
         ];
     }
