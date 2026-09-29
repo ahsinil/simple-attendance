@@ -75,7 +75,11 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Login successful',
             'data' => [
-                'user' => $this->formatUser($user),
+                'user' => array_merge($this->formatUser($user), [
+                    'settings' => [
+                        'attendance_method' => \App\Models\AppSetting::get('attendance_method', 'barcode'),
+                    ]
+                ]),
                 'token' => $token,
                 'device' => $deviceRegistration,
             ],
@@ -118,7 +122,11 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $this->formatUser($user),
+            'data' => array_merge($this->formatUser($user), [
+                'settings' => [
+                    'attendance_method' => \App\Models\AppSetting::get('attendance_method', 'barcode'),
+                ]
+            ]),
         ]);
     }
 

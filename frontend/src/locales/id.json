@@ -368,7 +368,7 @@
       "enterBarcodeData": "Masukkan data barcode...",
       "processing": "Memproses...",
       "submitAttendance": "Kirim Absensi",
-      "makeSureWithinOffice": "Pastikan Anda berada di area kantor sebelum scan"
+      "makeSureWithinOffice": "Pastikan Anda berada di area kantor sebelum kirim absensi"
     },
     "historyView": {
       "from": "Dari",

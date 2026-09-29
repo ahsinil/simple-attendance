@@ -1,10 +1,12 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAttendanceStore } from '@/stores/attendance'
+import { useAuthStore } from '@/stores/auth'
 import { QrcodeStream } from 'vue-qrcode-reader'
 import { getDeviceFingerprint, getDeviceData } from '@/utils/deviceFingerprint'
 
 const attendanceStore = useAttendanceStore()
+const authStore = useAuthStore()
 const deviceFingerprint = ref(null)
 const deviceData = ref({})
 
@@ -44,6 +46,8 @@ const gpsAccuracy = ref(null)
 const result = ref(null)
 const cameraError = ref('')
 const cameraLoading = ref(true)
+const selectedLocation = ref('')
+const attendanceMethod = computed(() => authStore.user?.settings?.attendance_method || 'barcode')
 
 const showOvertimePrompt = ref(false)
 const isOvertime = ref(false)
@@ -53,7 +57,16 @@ const submittingOvertime = ref(false)
 let watchId = null
 
 onMounted(async () => {
-  attendanceStore.fetchLocations()
+  await attendanceStore.fetchLocations()
+  if (attendanceStore.locations.length > 0) {
+    // Default to user's default location if available, otherwise first location
+    const defaultLocId = authStore.user?.default_location?.id
+    if (defaultLocId && attendanceStore.locations.find(l => l.id === defaultLocId)) {
+        selectedLocation.value = defaultLocId
+    } else {
+        selectedLocation.value = attendanceStore.locations[0].id
+    }
+  }
   startGpsTracking()
   // Generate device fingerprint for attendance scans
   try {
@@ -143,8 +156,13 @@ async function onDetect(detectedCodes) {
 }
 
 async function handleScan() {
-  if (!scannedCode.value) {
+  if (attendanceMethod.value === 'barcode' && !scannedCode.value) {
     result.value = { success: false, error: 'Please scan or enter barcode data' }
+    return
+  }
+
+  if (attendanceMethod.value === 'click' && !selectedLocation.value) {
+    result.value = { success: false, error: 'Please select a location' }
     return
   }
 
@@ -156,14 +174,21 @@ async function handleScan() {
   scanning.value = true
   result.value = null
 
-  const response = await attendanceStore.scan({
-    barcode: scannedCode.value,
+  const scanPayload = {
     gps_lat: gpsLocation.value.lat,
     gps_lng: gpsLocation.value.lng,
     gps_accuracy: gpsAccuracy.value,
     device_fingerprint: deviceFingerprint.value,
     ...deviceData.value,
-  })
+  }
+
+  if (attendanceMethod.value === 'click') {
+    scanPayload.location_id = selectedLocation.value
+  } else {
+    scanPayload.barcode = scannedCode.value
+  }
+
+  const response = await attendanceStore.scan(scanPayload)
 
   if (response.success) {
     if (response.data.attendance.check_type === 'OUT' && response.data.attendance.overtime_min > 60) {
@@ -337,13 +362,16 @@ function dismissResult() {
       </div>
     </div>
 
-    <!-- QR Scanner -->
+    <!-- QR Scanner or Click UI -->
     <div class="card p-6">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
+      <h3 v-if="attendanceMethod === 'barcode'" class="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
         {{ $t('app.attendanceView.scanQrCode') }}
       </h3>
+      <h3 v-else class="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
+        Submit Attendance
+      </h3>
 
-      <div class="aspect-square bg-gray-100 dark:bg-dark-bg rounded-lg overflow-hidden mb-4 relative">
+      <div v-if="attendanceMethod === 'barcode'" class="aspect-square bg-gray-100 dark:bg-dark-bg rounded-lg overflow-hidden mb-4 relative">
         <!-- Camera Loading -->
         <div v-if="cameraLoading" class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-dark-bg z-10">
           <div class="text-center">
@@ -381,9 +409,9 @@ function dismissResult() {
         </div>
       </div>
 
-      <!-- Manual Entry -->
+      <!-- Manual Entry / Click Mode -->
       <div class="space-y-4">
-        <div>
+        <div v-if="attendanceMethod === 'barcode'">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             {{ $t('app.attendanceView.orEnterBarcode') }}
           </label>
@@ -395,13 +423,31 @@ function dismissResult() {
             @keyup.enter="handleScan"
           />
         </div>
+        
+        <div v-if="attendanceMethod === 'click'">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Location
+          </label>
+          <select v-model="selectedLocation" class="input w-full">
+             <option v-for="loc in attendanceStore.locations" :key="loc.id" :value="loc.id">
+                {{ loc.name }}
+             </option>
+          </select>
+        </div>
 
         <button 
           @click="handleScan"
           class="btn btn-primary w-full py-3"
           :disabled="scanning || !gpsLocation"
         >
-          <span v-if="scanning" class="flex items-center justify-center gap-2">
+          <span v-if="!gpsLocation" class="flex items-center justify-center gap-2">
+            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            {{ $t('app.attendanceView.acquiringGps') }}
+          </span>
+          <span v-else-if="scanning" class="flex items-center justify-center gap-2">
             <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />

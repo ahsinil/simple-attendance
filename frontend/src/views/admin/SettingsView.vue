@@ -21,6 +21,7 @@ const settings = ref({
   saturday_multiplier: '1.5',
   sunday_multiplier: '2.0',
   monthly_working_hours: '173',
+  attendance_method: 'barcode',
 })
 
 const { locale, t: $t } = useI18n({ useScope: 'global' })
@@ -142,6 +143,15 @@ function showMessage(type, text) {
            <span class="material-symbols-outlined text-gray-500">rule</span>
            {{ $t('admin.settingsPageView.attendanceRules') }}
         </h2>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Attendance Method</label>
+          <select v-model="settings.attendance_method" class="w-full rounded-lg border border-gray-300 dark:border-dark-line bg-white dark:bg-dark-bg text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 px-4 py-2.5 shadow-sm">
+            <option value="barcode">Barcode Scan</option>
+            <option value="click">Click Mode</option>
+          </select>
+          <p class="text-xs text-gray-500 mt-1">Choose how employees check in and out.</p>
+        </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ $t('admin.settingsPageView.allowedRadius') }}</label>

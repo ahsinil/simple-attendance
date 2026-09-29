@@ -69,6 +69,12 @@ class AppSettingSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'key' => 'attendance_method',
+                'value' => 'barcode',
+                'type' => 'string',
+                'description' => 'Attendance method (barcode or click)',
+            ],
         ];
 
         foreach ($settings as $setting) {

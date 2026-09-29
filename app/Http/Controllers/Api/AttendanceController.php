@@ -35,8 +35,9 @@ class AttendanceController extends Controller
      */
     public function scan(Request $request): JsonResponse
     {
-        $request->validate([
-            'barcode' => 'required|string',
+        $attendanceMethod = \App\Models\AppSetting::get('attendance_method', 'barcode');
+        
+        $rules = [
             'gps_lat' => 'required|numeric|between:-90,90',
             'gps_lng' => 'required|numeric|between:-180,180',
             'gps_accuracy' => 'nullable|numeric|min:0',
@@ -44,7 +45,15 @@ class AttendanceController extends Controller
             'screen_resolution' => 'nullable|string|max:20',
             'timezone' => 'nullable|string|max:50',
             'canvas_fingerprint' => 'nullable|string',
-        ]);
+        ];
+
+        if ($attendanceMethod === 'click') {
+            $rules['location_id'] = 'required|exists:locations,id';
+        } else {
+            $rules['barcode'] = 'required|string';
+        }
+
+        $request->validate($rules);
 
         $user = $request->user();
 
@@ -76,15 +85,27 @@ class AttendanceController extends Controller
         }
 
         // Process the scan
-        $result = $this->attendanceService->processScan(
-            $user,
-            $request->input('barcode'),
-            (float) $request->input('gps_lat'),
-            (float) $request->input('gps_lng'),
-            $request->input('gps_accuracy') ? (float) $request->input('gps_accuracy') : null,
-            $deviceFingerprint,
-            $request->ip()
-        );
+        if ($attendanceMethod === 'click') {
+            $result = $this->attendanceService->processClickScan(
+                $user,
+                $request->input('location_id'),
+                (float) $request->input('gps_lat'),
+                (float) $request->input('gps_lng'),
+                $request->input('gps_accuracy') ? (float) $request->input('gps_accuracy') : null,
+                $deviceFingerprint,
+                $request->ip()
+            );
+        } else {
+            $result = $this->attendanceService->processScan(
+                $user,
+                $request->input('barcode'),
+                (float) $request->input('gps_lat'),
+                (float) $request->input('gps_lng'),
+                $request->input('gps_accuracy') ? (float) $request->input('gps_accuracy') : null,
+                $deviceFingerprint,
+                $request->ip()
+            );
+        }
 
         if (!$result['success']) {
             return response()->json($result, 400);

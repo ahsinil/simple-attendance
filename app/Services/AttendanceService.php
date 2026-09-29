@@ -27,6 +27,71 @@ class AttendanceService
     }
 
     /**
+     * Process attendance click (check-in or check-out without barcode).
+     */
+    public function processClickScan(
+        User $user,
+        int $locationId,
+        float $gpsLat,
+        float $gpsLng,
+        ?float $gpsAccuracy = null,
+        ?string $deviceId = null,
+        ?string $ipAddress = null
+    ): array {
+        // Validate GPS coordinates
+        if (!$this->gpsService->validateCoordinates($gpsLat, $gpsLng)) {
+            return $this->failResponse('Invalid GPS coordinates');
+        }
+
+        // Get location
+        $location = Location::find($locationId);
+        
+        if (!$location) {
+            return $this->failResponse('Location not found');
+        }
+
+        // Validate GPS against location
+        $gpsResult = $this->gpsService->validateLocation(
+            $gpsLat,
+            $gpsLng,
+            (float) $location->latitude,
+            (float) $location->longitude,
+            $location->allowed_radius_m,
+            $gpsAccuracy
+        );
+
+        if (!$gpsResult['valid']) {
+            return $this->failResponse($gpsResult['error'] ?? 'GPS validation failed', [
+                'distance_m' => $gpsResult['distance_m'],
+                'allowed_radius_m' => $gpsResult['allowed_radius_m'] ?? $location->allowed_radius_m,
+            ]);
+        }
+
+        // Determine and validate check type (IN or OUT)
+        $checkTypeResult = $this->validateCheckType($user, $location);
+        
+        if (!$checkTypeResult['valid']) {
+            return $this->failResponse($checkTypeResult['error']);
+        }
+        
+        $checkType = $checkTypeResult['check_type'];
+        
+        // Process the attendance
+        return $this->recordAttendance(
+            $user,
+            $location,
+            $checkType,
+            '-',
+            $gpsLat,
+            $gpsLng,
+            $gpsAccuracy,
+            $gpsResult['distance_m'],
+            $deviceId,
+            $ipAddress
+        );
+    }
+
+    /**
      * Process attendance scan (check-in or check-out).
      */
     public function processScan(
