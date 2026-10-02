@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { adminApi } from '@/services/api'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
 
 const loading = ref(false)
 const saving = ref(false)
@@ -58,6 +59,10 @@ async function saveSettings() {
     const response = await adminApi.updateSettings({ settings: settings.value })
     if (response.data.success) {
       showMessage('success', 'Settings updated successfully')
+      
+      // Update local auth user to reflect new settings
+      const authStore = useAuthStore()
+      await authStore.fetchUser()
     }
   } catch (error) {
     showMessage('error', 'Failed to save settings')

@@ -17,6 +17,17 @@ class AppSetting extends Model
         'description',
     ];
 
+    protected static function booted()
+    {
+        static::saved(function ($setting) {
+            Cache::forget("app_setting:{$setting->key}");
+        });
+
+        static::deleted(function ($setting) {
+            Cache::forget("app_setting:{$setting->key}");
+        });
+    }
+
     /**
      * Get a setting value by key.
      */

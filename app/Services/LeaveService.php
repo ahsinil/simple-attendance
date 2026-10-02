@@ -26,10 +26,14 @@ class LeaveService
             ->pluck('date')
             ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
             ->toArray();
+            
+        // Get company work days setting
+        $workDaysStr = \App\Models\AppSetting::get('work_days', 'Mon,Tue,Wed,Thu,Fri');
+        $companyWorkDays = explode(',', $workDaysStr);
 
         while ($current <= $endDate) {
-            // Skip weekends (Saturday = 6, Sunday = 0)
-            if (!$current->isWeekend()) {
+            // Check if current day is a working day
+            if (in_array($current->shortEnglishDayOfWeek, $companyWorkDays)) {
                 // Skip holidays
                 if (!in_array($current->format('Y-m-d'), $holidays)) {
                     $days++;
